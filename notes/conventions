@@ -1,0 +1,6 @@
+simulation of actuators and simulators is in the same package as actuators and simulators
+naming: description-partnumber
+e.g.
+gps-ublox7
+gps-simulated
+
