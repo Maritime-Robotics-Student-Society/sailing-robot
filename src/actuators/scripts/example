@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+# this line is needed so the execution happens in python environment
+import rospy
+
