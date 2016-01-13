@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+import rospy
+from std_msgs.msg import Float32
+import lowlevel_control
+from lowlevel_control.pid_data import PID_Data
+
+data = PID_Data()
+
+
+print(data.goal_heading)
+
+if __name__ == '__main__':
+    try:
+        rospy.Subscriber('/goal_heading', Float32, data.update_goal_heading)
+    except rospy.ROSInterruptException:
+        pass
