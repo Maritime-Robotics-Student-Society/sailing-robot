@@ -117,7 +117,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
      inkscape:cx="307.99396"
-     inkscape:cy="432.35684"
+     inkscape:cy="518.07113"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -520,9 +520,9 @@
            y="61.290752" /></flowRegion><flowPara
          id="flowPara3775-7">sail_to_wp</flowPara><flowPara
          style="font-size:7px;fill:#000080"
-         id="flowPara5895">heading[degrees]</flowPara><flowPara
+         id="flowPara5895">position[latitude,[degrees] longitude[degrees]]</flowPara><flowPara
          id="flowPara5762-3"
-         style="font-size:7px;fill:#000080">next_wp[latitude degrees, longitude]</flowPara><flowPara
+         style="font-size:7px;fill:#000080">next_wp[latitude [degrees], longitude [degrees]]</flowPara><flowPara
          style="font-size:7px;fill:#000080"
          id="flowPara5899">wind_direction[degrees]</flowPara><flowPara
          id="flowPara5748-43"
