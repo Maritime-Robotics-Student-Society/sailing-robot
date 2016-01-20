@@ -117,7 +117,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
      inkscape:cx="307.99396"
-     inkscape:cy="518.07113"
+     inkscape:cy="432.35684"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -201,11 +201,10 @@
            height="81.428574"
            x="240.35715"
            y="64.147896" /></flowRegion><flowPara
-         id="flowPara3775">sail_lookup</flowPara><flowPara
          id="flowPara5746"
-         style="font-size:7px;fill:#000080">heading[degrees]</flowPara><flowPara
+         style="font-size:12px;fill:#000000">sail_lookup</flowPara><flowPara
          id="flowPara5762"
-         style="font-size:7px;fill:#000080">wind_direction[degrees]</flowPara><flowPara
+         style="font-size:7px;fill:#000080">wind_direction_localKS[degrees]</flowPara><flowPara
          id="flowPara5748"
          style="font-size:7px"><flowSpan
    style="font-size:7px;fill:#008000"
