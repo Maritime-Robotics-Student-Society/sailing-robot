@@ -4,8 +4,11 @@ import rospy
 from std_msgs.msg import Float32
 import lowlevel_control
 from lowlevel_control.pid_data import PID_Data
+import lowlevel_control.pid_control as _PID
 
 data = PID_Data()
+
+controller = _PID.PID(1.0, 2.0, 3.0, 1.0, -1.0)
 
 
 print(data.goal_heading)
@@ -13,5 +16,8 @@ print(data.goal_heading)
 if __name__ == '__main__':
     try:
         rospy.Subscriber('/goal_heading', Float32, data.update_goal_heading)
+        rospy.Subscriber('/heading', Float32, data.goal_heading)
+        angle = controller.update_PID(data.goal_heading-data.goal_heading)
+        rospy.Publisher('/servo', UInt16, angle)
     except rospy.ROSInterruptException:
         pass
