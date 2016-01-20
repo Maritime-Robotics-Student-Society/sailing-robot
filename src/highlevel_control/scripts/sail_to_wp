@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+import rospy
+from std_msgs.msg import Float32
+import highlevel_control
+from highlevel_control.pid_data import SailToWP
+
+data = SailToWP()
+
+
+print(data.goal_heading)
+
+if __name__ == '__main__':
+    try:
+        rospy.Subscriber('/heading', Float32, data.update_heading)
+    except rospy.ROSInterruptException:
+        pass
