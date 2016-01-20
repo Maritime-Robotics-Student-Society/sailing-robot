@@ -2,6 +2,7 @@
 
 import rospy
 from std_msgs.msg import Float32
+from std_msgs.msg import UInt16
 import lowlevel_control
 from lowlevel_control.pid_data import PID_Data
 import lowlevel_control.pid_control as _PID
