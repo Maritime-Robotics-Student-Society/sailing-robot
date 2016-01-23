@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+#
+# Node receives current waypoint from path planner
+# calculates goal heading for reaching the waypoint as fast as possible
+
+import rospy
+from std_msgs.msg import Float32
+import highlevel_control
+from highlevel_control.sail_to_wp import SailToWP
+from highlevel_control.msg import waypoint
+
+wp_data = SailToWP()
+output = waypoint()
+output.latitude = wp_data.next_wp['lat']
+output.longitude = wp_data.next_wp['lon']
+
+def waypoint_publisher():
+    pub = rospy.Publisher("/goal_heading", waypoint, queue_size=10)
+    rospy.init_node("publish_goal_heading", anonymous=True)
+    rate = rospy.Rate(10)
+
+    while not rospy.is_shutdown():
+
+
+        output.latitude += 0.000001
+        output.longitude += 0.000001
+        pub.publish(output)
+        rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        rospy.Subscriber('/heading', Float32, heading_data.update_heading)
+        rospy.Subscriber('/next_wp', waypoint, heading_data.update_waypoint)
+        rospy.Subscirber('/wind_direction', Float32, heading_data.update_wind_direction)
+        goal_heading_publisher()
+    except rospy.ROSInterruptException:
+        pass
