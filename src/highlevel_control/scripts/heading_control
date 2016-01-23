@@ -5,26 +5,48 @@
 
 import rospy
 from std_msgs.msg import Float32
+from std_msgs.msg import String
 import highlevel_control
-from highlevel_control.sail_to_wp import SailToWP
+from highlevel_control.heading_planning import HeadingPlan
 from highlevel_control.msg import waypoint
 
-wp_data = SailToWP()
-output = waypoint()
-output.latitude = wp_data.next_wp['lat']
-output.longitude = wp_data.next_wp['lon']
+heading_data = HeadingPlan()
 
-def waypoint_publisher():
-    pub = rospy.Publisher("/goal_heading", waypoint, queue_size=10)
+def goal_heading_publisher():
+    pub = rospy.Publisher("/goal_heading", Float32, queue_size=10)
+    pub_state = rospy.Publisher("/sailing_state", Float32, queue_size=10)
     rospy.init_node("publish_goal_heading", anonymous=True)
     rate = rospy.Rate(10)
 
     while not rospy.is_shutdown():
+        if heading_data.sailing_state == 'normal':
+            heading_data.calculate_laylines()
+            heading_data.calculate_wp_heading()
+            # sail to wp heading if not within laylines
+            if heading_data.check_outside_laylines():
+                pub.publish(heading_data.wp_heading)
+                pub_state.publish(heading_data.sailing_state)
+            else:
+                heading_data.calculate_side_heading()
+                heading_data.calculate_alternate_heading()
+                heading_data.determine_sailing_state()
+                # the goal heading only needs publishing if the sailing state stayed normal!
+                if heading_data.sailing_state == 'normal':
+                    pub.publish(heading_data.side_heading)
+                    pub_state.publish(heading_data.sailing_state)
+
+        # if (not elif!) so that this will be executed if the step above changed the state to tacking    
+        if heading_data.sailing_state == 'tack_to_port_tack':
+            #TODO 
+            # publish states: tacking, tack_sail, tack_rudder
+            pass
+        elif heading_data.sailing_state == 'tack_to_stbd_tack':
+            #TODO 
+            # publish states: tacking, tack_sail, tack_rudder
+            pass
 
 
-        output.latitude += 0.000001
-        output.longitude += 0.000001
-        pub.publish(output)
+
         rate.sleep()
 
 
@@ -32,7 +54,8 @@ if __name__ == '__main__':
     try:
         rospy.Subscriber('/heading', Float32, heading_data.update_heading)
         rospy.Subscriber('/next_wp', waypoint, heading_data.update_waypoint)
-        rospy.Subscirber('/wind_direction', Float32, heading_data.update_wind_direction)
+        rospy.Subscriber('/wind_direction', Float32, heading_data.update_wind_direction)
+        rospy.Subscriber('/position', waypoint, heading_data.update_position)
         goal_heading_publisher()
     except rospy.ROSInterruptException:
         pass
