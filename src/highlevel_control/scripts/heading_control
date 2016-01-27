@@ -20,15 +20,13 @@ def goal_heading_publisher():
 
     while not rospy.is_shutdown():
         if heading_data.sailing_state == 'normal':
-            heading_data.calculate_laylines()
             heading_data.calculate_wp_heading()
-            # sail to wp heading if not within laylines
-            if heading_data.check_outside_laylines():
+            heading_data.calculate_side_headings()
+            # sail to wp heading if the heading angle is not in the dead zone
+            if heading_data.check_outside_dead_zone():
                 pub.publish(heading_data.wp_heading)
                 pub_state.publish(heading_data.sailing_state)
             else:
-                heading_data.calculate_side_heading()
-                heading_data.calculate_alternate_heading()
                 heading_data.determine_sailing_state()
                 # the goal heading only needs publishing if the sailing state stayed normal!
                 if heading_data.sailing_state == 'normal':
