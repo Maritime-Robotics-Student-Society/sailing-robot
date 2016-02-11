@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 744.09448819 1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r"
+   sodipodi:docname="upwind-tactics.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4183">
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:1;"
+         offset="0"
+         id="stop4185" />
+      <stop
+         style="stop-color:#4d4d4d;stop-opacity:0;"
+         offset="1"
+         id="stop4187" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4183"
+       id="linearGradient4189"
+       x1="664.28571"
+       y1="440.82648"
+       x2="542.39282"
+       y2="318.93362"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4"
+     inkscape:cx="433.95433"
+     inkscape:cy="781.58175"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1680"
+     inkscape:window-height="998"
+     inkscape:window-x="0"
+     inkscape:window-y="369"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g3346"
+       transform="translate(-93.571429,-114.28571)">
+      <path
+         sodipodi:nodetypes="cccccccc"
+         inkscape:connector-curvature="0"
+         id="path3340"
+         d="m 158.23127,204.65832 42.42641,-42.4264 87.68124,87.68124 21.2132,-21.21321 -9.09267,75.76014 -75.76014,9.09268 21.2132,-21.21321 z"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <text
+         transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)"
+         sodipodi:linespacing="125%"
+         id="text3342"
+         y="12.368532"
+         x="284.12604"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-size:22.5px"
+           y="12.368532"
+           x="284.12604"
+           id="tspan3344"
+           sodipodi:role="line">Wind</tspan></text>
+    </g>
+    <g
+       id="g4310">
+      <path
+         sodipodi:nodetypes="cccc"
+         inkscape:connector-curvature="0"
+         id="path3351"
+         d="m 257.68791,246.29078 0,-38.32654 38.33882,10.27286 -38.33882,7.41631"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.37582445px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3357"
+         d="m 258.5606,216.72044 c 0,-7.02285 0.0709,-7.6165 0.88389,-7.40379 9.07077,2.37321 32.38135,8.70863 32.30366,8.77957 -0.16342,0.14923 -32.02726,6.25928 -32.64204,6.25928 -0.36657,0 -0.54551,-2.50451 -0.54551,-7.63506 z"
+         style="fill:#008000" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="267.56427"
+       y="240.40407"
+       id="text3359"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3361"
+         x="267.56427"
+         y="240.40407"
+         style="font-size:12.5px">Next</tspan><tspan
+         sodipodi:role="line"
+         x="267.56427"
+         y="256.02905"
+         id="tspan3363"
+         style="font-size:12.5px">waypoint</tspan></text>
+    <g
+       id="g3369"
+       transform="translate(299.28571,90.714286)">
+      <path
+         sodipodi:nodetypes="cccc"
+         inkscape:connector-curvature="0"
+         id="path3365"
+         d="m 344.86347,351.25644 c 11.7381,17.14286 25.2619,10.71429 36.28571,10 l 0,-20 c -12.45238,-2.85714 -25.61905,-4.64286 -36.28571,10 z"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <ellipse
+         ry="0.98214287"
+         rx="1.1607143"
+         cy="351.1633"
+         cx="362.95029"
+         id="path3367"
+         style="fill:#000000" />
+    </g>
+    <g
+       id="g4208">
+      <path
+         sodipodi:nodetypes="ccc"
+         inkscape:connector-curvature="0"
+         id="path3373"
+         d="m 360,441.64791 302.85714,0 0,-264.99999"
+         style="fill:url(#linearGradient4189);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <g
+         transform="translate(50,-43.571429)"
+         id="g4201">
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="532.14288"
+           y="374.50507"
+           id="text4191"
+           sodipodi:linespacing="125%"><tspan
+             sodipodi:role="line"
+             id="tspan4193"
+             x="532.14288"
+             y="374.50507"
+             style="-inkscape-font-specification:'sans-serif Italic';font-family:sans-serif;font-weight:normal;font-style:italic;font-stretch:normal;font-variant:normal">Dead zone</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-weight:normal;font-size:7.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           x="531.42859"
+           y="389.07648"
+           id="text4195"
+           sodipodi:linespacing="125%"><tspan
+             sodipodi:role="line"
+             x="531.42859"
+             y="389.07648"
+             id="tspan4259">Can't sail directly</tspan><tspan
+             sodipodi:role="line"
+             x="531.42859"
+             y="398.45148"
+             id="tspan4263">towards these</tspan><tspan
+             sodipodi:role="line"
+             x="531.42859"
+             y="407.82648"
+             id="tspan4265">headings</tspan></text>
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="684.28571"
+         y="446.64792"
+         id="text4253"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan4255"
+           x="684.28571"
+           y="446.64792">Boat</tspan></text>
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:3,3;stroke-dashoffset:0"
+       d="M 131.42857,213.79077 467.85714,550.21934"
+       id="path4217"
+       inkscape:connector-curvature="0" />
+    <g
+       id="g4319"
+       transform="translate(-6,6)">
+      <text
+         transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)"
+         sodipodi:linespacing="125%"
+         id="text4236"
+         y="-93.598419"
+         x="416.05377"
+         style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Italic'"
+           y="-93.598419"
+           x="416.05377"
+           id="tspan4238"
+           sodipodi:role="line">Tacking corridor</tspan></text>
+      <text
+         transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)"
+         sodipodi:linespacing="125%"
+         id="text4240"
+         y="-78.283966"
+         x="416.61285"
+         style="font-style:normal;font-weight:normal;font-size:7.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         xml:space="preserve"><tspan
+           y="-78.283966"
+           x="416.61285"
+           id="tspan4242"
+           sodipodi:role="line">Tack across this width</tspan><tspan
+           id="tspan4244"
+           y="-68.908966"
+           x="416.61285"
+           sodipodi:role="line">to go upwind</tspan></text>
+    </g>
+    <g
+       id="g4298">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4286"
+         d="m 257.85714,246.64792 -46.78571,46.78571 452.5,147.5"
+         style="fill:none;fill-rule:evenodd;stroke:#4537b0;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         d="m 220.8291,283.69749 a 13.75,13.571428 0 0 1 3.44805,14.07852 L 211.25,293.43362 Z"
+         sodipodi:end="0.32569272"
+         sodipodi:start="5.4831229"
+         sodipodi:ry="13.571428"
+         sodipodi:rx="13.75"
+         sodipodi:cy="293.43362"
+         sodipodi:cx="211.25"
+         sodipodi:type="arc"
+         id="path4296"
+         style="fill:#7da7f3;fill-opacity:1;fill-rule:evenodd;stroke:#4537b0;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;text-align:start;letter-spacing:0px;word-spacing:0px;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="129.82367"
+       y="297.07648"
+       id="text4302"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4304"
+         x="129.82367"
+         y="297.07648"
+         style="font-size:10px;text-align:start;text-anchor:start">Tack when</tspan><tspan
+         sodipodi:role="line"
+         x="129.82367"
+         y="309.57648"
+         id="tspan4306"
+         style="font-size:10px;text-align:start;text-anchor:start">this angle &gt;90°</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:3, 3;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 243.85714,96.219347 677.42857,529.79078"
+       id="path4308"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>
