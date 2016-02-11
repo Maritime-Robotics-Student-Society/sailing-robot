@@ -54,9 +54,9 @@ class HeadingPlan:
         """
         # TODO: Is wind_direction the heading the wind is coming from, or
         # the heading it's moving towards? I assume the former
-        res = heading - self.wind_direction
-        if res < -180:
-            res += 360
+        res = (heading - self.wind_direction) % 360
+        if res > 180:
+            res -= 360
         return res
 
     def wind_angle_to_heading(self, wind_angle):
