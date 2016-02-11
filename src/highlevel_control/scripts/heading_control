@@ -19,32 +19,9 @@ def goal_heading_publisher():
     rate = rospy.Rate(10)
 
     while not rospy.is_shutdown():
-        if heading_data.sailing_state == 'normal':
-            heading_data.calculate_wp_heading()
-            heading_data.calculate_side_headings()
-            # sail to wp heading if the heading angle is not in the dead zone
-            if heading_data.check_outside_dead_zone():
-                pub.publish(heading_data.wp_heading)
-                pub_state.publish(heading_data.sailing_state)
-            else:
-                heading_data.determine_sailing_state()
-                # the goal heading only needs publishing if the sailing state stayed normal!
-                if heading_data.sailing_state == 'normal':
-                    pub.publish(heading_data.side_heading)
-                    pub_state.publish(heading_data.sailing_state)
-
-        # if (not elif!) so that this will be executed if the step above changed the state to tacking    
-        if heading_data.sailing_state == 'tack_to_port_tack':
-            #TODO 
-            # publish states: tacking, tack_sail, tack_rudder
-            pass
-        elif heading_data.sailing_state == 'tack_to_stbd_tack':
-            #TODO 
-            # publish states: tacking, tack_sail, tack_rudder
-            pass
-
-
-
+        state, goal_heading = heading_data.calculate_state_and_goal()
+        pub.publish(goal_heading)
+        pub_state.publish(state)
         rate.sleep()
 
 
