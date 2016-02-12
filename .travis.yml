@@ -101,5 +101,6 @@ before_script:
 script:
   - cd ~/catkin_ws
   - catkin_make $( [ -f $CATKIN_OPTIONS ] && cat $CATKIN_OPTIONS )
-  - nosetests -w $TRAVIS_BUILD_DIR/src/highlevel_control/
+  - catkin_make run_tests
+  - catkin_test_results
   # Testing: Use both run_tests (to see the output) and test (to error out).
