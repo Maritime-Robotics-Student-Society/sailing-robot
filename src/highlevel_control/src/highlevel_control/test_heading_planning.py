@@ -68,3 +68,27 @@ class HeadingPlanTests(unittest.TestCase):
         self.hp.heading = 280  # We're reaching the wrong way!
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_stbd_tack')
+
+    def test_to_windward_port_tack(self):
+        self.hp.wind_direction = 90
+        self.hp.heading = 180
+        state, goal = self.hp.calculate_state_and_goal()
+        self.assertEqual(state, 'normal')
+        self.assertEqual(goal, 135)
+
+        # Time to switch tack
+        self.hp.position = LatLon(50.68, -1.018)
+        state, goal = self.hp.calculate_state_and_goal()
+        self.assertEqual(state, 'tack_to_stbd_tack')
+
+    def test_to_windward_stbd_tack(self):
+        self.hp.wind_direction = 90
+        self.hp.heading = 0
+        state, goal = self.hp.calculate_state_and_goal()
+        self.assertEqual(state, 'normal')
+        self.assertEqual(goal, 45)
+
+        # Time to switch tack
+        self.hp.position = LatLon(50.72, -1.018)
+        state, goal = self.hp.calculate_state_and_goal()
+        self.assertEqual(state, 'tack_to_port_tack')
