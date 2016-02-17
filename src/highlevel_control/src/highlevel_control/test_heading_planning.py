@@ -1,13 +1,20 @@
 import unittest
+from nose.tools import assert_equal
 
 from LatLon import LatLon
-from .heading_planning import HeadingPlan
+from .heading_planning import HeadingPlan, angleAbsDistance
+
+def test_angle_difference():
+    assert_equal(angleAbsDistance(90, 50), 40)
+    assert_equal(angleAbsDistance(50, 90), 40)
+    assert_equal(angleAbsDistance(350, 40), 50)
+    assert_equal(angleAbsDistance(40, 350), 50)
 
 class HeadingPlanTests(unittest.TestCase):
     def setUp(self):
         self.hp = HeadingPlan(beating_angle=45, tack_line_offset=0.01)
         self.hp.position = LatLon(50.7, -1.02)
-        self.hp.waypoint = LatLon(50.7, -0.8)  # Head east
+        self.hp.waypoint = LatLon(50.7, -0.98)  # Head east
 
     def test_complete_tack_to_port(self):
         self.hp.sailing_state = 'tack_to_port_tack'

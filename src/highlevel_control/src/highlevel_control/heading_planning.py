@@ -131,6 +131,6 @@ def angleSum(a,b):
     return (a+b)%360
 
 def angleAbsDistance(a,b):
-    distanceA = abs((a - b)%360)
-    distanceB = abs((a - b - 360)%360)
+    distanceA = abs((a - b) % 360)
+    distanceB = abs((b - a) % 360)
     return min(distanceA, distanceB)
