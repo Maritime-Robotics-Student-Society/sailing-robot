@@ -1,0 +1,9 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <option name="myLocal" value="true" />
+    <inspection_tool class="PyReturnFromInitInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Problems" level="WARNING" enabled="true" />
+    </inspection_tool>
+  </profile>
+</component>

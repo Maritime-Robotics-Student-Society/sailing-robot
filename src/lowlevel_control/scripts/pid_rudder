@@ -3,8 +3,6 @@
 import rospy
 from std_msgs.msg import Float32, UInt16, String
 
-
-import lowlevel_control
 from lowlevel_control.pid_data import PID_Data
 import lowlevel_control.pid_control as _PID
 
@@ -21,7 +19,7 @@ def node_publisher():
     PID controller was used in other conditions.
     :rtype: object
     """
-    pub = rospy.Publisher('/servo', UInt16, queue_size=10)
+    pub = rospy.Publisher('/servo', UInt16, queue_size=10)  # Use UInt 16 here to minimize the memory use
     rospy.init_node('rudder_servo', anonymous=True)
     rate = rospy.Rate(10)
 
