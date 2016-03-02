@@ -32,7 +32,7 @@ if __name__ == '__main__':
         rudder_pub = rospy.Publisher('/tack_rudder', Float32, queue_size=10)
         update = updater(sail_pub, rudder_pub)
         rospy.Subscriber('/sailing_state', String, update)
-        rospy.init_node("publish_goal_heading", anonymous=True)
+        rospy.init_node("publish_tack_data", anonymous=True)
         rospy.spin()  # Wait for shutdown
     except rospy.ROSInterruptException:
         pass
