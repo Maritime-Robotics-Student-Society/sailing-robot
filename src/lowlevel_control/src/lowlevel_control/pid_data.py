@@ -4,7 +4,7 @@ import rospy
 class PID_Data:
     def __init__(self):
         self.tack_rudder = 0.
-        self.update_sailing_state = ''
+        self.sailing_state = ''
         self.goal_heading = 0.
         self.heading = 0.
 
@@ -16,8 +16,10 @@ class PID_Data:
         self.goal_heading = msg.data
 
     def update_sailing_state(self, msg):
-
-        self.update_sailing_state = msg.data
+        """
+        Update sailing state data from higher level controller
+        """
+        self.sailing_state = msg.data
 
     def update_heading(self, msg):
         """
