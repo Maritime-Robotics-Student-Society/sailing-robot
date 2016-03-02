@@ -15,6 +15,7 @@
     -->
 
     <node name = "heading_control" pkg="highlevel_control" type = "heading_control" />
+    <node name = "tack" pkg="highlevel_control" type = "tack" />
     <node name = "pid_rudder" pkg="lowlevel_control" type = "pid_rudder" />
 
 </launch>
