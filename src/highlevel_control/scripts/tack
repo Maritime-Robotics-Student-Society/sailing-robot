@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+#
+# Node receives sailing_state from heading_control
+# Outputs tack_sail and tack_rudder to override normal direction control
+
+import rospy
+from std_msgs.msg import Float32
+from std_msgs.msg import String
+
+heading_data = HeadingPlan()
+
+def updater(sail_pub, rudder_pub):
+    def update_sailing_state(msg):
+        new = msg.data
+        if new == 'tack_to_port_tack':
+            # Turning right
+            sail_pub.publish(0)
+            rudder_pub.publish(-90)
+        elif new == 'tack_to_stbd_tack':
+            # Turning left
+            sail_pub.publish(0)
+            rudder_pub.publish(90)
+        else:
+            # Normal sailing - it should use sail and rudder angles from elsewhere
+            sail_pub.publish(0)
+            rudder_pub.publish(0)
+
+
+if __name__ == '__main__':
+    try:
+        sail_pub = rospy.Publisher('/tack_sail', Float32, queue_size=10)
+        rudder_pub = rospy.Publisher('/tack_rudder', Float32, queue_size=10)
+        update = updater(sail_pub, rudder_pub)
+        rospy.Subscriber('/sailing_state', String, update)
+        rospy.init_node("publish_goal_heading", anonymous=True)
+        rospy.spin()  # Wait for shutdown
+    except rospy.ROSInterruptException:
+        pass

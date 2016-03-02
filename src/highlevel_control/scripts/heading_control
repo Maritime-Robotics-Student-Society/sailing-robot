@@ -14,7 +14,7 @@ heading_data = HeadingPlan()
 
 def goal_heading_publisher():
     pub = rospy.Publisher("/goal_heading", Float32, queue_size=10)
-    pub_state = rospy.Publisher("/sailing_state", Float32, queue_size=10)
+    pub_state = rospy.Publisher("/sailing_state", String, queue_size=10)
     rospy.init_node("publish_goal_heading", anonymous=True)
     rate = rospy.Rate(10)
 
