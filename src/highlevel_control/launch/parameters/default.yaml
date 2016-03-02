@@ -1,0 +1,39 @@
+# 
+# Navigation
+#
+# Values relevant for higherlevel waypoint navigation
+
+# Angle area from going directly uptwind to the end of the deadzone (the total angular area of the deadzone is therefore 2*navigation/deadzone
+# in [degrees]
+/navigation/deadzone: 45
+# The definition where we change tack when going upwind is based on crossing a line parallel to the wind direction, going through a point at a given distance to the waypoint.
+# See https://github.com/Maritime-Robotics-Student-Society/sailing-robot/blob/master/notes/upwind-tactics.svg# in [m]
+/navigation/tackline_distance: 5
+
+#
+# Boat Sizes
+#
+# Values that may change from boat to boat, describing measurements of the boat
+
+# Length over which the sheet can be varied
+# (EXAMPLE, PROBABLY NOT ACTUALLY USED)
+# in [m]
+/boat_sizes/sheet_length: 3
+
+#
+# Rudder Parameters
+#
+
+# PID values for rudder control
+/rudder/p: 0
+/rudder/i: 0
+/rudder/p: 0
+
+# maximum angle
+# absolute value, in [degrees], see https://github.com/Maritime-Robotics-Student-Society/sailing-robot/wiki/Naming-conventions
+/rudder/max_angle: 40
+
+# initial position
+# in [degrees]
+/rudder/initial_angle: 0
+
