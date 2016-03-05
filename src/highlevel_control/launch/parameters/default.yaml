@@ -8,6 +8,16 @@
 # in degrees, conventions like for wind_direction_apparent topic
 /dummy/wind_direction_apparent: 0
 
+#
+# Configuration
+#
+# General configuration settings
+
+# ROS rate
+# in [Hz]
+/rate: 10
+
+#
 # Navigation
 #
 # Values relevant for higherlevel waypoint navigation
