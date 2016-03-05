@@ -29,7 +29,7 @@ if __name__ == '__main__':
     try:
         rospy.Subscriber('/heading', Float32, heading_data.update_heading)
         rospy.Subscriber('/next_wp', waypoint, heading_data.update_waypoint)
-        rospy.Subscriber('/wind_direction', Float32, heading_data.update_wind_direction)
+        rospy.Subscriber('/wind_direction_apparent', Float32, heading_data.update_wind_direction)
         rospy.Subscriber('/position', waypoint, heading_data.update_position)
         goal_heading_publisher()
     except rospy.ROSInterruptException:
