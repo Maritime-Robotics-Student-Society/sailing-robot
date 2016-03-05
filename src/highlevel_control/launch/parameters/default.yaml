@@ -15,7 +15,7 @@
 
 # ROS rate
 # in [Hz]
-/rate: 10
+/config/rate: 10
 
 #
 # Navigation
