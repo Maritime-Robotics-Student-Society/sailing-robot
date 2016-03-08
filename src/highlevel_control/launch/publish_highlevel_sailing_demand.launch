@@ -1,5 +1,17 @@
 <launch>
+   <!--
+   Load Parameters
+   -->
+
+   <rosparam file="$(find highlevel_control)/launch/parameters/default.yaml" command="load"/>
+
+
+  <!--
+  Launch Nodes
+  -->
+
   <node name="sail_to_wp" pkg="highlevel_control" type="heading_control"/>
+  <node name="publish_dummy_apparent_wind" pkg='sensors' type="publish_apparent_wind_direction"/>
 
 </launch>
 
