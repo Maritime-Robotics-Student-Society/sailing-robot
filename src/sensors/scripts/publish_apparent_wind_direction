@@ -8,18 +8,20 @@ import rospy
 from std_msgs.msg import Float32
 
 windDirection = rospy.get_param("/dummy/wind_direction_apparent")
-rate = rospy.Rate(rospy.get_param("/config/rate")
 
-def updater():
-    wind_pub.publish(windDirection)
-    rate.sleep()
+def wind_direction_apparent_publisher():
+
+    rate = rospy.Rate(rospy.get_param("/config/rate"))
+
+    while not rospy.is_shutdown():
+        wind_pub.publish(windDirection)
+        rate.sleep()
 
 
 if __name__ == '__main__':
     try:
         wind_pub = rospy.Publisher('/wind_direction_apparent', Float32, queue_size=10)
-        updater()
         rospy.init_node("publish_dummy_wind_data", anonymous=True)
-        rospy.spin() # Wait for shutdown
+        wind_direction_apparent_publisher()
     except rospy.ROSInterruptException:
         pass
