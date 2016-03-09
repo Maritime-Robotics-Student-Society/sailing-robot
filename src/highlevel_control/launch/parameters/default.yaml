@@ -29,30 +29,47 @@
 # See https://github.com/Maritime-Robotics-Student-Society/sailing-robot/blob/master/notes/upwind-tactics.svg# in [m]
 /navigation/tackline_distance: 5
 
-#
-# Boat Sizes
-#
-# Values that may change from boat to boat, describing measurements of the boat
-
-# Length over which the sheet can be varied
-# (EXAMPLE, PROBABLY NOT ACTUALLY USED)
-# in [m]
-/boat_sizes/sheet_length: 3
 
 #
 # Rudder Parameters
 #
 
 # PID values for rudder control
-/rudder/p: 0
-/rudder/i: 0
-/rudder/p: 0
+/rudder/control/Kp: 0
+/rudder/control/Ki: 0
+/rudder/control/Kd: 0
 
 # maximum angle
 # absolute value, in [degrees], see https://github.com/Maritime-Robotics-Student-Society/sailing-robot/wiki/Naming-conventions
-/rudder/max_angle: 40
+/rudder/maxAngle: 40
 
 # initial position
 # in [degrees]
-/rudder/initial_angle: 0
+/rudder/initialAngle: 0
 
+
+#
+# Sail Parameters
+#
+
+# PID values for rudder control
+/sail/control/Kp: 0
+/sail/control/Ki: 0
+/sail/control/Kd: 0
+
+# maximum angle
+# in [degrees]
+/sail/maxAngle: 90
+
+# Safe value for the boat sail to be set at
+# in [degrees]
+/sail/initialAngle: 90
+
+# Length over which the sheet can be varied
+# (EXAMPLE, PROBABLY NOT ACTUALLY USED)
+# in [m]
+/sail/sheet_length: 3
+
+# Diameter of the sail winch
+# in [mm]
+/sail/winchDiameter: 38
