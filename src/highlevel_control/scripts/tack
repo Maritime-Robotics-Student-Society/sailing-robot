@@ -7,31 +7,18 @@ import rospy
 from std_msgs.msg import Float32
 from std_msgs.msg import String
 
-rate = rospy.Rate(rospy.get_param("/config/rate")
-
-def updater(sail_pub, rudder_pub):
-    def update_sailing_state(msg):
-        new = msg.data
-        if new == 'tack_to_port_tack':
-            # Turning right
-            sail_pub.publish(0)
-            rudder_pub.publish(-90)
-        elif new == 'tack_to_stbd_tack':
-            # Turning left
-            sail_pub.publish(0)
-            rudder_pub.publish(90)
-        else:
-            # Normal sailing - it should use sail and rudder angles from elsewhere
-            sail_pub.publish(0)
-            rudder_pub.publish(0)
-
+from highlevel_control.tack_control import Tacking
 
 if __name__ == '__main__':
     try:
         sail_pub = rospy.Publisher('/tack_sail', Float32, queue_size=10)
         rudder_pub = rospy.Publisher('/tack_rudder', Float32, queue_size=10)
-        update = updater(sail_pub, rudder_pub)
-        rospy.Subscriber('/sailing_state', String, update)
+        tacking = Tacking()
+        def recv(msg):
+            sail, rudder = tacking.calculate_sail_and_rudder(msg.data)
+            sail_pub.publish(sail)
+            rudder_pub.publish(rudder)
+        rospy.Subscriber('/sailing_state', String, recv)
         rospy.init_node("publish_tack_data", anonymous=True)
         rospy.spin()  # Wait for shutdown
     except rospy.ROSInterruptException:
