@@ -1,0 +1,32 @@
+#!/usr/bin/python
+#
+# Node publishes apparent wind direction
+# DUMMY NODE, at the moment it just keeps publishing a constant wind direction
+# as specified in the parameters file
+
+import rospy
+from std_msgs.msg import Float32
+from sensor_msgs.msg import NavSatFix
+
+currentLatitude = rospy.get_param("/dummy/latitude")
+currentLongitude = rospy.get_param("/dummy/longitude")
+position = NavSatFix()
+
+def position_publisher():
+
+    rate = rospy.Rate(rospy.get_param("/config/rate"))
+    position.latitude = currentLatitude
+    position.longitude = currentLongitude
+
+    while not rospy.is_shutdown():
+        position_pub.publish(position)
+        rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        position_pub = rospy.Publisher('/position', NavSatFix, queue_size=10)
+        rospy.init_node("publish_dummy_position_data", anonymous=True)
+        position_publisher()
+    except rospy.ROSInterruptException:
+        pass
