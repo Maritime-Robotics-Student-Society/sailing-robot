@@ -1,0 +1,22 @@
+<launch>
+    <!--
+    General test file to launch all existing nodes with dummy values
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find highlevel_control)/launch/parameters/default.yaml" command="load"/>
+
+    <!--
+    Nodes
+    -->
+    <node name="publish_dummy_apparent_wind" pkg='sensors' type="publish_apparent_wind_direction"/>
+    <node name="publish_dummy_heading" pkg='sensors' type="publish_heading"/>
+    <node name="publish_dummy_position" pkg='sensors' type="publish_position"/>
+    <node name = "heading_control" pkg="highlevel_control" type = "heading_control" />
+    <node name = "tack" pkg="highlevel_control" type = "tack" />
+    <node name = "pid_rudder" pkg="lowlevel_control" type = "pid_rudder" />
+
+</launch>
