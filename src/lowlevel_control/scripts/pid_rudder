@@ -26,7 +26,7 @@ def node_publisher():
     rate = rospy.Rate(10)
 
     while not rospy.is_shutdown():
-        if data.update_sailing_state != 'TACK':
+        if data.sailing_state == 'normal':
             angle = controller.update_PID(data.goal_heading-data.heading)
         else:
             angle = data.tack_rudder
