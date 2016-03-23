@@ -7,21 +7,21 @@
 import rospy
 from std_msgs.msg import Float32
 
-currentHeading = rospy.get_param("/dummy/currentHeading")
+currentHeading = rospy.get_param("/dummy/heading")
 
-def wind_direction_apparent_publisher():
+def heading_publisher():
 
     rate = rospy.Rate(rospy.get_param("/config/rate"))
 
     while not rospy.is_shutdown():
-        wind_pub.publish(windDirection)
+        heading_pub.publish(currentHeading)
         rate.sleep()
 
 
 if __name__ == '__main__':
     try:
-        wind_pub = rospy.Publisher('/heading', Float32, queue_size=10)
+        heading_pub = rospy.Publisher('/heading', Float32, queue_size=10)
         rospy.init_node("publish_dummy_heading_data", anonymous=True)
-        wind_direction_apparent_publisher()
+        heading_publisher()
     except rospy.ROSInterruptException:
         pass
