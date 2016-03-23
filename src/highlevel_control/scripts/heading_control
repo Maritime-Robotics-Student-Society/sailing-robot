@@ -8,7 +8,7 @@ from std_msgs.msg import Float32
 from std_msgs.msg import String
 import highlevel_control
 from highlevel_control.heading_planning import HeadingPlan
-from highlevel_control.msg import waypoint
+from sensor_msgs.msg import NavSatFix
 
 heading_data = HeadingPlan()
 
@@ -28,9 +28,9 @@ def goal_heading_publisher():
 if __name__ == '__main__':
     try:
         rospy.Subscriber('/heading', Float32, heading_data.update_heading)
-        rospy.Subscriber('/next_wp', waypoint, heading_data.update_waypoint)
+        rospy.Subscriber('/next_wp', NavSatFix, heading_data.update_waypoint)
         rospy.Subscriber('/wind_direction_apparent', Float32, heading_data.update_wind_direction)
-        rospy.Subscriber('/position', waypoint, heading_data.update_position)
+        rospy.Subscriber('/position', NavSatFix, heading_data.update_position)
         goal_heading_publisher()
     except rospy.ROSInterruptException:
         pass
