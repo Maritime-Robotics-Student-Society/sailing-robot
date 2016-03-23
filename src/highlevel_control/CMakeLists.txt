@@ -7,6 +7,7 @@ project(highlevel_control)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
+  sensor_msgs
   message_generation
 )
 
@@ -44,10 +45,9 @@ catkin_python_setup()
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-    FILES
-    waypoint.msg
-)
+#add_message_files(
+#    FILES
+#)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -67,6 +67,7 @@ add_message_files(
  generate_messages(
    DEPENDENCIES
    std_msgs
+   sensor_msgs
  )
 
 ###################################
@@ -81,7 +82,7 @@ add_message_files(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES highlevel_control
-  CATKIN_DEPENDS rospy std_msgs message_runtime
+  CATKIN_DEPENDS rospy std_msgs sensor_msgs message_runtime
 #  DEPENDS system_lib
 )
 
