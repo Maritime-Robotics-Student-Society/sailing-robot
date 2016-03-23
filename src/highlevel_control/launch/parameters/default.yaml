@@ -12,6 +12,11 @@
 # in degrees
 /dummy/heading: 25
 
+# dummy latitude/longitude paramters for tests indoors, without position fix
+# in degrees
+/dummy/latitude: 50.7
+/dummy/longitude: -1.02
+
 #
 # Configuration
 #
