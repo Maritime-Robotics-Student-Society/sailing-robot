@@ -8,8 +8,9 @@ import lowlevel_control.pid_control as _PID
 
 data = PID_Data()
 
+sail = rospy.get_param('/sail')
 
-controller = _PID.PID(1.0, 2.0, 3.0, 1.0, -1.0)
+controller = _PID.PID(sail['control']['Kp'], sail['control']['Ki'], sail['control']['Kd'], sail['maxAngle'], -sail['maxAngle'])
 
 
 def node_publisher():
