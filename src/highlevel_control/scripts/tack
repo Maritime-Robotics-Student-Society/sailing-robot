@@ -18,8 +18,8 @@ if __name__ == '__main__':
             sail, rudder = tacking.calculate_sail_and_rudder(msg.data)
             sail_pub.publish(sail)
             rudder_pub.publish(rudder)
-        rospy.Subscriber('/sailing_state', String, recv)
         rospy.init_node("publish_tack_data", anonymous=True)
+        rospy.Subscriber('/sailing_state', String, recv)
         rospy.spin()  # Wait for shutdown
     except rospy.ROSInterruptException:
         pass
