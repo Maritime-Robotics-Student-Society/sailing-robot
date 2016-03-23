@@ -20,7 +20,7 @@ def node_publisher():
     PID controller was used in other conditions.
     :rtype: object
     """
-    pub = rospy.Publisher('/servo', UInt16, queue_size=10)  # Use UInt 16 here to minimize the memory use
+    pub = rospy.Publisher('/rudder_control', UInt16, queue_size=10)  # Use UInt 16 here to minimize the memory use
     rospy.init_node('rudder_servo', anonymous=True)
     rate = rospy.Rate(10)
 
@@ -30,7 +30,7 @@ def node_publisher():
         else:
             angle = data.tack_rudder
 
-        pub.publish(angle)
+        pub.publish(int(angle))
 
         rate.sleep()
 
