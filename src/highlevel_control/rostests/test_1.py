@@ -6,33 +6,25 @@ NAME = 'peer_subscribe_notify_test'
 import sys
 import time
 import unittest
+from Queue import Queue
 
 import rospy
 import rostest
 import roslib.scriptutil as scriptutil
 from std_msgs.msg import String, Float32
 
+def subscribe_queue(topic, msg_type):
+    q = Queue()
+    rospy.Subscriber(topic, msg_type, q.put)
+    return q
 
 class TestOnShutdown(unittest.TestCase):
-    def __init__(self, *args):
-        super(TestOnShutdown, self).__init__(*args)
-        self.success = False
-
-    def callback(self, msg):
-        print(rospy.get_caller_id(), "I heard %s" % msg.data)
-        #greetings is only sent over peer_publish callback, so hearing it is a success condition
-        if msg.data == 90:
-            self.success = True
-
     def test_notify(self):
-        rospy.Subscriber("/tack_rudder", Float32, self.callback)
+        q = subscribe_queue("/tack_rudder", Float32)
         rospy.init_node(NAME, anonymous=True)
         p = rospy.Publisher("/sailing_state", String, queue_size=10)
-        p.publish('tack_to_stbd_tack')
-        timeout_t = time.time() + 10.0*1000 #10 seconds
-        while not rospy.is_shutdown() and not self.success and time.time() < timeout_t:
-            time.sleep(0.1)
-        self.assert_(self.success, str(self.success))
+        msg = q.get(timeout=2)
+        self.assertEqual(msg.data, 90)
 
 if __name__ == '__main__':
     rostest.rosrun(PKG, NAME, TestOnShutdown, sys.argv)
