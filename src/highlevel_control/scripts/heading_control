@@ -14,7 +14,6 @@ from highlevel_control.msg import waypoint
 def goal_heading_publisher(heading_data):
     pub = rospy.Publisher("/goal_heading", Float32, queue_size=10)
     pub_state = rospy.Publisher("/sailing_state", String, queue_size=10)
-    rospy.init_node("publish_goal_heading", anonymous=True)
     rate = rospy.Rate(rospy.get_param("/config/rate"))
 
     while not rospy.is_shutdown():
@@ -26,13 +25,14 @@ def goal_heading_publisher(heading_data):
 
 if __name__ == '__main__':
     try:
+        rospy.init_node("publish_goal_heading", anonymous=True)
+        tackline_dist = rospy.get_param("/navigation/tackline_distance") / 1000 # m to km
+        deadzone = rospy.get_param("/navigation/deadzone")
+        heading_data = HeadingPlan(beating_angle=deadzone, tack_line_offset=tackline_dist)
         rospy.Subscriber('/heading', Float32, heading_data.update_heading)
         rospy.Subscriber('/next_wp', waypoint, heading_data.update_waypoint)
         rospy.Subscriber('/wind_direction_apparent', Float32, heading_data.update_wind_direction)
         rospy.Subscriber('/position', waypoint, heading_data.update_position)
-        tackline_dist = rospy.get_param("/navigation/tackline_distance") / 1000 # m to km
-        deadzone = rospy.get_param("/navigation/deadzone")
-        heading_data = HeadingPlan(beating_angle=deadzone, tack_line_offset=tackline_dist)
         goal_heading_publisher(heading_data)
     except rospy.ROSInterruptException:
         pass
