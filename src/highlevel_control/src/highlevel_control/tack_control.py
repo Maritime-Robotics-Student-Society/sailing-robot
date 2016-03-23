@@ -4,7 +4,7 @@ class Tacking(object):
         if state == 'tack_to_port_tack':
             # Turning right
             return 0, -90
-        elif new == 'tack_to_stbd_tack':
+        elif state == 'tack_to_stbd_tack':
             # Turning left
             return 0, 90
         else:
