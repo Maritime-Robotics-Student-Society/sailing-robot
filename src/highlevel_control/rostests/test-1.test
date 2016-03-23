@@ -14,9 +14,7 @@
     Nodes
     -->
 
-    <node name = "heading_control" pkg="highlevel_control" type = "heading_control" />
     <node name = "tack" pkg="highlevel_control" type = "tack" />
-    <node name = "pid_rudder" pkg="lowlevel_control" type = "pid_rudder" />
     <test test-name="test_1" pkg="highlevel_control" type="test_1.py" />
 
 </launch>
