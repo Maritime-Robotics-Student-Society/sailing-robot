@@ -13,14 +13,11 @@ ros::NodeHandle nh;
 std_msgs::Float64 apparent_wind_speed;
 ros::Publisher publishApparentWindSpeed("/apparent_wind_speed", &apparent_wind_speed);
 
-float wind_speed = 0;
 
-unsigned int duration;
-
-unsigned long timePrevious;
+float wind_speed = 0;  // Initialise wind speed
+int timestep = 100;   // timestep in [ms] 
 
 int PIN = 2;
-
 int count = 0;
 
 void arduino_anemometer()
@@ -34,26 +31,18 @@ void setup()
   nh.advertise(publishApparentWindSpeed);
   attachInterrupt(digitalPinToInterrupt(PIN) , arduino_anemometer, RISING);
 
-  count = 0;
-  duration = 0;
-  timePrevious = 0; 
-
 }
 
 
 void loop()
 {
-  /*
-   * Wind calculations here
-   */
- 
-  duration = (millis() - timePrevious);
-  timePrevious = millis();
-  count = 0;
-  wind_speed = (666.66/duration);
-
+  // Publish previously measured wind speed
   apparent_wind_speed.data = wind_speed;
   publishApparentWindSpeed.publish( &apparent_wind_speed );
   nh.spinOnce();
-  delay(100);
+
+  // measure wind speed over the next time step
+  count = 0;
+  delay(timestep);
+  wind_speed = (666.66/timestep) * count;
 }
