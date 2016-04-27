@@ -8,6 +8,7 @@
 */
 #include<ros.h>
 #include<std_msgs/UInt16.h>
+#include <stdlib.h>
 
 ros::NodeHandle nh;
 // the setup routine runs once when you press reset:
@@ -23,36 +24,19 @@ ros::Publisher p("wind_direction_apparent", &wind_angle);
 void loop() {
   // read the input on analog pin 0:
   nh.initNode();
-  int angle;
+  int i; // count number
   int sensorValue1 = analogRead(A0);
+  int Reference[8] = {516,707,818,915,965,994,1009,1016};
+  int Direction[8] = {135, 90, 45,180,  0,225, 270, 315};
+  int position=-1,thread=100;
+
   // print out the value you read:
-  switch(sensorValue1)
-  { case 965:
-       angle = 0;
-       break;
-    case 818:
-       angle = 45;
-       break;
-    case 707:
-       angle = 90;
-       break;
-    case 516:
-       angle = 135;
-       break;
-    case 915:
-       angle = 180;
-       break;
-    case 994:
-       angle = 225;
-       break;
-    case 1009:
-       angle = 270;
-       break;
-    case 1016:
-       angle = 315;
-       break;
-  }
-  wind_angle.data = angle;
+  for(i=0;i<=7;i++){
+        if(abs(Reference[i]-sensorValue1)<thread){
+            thread=abs(Reference[i]-sensorValue1);
+            position=i;
+        }
+  wind_angle.data = Direction[position];
   p.publish(&wind_angle);
   delay(50);        // delay in between reads for stability
   nh.spinOnce();
