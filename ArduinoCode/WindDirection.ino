@@ -3,41 +3,50 @@
   Reads an analog input on pin 0, prints the result to the serial monitor.
   Graphical representation is available using serial plotter (Tools > Serial Plotter menu)
   Attach the center pin of a potentiometer to pin A0, and the outside pins to +5V and ground.
-
+  
   This example code is in the public domain.
-*/
-#include<ros.h>
-#include<std_msgs/UInt16.h>
-#include <stdlib.h>
+ * 
+ * Debug commands:
+ * #roscore
+ * #rosrun rosserial_python serial_node.py /dev/ttyACM0
+ * #rostopic echo chatter
+ */
 
-ros::NodeHandle nh;
-// the setup routine runs once when you press reset:
-void setup() {
-  // initialize serial communication at 9600 bits per second:
+#include <ros.h>
+#include <stdlib.h>
+#include<std_msgs/Float32.h>
+
+ros::NodeHandle  nh;
+std_msgs::Float32 wind_direction_angle;
+ros::Publisher chatter("wind_direction_apparent", &wind_direction_angle);
+
+
+void setup()
+{
   Serial.begin(9600);
+  nh.initNode();  
+  nh.advertise(chatter);
+//  nh.getHardware()->setBaud(57600);
 }
 
-std_msgs::UInt16 wind_angle;
-ros::Publisher p("wind_direction_apparent", &wind_angle);
-
-// the loop routine runs over and over again forever:
-void loop() {
-  // read the input on analog pin 0:
-  nh.initNode();
-  int i; // count number
-  int sensorValue1 = analogRead(A0);
-  int Reference[8] = {516,707,818,915,965,994,1009,1016};
-  int Direction[8] = {135, 90, 45,180,  0,225, 270, 315};
-  int position=-1,thread=100;
-
-  // print out the value you read:
-  for(i=0;i<=7;i++){
+void loop()
+{
+  int   i; // count number
+  int   sensorValue1 =analogRead(A0);  // Pin A0
+  int   Reference[16] = {  422,   487, 516,  603, 707,  780, 818,   891, 915,   958, 965,   980, 994,   1001, 1009, 1016};
+  float Direction[16] = {112.5, 157.5, 135, 67.5,  90, 22.5,  45, 202.5, 180, 337.5,   0, 247.5, 225,  292.5,  270,  315};
+  int   position=-1,thread=100;
+  
+  // Update angle
+  for(i=0;i<=15;i++){
         if(abs(Reference[i]-sensorValue1)<thread){
             thread=abs(Reference[i]-sensorValue1);
             position=i;
         }
-  wind_angle.data = Direction[position];
-  p.publish(&wind_angle);
-  delay(50);        // delay in between reads for stability
+  }
+  
+  wind_direction_angle.data = Direction[position];
+  chatter.publish( &wind_direction_angle );
   nh.spinOnce();
+  delay(100);
 }
