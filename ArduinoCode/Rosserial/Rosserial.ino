@@ -36,7 +36,7 @@ void servo_cb( const std_msgs::UInt16& cmd_msg){
 }
 
 void rudder_servo(const std_msgs::UInt16& cmd_msg){
- rudderservo.write(cmd_msg.data);
+ rudderservo.write(cmd_msg.data + 90);
 }
 
 
