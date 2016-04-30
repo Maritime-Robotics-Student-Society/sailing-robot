@@ -33,7 +33,7 @@ int   i;                // count number (for loop)
 int   Reference[16] = { 422,   487, 516,  603, 707,  780, 818,   891, 915,   958, 965,   980, 994,   1001, 1009, 1016};
 float Direction[16] = {112.5, 157.5, 135, 67.5,  90, 22.5,  45, 202.5, 180, 337.5,   0, 247.5, 225,  292.5,  270,  315};
 int   position=-1,thread=100;
-int   sensorValue1 
+int   sensorValue1; 
 
 
 void arduino_anemometer()
