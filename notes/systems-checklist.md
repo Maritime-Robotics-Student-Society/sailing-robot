@@ -16,7 +16,7 @@ Check that:
 - `/heading` changes appropriately when the IMU is turned
 - Values ?-? are being published on `/wind_direction_apparent`
 - `/wind_direction_apparent` changes when the windvane is manually moved
-- `/apparent_wind_speed` falls to 0 when anemometer still, rises when manually moved
+- `/wind_speed_apparent` falls to 0 when anemometer still, rises when manually moved
 - TODO: smoothing of wind direction (and speed?)
 - `/position` gives a sensible latitude and longitude
 - `/position` changes if the setup is moved some distance
