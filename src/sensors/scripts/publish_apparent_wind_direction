@@ -5,7 +5,7 @@
 # as specified in the parameters file
 
 import rospy
-from std_msgs.msg import Float32
+from std_msgs.msg import Float64
 
 windDirection = rospy.get_param("/dummy/wind_direction_apparent")
 
@@ -20,7 +20,7 @@ def wind_direction_apparent_publisher():
 
 if __name__ == '__main__':
     try:
-        wind_pub = rospy.Publisher('/wind_direction_apparent', Float32, queue_size=10)
+        wind_pub = rospy.Publisher('/wind_direction_apparent', Float64, queue_size=10)
         rospy.init_node("publish_dummy_wind_data", anonymous=True)
         wind_direction_apparent_publisher()
     except rospy.ROSInterruptException:
