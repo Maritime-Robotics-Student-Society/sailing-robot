@@ -12,8 +12,8 @@ ros::NodeHandle nh;
 
 std_msgs::Float64 apparent_wind_speed;
 std_msgs::Float64 apparent_wind_angle;
-ros::Publisher publishApparentWindSpeed("/apparent_wind_speed", &apparent_wind_speed);
-ros::Publisher publishApparentWindAngle("/apparent_wind_angle", &apparent_wind_angle);
+ros::Publisher publishApparentWindSpeed("/wind_speed_apparent", &apparent_wind_speed);
+ros::Publisher publishApparentWindAngle("/wind_direction_apparent", &apparent_wind_angle);
 
 float wind_speed = 0;  // Initialise wind speed
 int timestep = 100;   // timestep in [ms] 
