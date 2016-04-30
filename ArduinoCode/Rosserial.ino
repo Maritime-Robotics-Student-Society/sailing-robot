@@ -26,7 +26,7 @@ ros::NodeHandle  nh;
 
 
 Servo servo;
-Servo sailservo;
+Servo rudderservo;
 void servo_cb( const std_msgs::UInt16& cmd_msg){
   float pwm;
   pwm = 400*((float)cmd_msg.data/630) + 1500;
@@ -35,22 +35,23 @@ void servo_cb( const std_msgs::UInt16& cmd_msg){
   //str_msg.data = pwm;
 }
 
-void sail_servo(const std_msgs::UInt16& cmd_msg){
- sailservo.write(cmd_msg.data);
+void rudder_servo(const std_msgs::UInt16& cmd_msg){
+ rudderservo.write(cmd_msg.data);
 }
 
 
-ros::Subscriber<std_msgs::UInt16> sub("rudder_control", servo_cb);
-ros::Subscriber<std_msgs::UInt16> sub("sail_servo", sail_servo);
+ros::Subscriber<std_msgs::UInt16> sub1("sail_servo", servo_cb);
+ros::Subscriber<std_msgs::UInt16> sub2("rudder_control",rudder_servo);
 
 void setup(){
   pinMode(13, OUTPUT);
 
   nh.initNode();
-  nh.subscribe(sub);
+  nh.subscribe(sub1);
+  nh.subscribe(sub2);
   
-  servo.attach(9);  // rudder servo attached to pin 9
-  sailservo.attach(10); // sail servo attached to pin 10
+  servo.attach(9);  // sail servo attached to pin 9
+  rudderservo.attach(10); // rudder servo attached to pin 10
 }
 
 void loop(){

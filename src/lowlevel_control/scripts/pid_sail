@@ -2,7 +2,7 @@
 
 import rospy
 import numpy as np
-from std_msgs.msg import Float64, Float32, UInt16, String
+from std_msgs.msg import Float32, UInt16, String
 
 from lowlevel_control.sail_data import Sail_data
 
@@ -27,7 +27,7 @@ def node_publisher():
 
 if __name__ == '__main__':
     try:
-        rospy.Subscriber('/wind_direction_apparent', Float64, sail.update_apparent_wind_angle)
+        rospy.Subscriber('/wind_direction_apparent', Float32, sail.update_apparent_wind_angle)
         node_publisher()
     except rospy.ROSInterruptException:
         pass
