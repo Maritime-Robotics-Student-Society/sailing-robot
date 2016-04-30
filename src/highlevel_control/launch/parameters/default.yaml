@@ -14,8 +14,8 @@
 
 # dummy latitude/longitude paramters for tests indoors, without position fix
 # in degrees
-/dummy/latitude: 50.7
-/dummy/longitude: -1.02
+/dummy/latitude: 50.936981
+/dummy/longitude: -1.405315
 
 #
 # Configuration
