@@ -44,6 +44,7 @@ ros::Subscriber<std_msgs::UInt16> sub1("sail_servo", servo_cb);
 ros::Subscriber<std_msgs::UInt16> sub2("rudder_control",rudder_servo);
 
 void setup(){
+  nh.getHardware()->setBaud(9600);
   pinMode(13, OUTPUT);
 
   nh.initNode();
