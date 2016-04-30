@@ -1,14 +1,26 @@
+#!/usr/bin/python
+
 import serial
 import pynmea2
+import rospy
+from sensor_msgs.msg import NavSatFix
 
-def parseGPS(str):
-    if str.find('GGA') > 0:
-        msg = pynmea2.parse(str)
-        print "Timestamp: %s -- Lat: %s %s -- Lon: %s %s -- Altitude: %s %s" % (msg.timestamp,msg.lat,msg.lat_dir,msg.lon,msg.lon_dir,msg.altitude,msg.altitude_units)
-	#print msg
+serial_port = serial.Serial("/dev/ttyAMA0", 9600, timeout=0.5)
 
-serialPort = serial.Serial("/dev/ttyAMA0", 9600, timeout=0.5)
+def pos_publisher():
+    while not rospy.is_shutdown():
+        gps_data = serial_port.readline()
+        if 'GGA' in gps_data:
+            fix = pynmea2.parse(gps_data)
+            msg = NavSatFix()
+            msg.latitude = fix.lat
+            msg.longitude = fix.lon
+            pos_pub.publish(msg)
 
-while True:
-    str = serialPort.readline()
-    parseGPS(str)
+if __name__ == '__main__':
+    try:
+        pos_pub = rospy.Publisher('/position', NavSatFix, queue_size=10)
+        rospy.init_node("publish_gps_position", anonymous=True)
+        pos_publisher()
+    except rospy.ROSInterruptException:
+        pass

@@ -2,7 +2,7 @@ Raspberry Pi Setup for Robot Operate System
 
 Hardware version of Raspberry Pi: RASPBERRY PI 2 MODEL B
 
-Operate system: Ubuntu 14.04 LTS install instruction can be found at:https://wiki.ubuntu.com/ARM/RaspberryPi
+Operate system: Raspbian
 
-Robot Operate System version: Indigo setup guidance at: http://wiki.ros.org/ROSberryPi/Installing%20ROS%20Indigo%20on%20Raspberry%20Pi
+Robot Operate System version: Indigo 
 

@@ -16,7 +16,7 @@ def wp_publisher():
     rate = rospy.Rate(rospy.get_param("/config/rate"))
 
     while not rospy.is_shutdown():
-        wp_pub.publish(NavSatFix)
+        wp_pub.publish(msg)
         rate.sleep()
 
 
