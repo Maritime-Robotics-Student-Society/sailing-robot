@@ -20,6 +20,7 @@
 
 #include <Servo.h> 
 #include <ros.h>
+#include <std_msgs/UInt16.h>
 #include <std_msgs/Int16.h>
 #include <math.h>
 ros::NodeHandle  nh;
@@ -27,7 +28,7 @@ ros::NodeHandle  nh;
 
 Servo servo;
 Servo rudderservo;
-void servo_cb( const std_msgs::Int16& cmd_msg){
+void servo_cb( const std_msgs::UInt16& cmd_msg){
   float pwm;
   pwm = 400*((float)cmd_msg.data/630) + 1500;
   servo.writeMicroseconds(pwm); //set servo angle, should be from 0-180  
@@ -40,7 +41,7 @@ void rudder_servo(const std_msgs::Int16& cmd_msg){
 }
 
 
-ros::Subscriber<std_msgs::Int16> sub1("sail_servo", servo_cb);
+ros::Subscriber<std_msgs::UInt16> sub1("sail_servo", servo_cb);
 ros::Subscriber<std_msgs::Int16> sub2("rudder_control",rudder_servo);
 
 void setup(){
