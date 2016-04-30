@@ -20,13 +20,14 @@ ros::Publisher publishApparentWindSpeed("/wind_speed_apparent", &apparent_wind_s
 ros::Publisher publishApparentWindAngle("/wind_direction_apparent", &apparent_wind_direction);
 
 float wind_speed = 0;   // Initialise wind speed
-int timestep = 100;     // timestep in [ms] 
+int timestep = 500;     // timestep in [ms] 
 
-int PIN = 2;            // For the wind speed sensor, pin 2 or 3 only
+int PIN = 3;            // For the wind speed sensor, pin 2 or 3 only
 int count = 0;
 
 int   i;                // count number (for loop)
 
+int led = 13; //???
 
 // read raw sensor data from the analog PINs
 // Initialisation for the wind directions sensor
@@ -39,6 +40,10 @@ int   sensorValue1;
 void arduino_anemometer()
 {
  count++;
+ digitalWrite(led, HIGH);
+ delay(100);
+ digitalWrite(led, LOW);
+ delay(100);
 }
 
 void setup()
@@ -47,9 +52,11 @@ void setup()
   nh.initNode();
   nh.advertise(publishApparentWindSpeed);
   nh.advertise(publishApparentWindAngle);
-  attachInterrupt(PIN , arduino_anemometer, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN) , arduino_anemometer, RISING);
 
   sensorValue1 = analogRead(A0);  // Pin A0 for the wind direction
+  
+  pinMode(led, OUTPUT);
 }
 
 
@@ -66,6 +73,7 @@ void loop()
   delay(timestep);
   wind_speed = (666.66/timestep) * count;
 
+ 
   thread=100;
   // Update apparent wind angle
   for(i=0;i<=15;i++){
