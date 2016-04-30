@@ -1,8 +1,11 @@
 /*
- * rosserial publisher for wind speed sensor
+ * rosserial publisher for wind sensors
  *
  * publishing the apparent windspeed in [m/s]
  * based on rotation counts from the wind anemometer
+ *
+ * publishing the apparent wind direction in [degrees]
+ * based on the resistance measured with the wind vane
  */
 
 #include <ros.h>
@@ -12,8 +15,8 @@ ros::NodeHandle nh;
 
 std_msgs::Float64 apparent_wind_speed;
 std_msgs::Float64 apparent_wind_angle;
-ros::Publisher publishApparentWindSpeed("/apparent_wind_speed", &apparent_wind_speed);
-ros::Publisher publishApparentWindAngle("/apparent_wind_angle", &apparent_wind_angle);
+ros::Publisher publishApparentWindSpeed("/wind_speed_apparent", &apparent_wind_speed);
+ros::Publisher publishApparentWindAngle("/wind_direction_apparent", &apparent_wind_angle);
 
 float wind_speed = 0;  // Initialise wind speed
 int timestep = 100;   // timestep in [ms] 
