@@ -14,7 +14,7 @@
     -->
     <!-- These are currently dummies, need to be replaced with real nodes -->
     <node name="publish_heading" pkg='sensors' type="publish_heading"/>
-    <node name="publish_position" pkg='sensors' type="publish_position"/>
+    <node name="publish_position" pkg='sensors' type="gps"/>
     <node name="publish_waypoint" pkg='highlevel_control' type="dummy_wp"/>
     <node name = "heading_control" pkg="highlevel_control" type = "heading_control" />
     <node name = "tack" pkg="highlevel_control" type = "tack" />
