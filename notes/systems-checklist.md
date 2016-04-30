@@ -2,9 +2,9 @@
 
 To ensure that things are running with real hardware. Setup steps:
 
-1. Ensure RasPi and Arduino have correct code loaded from Github, and the RasPi
+1. Ensure RasPi and Arduinos have correct code loaded from Github, and the RasPi
    code is built (`catkin_make` in sailing-robot directory).
-2. Connect RasPi and Arduino to power source
+2. Connect RasPi to power source, and Arduinos to RasPi.
 3. Plug in all sensors and actuators
 4. On the RasPi, run `source devel/setup.bash`, and then
    `roslaunch highlevel_control with-real-hardware.launch`
@@ -14,7 +14,7 @@ Check that:
 - All nodes come up successfully
 - Values 0-360 are being published on `/heading`
 - `/heading` changes appropriately when the IMU is turned
-- Values ?-? are being published on `/wind_direction_apparent`
+- Values 0-360 are being published on `/wind_direction_apparent`
 - `/wind_direction_apparent` changes when the windvane is manually moved
 - `/wind_speed_apparent` falls to 0 when anemometer still, rises when manually moved
 - TODO: smoothing of wind direction (and speed?)
