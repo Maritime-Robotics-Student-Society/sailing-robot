@@ -5,6 +5,7 @@
 
 import rospy
 from std_msgs.msg import Float32
+from std_msgs.msg import Float64
 from std_msgs.msg import String
 import highlevel_control
 from highlevel_control.heading_planning import HeadingPlan
@@ -31,7 +32,7 @@ if __name__ == '__main__':
         heading_data = HeadingPlan(beating_angle=deadzone, tack_line_offset=tackline_dist)
         rospy.Subscriber('/heading', Float32, heading_data.update_heading)
         rospy.Subscriber('/next_wp', NavSatFix, heading_data.update_waypoint)
-        rospy.Subscriber('/wind_direction_apparent', Float32, heading_data.update_wind_direction)
+        rospy.Subscriber('/wind_direction_apparent', Float64, heading_data.update_wind_direction)
         rospy.Subscriber('/position', NavSatFix, heading_data.update_position)
         goal_heading_publisher(heading_data)
     except rospy.ROSInterruptException:
