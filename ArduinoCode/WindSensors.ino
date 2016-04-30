@@ -9,14 +9,15 @@
  */
 
 #include <ros.h>
+#include <stdlib.h>
 #include <std_msgs/Float64.h>
 
 ros::NodeHandle nh;
 
 std_msgs::Float64 apparent_wind_speed;
-std_msgs::Float64 apparent_wind_angle;
+std_msgs::Float64 apparent_wind_direction;
 ros::Publisher publishApparentWindSpeed("/wind_speed_apparent", &apparent_wind_speed);
-ros::Publisher publishApparentWindAngle("/wind_direction_apparent", &apparent_wind_angle);
+ros::Publisher publishApparentWindAngle("/wind_direction_apparent", &apparent_wind_direction);
 
 float wind_speed = 0;  // Initialise wind speed
 int timestep = 100;   // timestep in [ms] 
@@ -66,6 +67,7 @@ void loop()
             thread=abs(Reference[i]-sensorValue1);
             position=i;
         }
-  wind_direction_angle.data = Direction[position];
-  publishApparentWindAngle.publish(&wind_direction_angle);
+  }
+  apparent_wind_direction.data = Direction[position];
+  publishApparentWindAngle.publish(&apparent_wind_direction);
 }
