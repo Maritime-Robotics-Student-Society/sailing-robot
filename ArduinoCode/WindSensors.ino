@@ -1,8 +1,11 @@
 /*
- * rosserial publisher for wind speed sensor
+ * rosserial publisher for wind sensors
  *
  * publishing the apparent windspeed in [m/s]
  * based on rotation counts from the wind anemometer
+ *
+ * publishing the apparent wind direction in [degrees]
+ * based on the resistance measured with the wind vane
  */
 
 #include <ros.h>
