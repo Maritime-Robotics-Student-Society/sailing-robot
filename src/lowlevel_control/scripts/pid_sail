@@ -30,7 +30,7 @@ def node_publisher():
 
 if __name__ == '__main__':
     try:
-        rospy.Subscriber('/wind_direction_apparent', Float32, sail.update_apparent_wind_angle)
+        rospy.Subscriber('/wind_direction_apparent', Float64, sail.update_apparent_wind_angle)
         node_publisher()
     except rospy.ROSInterruptException:
         pass
