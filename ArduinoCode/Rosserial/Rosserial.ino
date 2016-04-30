@@ -21,6 +21,7 @@
 #include <Servo.h> 
 #include <ros.h>
 #include <std_msgs/UInt16.h>
+#include <std_msgs/Int16.h>
 #include <math.h>
 ros::NodeHandle  nh;
 
@@ -35,15 +36,16 @@ void servo_cb( const std_msgs::UInt16& cmd_msg){
   //str_msg.data = pwm;
 }
 
-void rudder_servo(const std_msgs::UInt16& cmd_msg){
+void rudder_servo(const std_msgs::Int16& cmd_msg){
  rudderservo.write(cmd_msg.data + 90);
 }
 
 
 ros::Subscriber<std_msgs::UInt16> sub1("sail_servo", servo_cb);
-ros::Subscriber<std_msgs::UInt16> sub2("rudder_control",rudder_servo);
+ros::Subscriber<std_msgs::Int16> sub2("rudder_control",rudder_servo);
 
 void setup(){
+  nh.getHardware()->setBaud(9600);
   pinMode(13, OUTPUT);
 
   nh.initNode();
