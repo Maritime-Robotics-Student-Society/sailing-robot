@@ -13,6 +13,8 @@ def pos_publisher():
         if 'GGA' in gps_data:
             fix = pynmea2.parse(gps_data)
             msg = NavSatFix()
+            if fix.lat == '':
+                continue
             msg.latitude = fix.lat
             msg.longitude = fix.lon
             pos_pub.publish(msg)
