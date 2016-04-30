@@ -27,9 +27,10 @@ void arduino_anemometer()
 
 void setup()
 {
+  nh.getHardware()->setBaud(9600);
   nh.initNode();
   nh.advertise(publishApparentWindSpeed);
-  attachInterrupt(digitalPinToInterrupt(PIN) , arduino_anemometer, RISING);
+  attachInterrupt(PIN , arduino_anemometer, RISING);
 
 }
 
@@ -42,7 +43,7 @@ void loop()
   nh.spinOnce();
 
   // measure wind speed over the next time step
-  count = 0;
+  count = 0; 
   delay(timestep);
   wind_speed = (666.66/timestep) * count;
 }
