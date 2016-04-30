@@ -77,7 +77,9 @@
 # Length over which the sheet can be varied
 # (EXAMPLE, PROBABLY NOT ACTUALLY USED)
 # in [m]
-/sail/sheet_length: 3
+/sail/boomsheetDistance: 1
+/sail/pullypivotDistance: 1
+/sail/heightofboom: 0.1
 
 # Diameter of the sail winch
 # in [mm]
