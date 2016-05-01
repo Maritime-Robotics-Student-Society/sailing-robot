@@ -2,6 +2,7 @@
 
 import serial
 import pynmea2
+import re
 import rospy
 from sensor_msgs.msg import NavSatFix
 
@@ -12,10 +13,14 @@ def decimal_degrees(d_m):
     
     We get the degrees and minutes unseparated, i.e. (100*degrees)+minutes
     """
-    d_m = float(d_m)
-    degrees = d_m // 100
-    minutes = d_m % 100
-    return degrees + (minutes / 60)
+    m = re.match(r'(-?)(\d+)(\d{2}\.\d+)', str(d_m))
+    if not m:
+        raise ValueError(d_m)
+    sign, degrees, minutes = m.group(1, 2, 3)
+    res = int(degrees) + (float(minutes) / 60)
+    if sign == '-':
+        return -res
+    return res
 
 def pos_publisher():
     while not rospy.is_shutdown():
