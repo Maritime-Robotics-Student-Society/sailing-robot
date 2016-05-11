@@ -45,29 +45,39 @@ class HeadingPlan:
     #
     ##################
 
-    def heading_to_wind_angle(self, heading):
-        """Convert compass heading to angle relative to the wind.
+    def absolute_wind_direction(self):
+        """Convert apparent wind direction to absolute wind direction"""
+        # This assumes that our speed is negligible relative to wind speed.
+        return angleSum(self.heading, self.wind_direction)
 
-        The result is between -180 and 180. 0 is into the wind,
-        +/- 180 is due downwind. Increasing angles go clockwise, as with
-        headings.
+    def angle_to_wind(self):
+        """Calculate angle relative to wind (-180 to 180)
+
+        Angle relative to wind is reversed from wind direction: if the wind is
+        coming from 90, the angle relative to the wind is -90.
         """
-        # TODO: Is wind_direction the heading the wind is coming from, or
-        # the heading it's moving towards? I assume the former
-        res = (heading - self.wind_direction) % 360
+        wd = self.wind_direction
+        if wd > 180:
+            wd -= 360
+        return -wd
+
+    def heading_to_wind_angle(self, heading):
+        """Convert a compass heading (0-360) to an angle relative to the wind (+-180)
+        """
+        res = (heading - self.absolute_wind_direction()) % 360
         if res > 180:
             res -= 360
         return res
 
     def wind_angle_to_heading(self, wind_angle):
-        """Convert angle relative to the wind back to compass heading.
+        """Convert angle relative to the wind (+-180) to a compass heading (0-360).
         """
-        return angleSum(self.wind_direction, wind_angle)
+        return angleSum(self.absolute_wind_direction(), wind_angle)
 
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
         """
-        boat_wind_angle = self.heading_to_wind_angle(self.heading)
+        boat_wind_angle = self.angle_to_wind()
         if self.sailing_state != 'normal':
             # A tack is in progress
             if self.sailing_state == 'tack_to_port_tack':
@@ -104,11 +114,11 @@ class HeadingPlan:
         # We need to tack upwind to the waypoint.
         if boat_wind_angle > 0:
             # On the port tack
-            offset_hdg = angleSum(self.wind_direction, 90)
+            offset_hdg = angleSum(self.absolute_wind_direction(), 90)
             beating_angle = self.beating_angle
             other_tack = 'tack_to_stbd_tack'
         else:
-            offset_hdg = angleSum(self.wind_direction, -90)
+            offset_hdg = angleSum(self.absolute_wind_direction(), -90)
             beating_angle = -self.beating_angle
             other_tack = 'tack_to_port_tack'
         tack_point = self.waypoint.offset(offset_hdg, self.tack_line_offset)

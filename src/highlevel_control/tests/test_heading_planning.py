@@ -18,18 +18,20 @@ class HeadingPlanTests(unittest.TestCase):
 
     def test_complete_tack_to_port(self):
         self.hp.sailing_state = 'tack_to_port_tack'
-        self.hp.wind_direction = 0
+        self.hp.wind_direction = 50
 
-        self.hp.heading = -50
+        self.hp.heading = 310
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_port_tack')
         self.assertEqual(goal, 45)
 
+        self.hp.wind_direction = 350
         self.hp.heading = 10
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_port_tack')
         self.assertEqual(goal, 45)
 
+        self.hp.wind_direction = 313
         self.hp.heading = 47
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'normal')
@@ -37,25 +39,26 @@ class HeadingPlanTests(unittest.TestCase):
 
     def test_continue_tack_to_stbd(self):
         self.hp.sailing_state = 'tack_to_stbd_tack'
-        self.hp.wind_direction = 180  # Wind from the south
-
         self.hp.heading = 200
+        self.hp.wind_direction = 340  # Wind from the south
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_stbd_tack')
         self.assertEqual(goal, 135)
 
+        self.hp.wind_direction = 10
         self.hp.heading = 170
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_stbd_tack')
         self.assertEqual(goal, 135)
 
+        self.hp.wind_direction = 48
         self.hp.heading = 132
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'normal')
         self.assertLess(goal, 135)
 
     def test_plain_sailing(self):
-        self.hp.wind_direction = 10
+        self.hp.wind_direction = 260
         self.hp.heading = 110
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'normal')
@@ -65,19 +68,19 @@ class HeadingPlanTests(unittest.TestCase):
         self.assertLess(goal, 91)
 
     def test_tack_to_port(self):
-        self.hp.wind_direction = 10
+        self.hp.wind_direction = 90
         self.hp.heading = 280  # We're reaching the wrong way!
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_port_tack')
 
     def test_tack_to_stbd(self):
-        self.hp.wind_direction = 190
+        self.hp.wind_direction = 270
         self.hp.heading = 280  # We're reaching the wrong way!
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_stbd_tack')
 
     def test_to_windward_port_tack(self):
-        self.hp.wind_direction = 90
+        self.hp.wind_direction = 270
         self.hp.heading = 180
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'normal')
