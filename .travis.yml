@@ -100,6 +100,7 @@ before_script:
 # catkin_make.
 script:
   - source /opt/ros/$ROS_DISTRO/setup.bash
+  - source ~/catkin_ws/devel/setup.bash
   - cd ~/catkin_ws
   - catkin_make $( [ -f $CATKIN_OPTIONS ] && cat $CATKIN_OPTIONS )
   - catkin_make run_tests
