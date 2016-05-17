@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(highlevel_control)
+project(sailing_robot)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -81,7 +81,7 @@ catkin_python_setup()
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES highlevel_control
+#  LIBRARIES sailing_robot
   CATKIN_DEPENDS rospy std_msgs sensor_msgs message_runtime
 #  DEPENDS system_lib
 )
@@ -98,24 +98,24 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(highlevel_control
-#   src/${PROJECT_NAME}/highlevel_control.cpp
+# add_library(sailing_robot
+#   src/${PROJECT_NAME}/sailing_robot.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(highlevel_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(sailing_robot ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(highlevel_control_node src/highlevel_control_node.cpp)
+# add_executable(sailing_robot_node src/sailing_robot_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(highlevel_control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(sailing_robot_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(highlevel_control_node
+# target_link_libraries(sailing_robot_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -134,7 +134,7 @@ include_directories(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS highlevel_control highlevel_control_node
+# install(TARGETS sailing_robot sailing_robot_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -159,7 +159,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_highlevel_control.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_sailing_robot.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
