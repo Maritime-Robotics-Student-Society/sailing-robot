@@ -2,7 +2,7 @@ import unittest
 from nose.tools import assert_equal
 
 from LatLon import LatLon
-from highlevel_control.heading_planning import HeadingPlan, angleAbsDistance
+from sailing_robot.heading_planning import HeadingPlan, angleAbsDistance
 
 def test_angle_difference():
     assert_equal(angleAbsDistance(90, 50), 40)
