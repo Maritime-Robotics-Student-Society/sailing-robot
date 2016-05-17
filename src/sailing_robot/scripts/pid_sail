@@ -4,7 +4,7 @@ import rospy
 import numpy as np
 from std_msgs.msg import Float64, UInt16, String
 
-from lowlevel_control.sail_data import Sail_data
+from sailing_robot.sail_data import Sail_data
 
 sail = Sail_data()
 saildata = rospy.get_param('/sail')
