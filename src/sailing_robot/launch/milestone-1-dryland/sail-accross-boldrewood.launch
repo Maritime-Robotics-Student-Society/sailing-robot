@@ -8,14 +8,14 @@
     Parameters
     -->
 
-    <rosparam file="$(find highlevel_control)/launch/parameters/default.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
 
     <!--
     Nodes
     -->
 
-    <node name = "heading_control" pkg="highlevel_control" type = "heading_control" />
-    <node name = "tack" pkg="highlevel_control" type = "tack" />
-    <node name = "pid_rudder" pkg="lowlevel_control" type = "pid_rudder" />
+    <node name = "heading_control" pkg="sailing_robot" type = "heading_control" />
+    <node name = "tack" pkg="sailing_robot" type = "tack" />
+    <node name = "pid_rudder" pkg="sailing_robot" type = "pid_rudder" />
 
 </launch>

@@ -3,15 +3,15 @@
    Load Parameters
    -->
 
-   <rosparam file="$(find highlevel_control)/launch/parameters/default.yaml" command="load"/>
+   <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
 
 
   <!--
   Launch Nodes
   -->
 
-  <node name="sail_to_wp" pkg="highlevel_control" type="heading_control"/>
-  <node name="publish_dummy_apparent_wind" pkg='sensors' type="publish_apparent_wind_direction"/>
+  <node name="sail_to_wp" pkg="sailing_robot" type="heading_control"/>
+  <node name="publish_dummy_apparent_wind" pkg='sailing_robot' type="publish_apparent_wind_direction"/>
 
 
     <!--
