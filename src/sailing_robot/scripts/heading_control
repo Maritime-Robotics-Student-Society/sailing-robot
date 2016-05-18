@@ -7,8 +7,8 @@ import rospy
 from std_msgs.msg import Float32
 from std_msgs.msg import Float64
 from std_msgs.msg import String
-import highlevel_control
-from highlevel_control.heading_planning import HeadingPlan
+import sailing_robot
+from sailing_robot.heading_planning import HeadingPlan
 from sensor_msgs.msg import NavSatFix
 
 

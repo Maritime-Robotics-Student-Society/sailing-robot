@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(lowlevel_control)
+project(sailing_robot)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -7,6 +7,7 @@ project(lowlevel_control)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
+  sensor_msgs
   message_generation
 )
 
@@ -44,9 +45,9 @@ catkin_python_setup()
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-# )
+#add_message_files(
+#    FILES
+#)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -63,10 +64,11 @@ catkin_python_setup()
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   std_msgs
+   sensor_msgs
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -79,8 +81,8 @@ catkin_python_setup()
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES lowlevel_control
-  CATKIN_DEPENDS rospy std_msgs message_runtime
+#  LIBRARIES sailing_robot
+  CATKIN_DEPENDS rospy std_msgs sensor_msgs message_runtime
 #  DEPENDS system_lib
 )
 
@@ -96,24 +98,24 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(lowlevel_control
-#   src/${PROJECT_NAME}/lowlevel_control.cpp
+# add_library(sailing_robot
+#   src/${PROJECT_NAME}/sailing_robot.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(lowlevel_control ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(sailing_robot ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(lowlevel_control_node src/lowlevel_control_node.cpp)
+# add_executable(sailing_robot_node src/sailing_robot_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(lowlevel_control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(sailing_robot_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(lowlevel_control_node
+# target_link_libraries(sailing_robot_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -132,7 +134,7 @@ include_directories(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS lowlevel_control lowlevel_control_node
+# install(TARGETS sailing_robot sailing_robot_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -157,10 +159,16 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_lowlevel_control.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_sailing_robot.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
-## Add folders to be run by python nosetests
-#catkin_add_nosetests(test)
+if (CATKIN_ENABLE_TESTING)
+  # rostests
+  find_package(rostest REQUIRED)
+  add_rostest(rostests/test-1.test)
+
+  # Python nosetests
+  catkin_add_nosetests(tests)
+endif()

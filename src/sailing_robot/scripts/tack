@@ -7,7 +7,7 @@ import rospy
 from std_msgs.msg import Float32
 from std_msgs.msg import String
 
-from highlevel_control.tack_control import Tacking
+from sailing_robot.tack_control import Tacking
 
 if __name__ == '__main__':
     try:

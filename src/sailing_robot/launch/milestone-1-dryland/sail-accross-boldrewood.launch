@@ -1,0 +1,21 @@
+<launch>
+    <!--
+    Launch file for dryland tests in March
+    using MacGyver
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <!--
+    Nodes
+    -->
+
+    <node name = "heading_control" pkg="sailing_robot" type = "heading_control" />
+    <node name = "tack" pkg="sailing_robot" type = "tack" />
+    <node name = "pid_rudder" pkg="sailing_robot" type = "pid_rudder" />
+
+</launch>

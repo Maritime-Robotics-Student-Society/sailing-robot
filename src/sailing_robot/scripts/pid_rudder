@@ -3,8 +3,8 @@
 import rospy
 from std_msgs.msg import Float32, Int16, String
 
-from lowlevel_control.pid_data import PID_Data
-import lowlevel_control.pid_control as _PID
+from sailing_robot.pid_data import PID_Data
+import sailing_robot.pid_control as _PID
 
 data = PID_Data()
 
