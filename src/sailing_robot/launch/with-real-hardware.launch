@@ -1,4 +1,4 @@
-launch>
+<launch>
     <!--
     General test file to launch all existing nodes to talk to real hardware
     -->
