@@ -33,3 +33,10 @@ class TasksTests(unittest.TestCase):
     def test_load_bad(self):
         with self.assertRaises(ValueError):
             tr = TasksRunner(tasks_bad, Navigation())
+
+    def test_step(self):
+        tr = TasksRunner(tasks_def_1, Navigation())
+        tr.start_next_task()
+        self.assertIsInstance(tr.active_task, HeadingPlan)
+        tr.start_next_task()
+        self.assertIsInstance(tr.active_task, StationKeeping)

@@ -46,6 +46,7 @@ class TasksRunner(object):
     def start_next_task(self):
         self.task_ix += 1
         self.active_task = self.tasks[self.task_ix]
+        endcond = '' # TODO
         self.log("Running task {}: {} with end condition {}".format(
                     self.task_ix, self.active_task.task_kind, '/'.join(endcond)
         ))
