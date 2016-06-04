@@ -20,7 +20,7 @@
     <node name = "tack" pkg="sailing_robot" type = "tack" />
     <node name = "pid_rudder" pkg="sailing_robot" type = "pid_rudder" />
     <node name = "pid_sail" pkg="sailing_robot" type = "pid_sail" />
-    <node name = "heading" pkg="sailing_robot" type="imu2" />
+    <node name = "heading" pkg="sailing_robot" type="imu-calibrated" />
 
     <!--
     Launch Bridge to Arduino
