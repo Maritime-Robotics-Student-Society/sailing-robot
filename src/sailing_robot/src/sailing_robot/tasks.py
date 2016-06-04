@@ -21,11 +21,11 @@ class TimedEnd(object):
 
 class TasksRunner(object):
     def __init__(self, tasks, nav, log=print):
-        self.tasks = [self._make_task(d) for d in tasks]
         self.task_ix = -1
         self.active_task = None
         self.log = log
         self.nav = nav
+        self.tasks = [self._make_task(d) for d in tasks]
     
     def _make_task(self, taskdict):
         kind = taskdict['kind']
@@ -35,7 +35,8 @@ class TasksRunner(object):
             task = HeadingPlan(waypoint=wp, nav=self.nav)
         elif kind == 'keep_station':
             markers = [tuple(p) for p in taskdict['markers']]
-            task = StationKeeping(markers, taskdict.get('buffer_width', 10))
+            task = StationKeeping(self.nav, markers,
+                            buffer_width=taskdict.get('buffer_width', 10))
         else:
             raise ValueError("Unknown task type: {}".format(kind))
         

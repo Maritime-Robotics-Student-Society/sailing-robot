@@ -3,7 +3,9 @@ import LatLon as ll
 from .navigation import Navigation, angleSum, angleAbsDistance
 
 class HeadingPlan:
-    def __init__(self, beating_angle=45, tack_line_offset=0.01, utm_zone=30):
+    def __init__(self, nav, tack_line_offset=0.01,
+            waypoint=ll.LatLon(50.742810, 1.014469) #somewhere in the solent
+            ):
         """Heading planning machinery.
 
         beating_angle is the closest angle we can sail to the wind -
@@ -17,8 +19,8 @@ class HeadingPlan:
         Distance calculations will be less accurate the further from the
         specified zone you are.
         """
-        self.nav = Navigation(beating_angle=beating_angle, utm_zone=utm_zone)
-        self.waypoint = ll.LatLon(50.742810, 1.014469) #somewhere in the solent
+        self.nav = nav
+        self.waypoint = waypoint
         self.tack_line_offset = tack_line_offset
         self.wp_heading = 0
         self.side_heading = 0

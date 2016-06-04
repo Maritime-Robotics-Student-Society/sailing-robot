@@ -3,8 +3,7 @@ import LatLon as ll
 from shapely.geometry import Polygon
 
 class StationKeeping:
-    def __init__(self, nav, markers=(), utm_zone=30,
-                buffer_width=10):
+    def __init__(self, nav, markers, buffer_width=10):
         """Machinery to stay within a marked area.
 
         nav is a Navigation object for common machinery.
@@ -22,11 +21,10 @@ class StationKeeping:
             (50.82, 1.01),
             (50.82, 1.03),
         ]
-        self.target_zone = shapely.Polygon([
-            self.latlon_to_utm(*p) for p in self.markers
+        self.target_zone = Polygon([
+            self.nav.latlon_to_utm(*p) for p in self.markers
         ])
         self.inner_zone = self.target_zone.buffer(-buffer_width)
-        self.beating_angle = beating_angle
         self.goal_heading = 0
         self.sailing_state = 'normal'  # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
     
@@ -36,32 +34,32 @@ class StationKeeping:
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
         """
-        boat_wind_angle = self.angle_to_wind()
+        boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':
             # A tack is in progress
             if self.sailing_state == 'tack_to_port_tack':
-                beating_angle = self.beating_angle
+                beating_angle = self.nav.beating_angle
                 continue_tack = boat_wind_angle < beating_angle
             else:  # 'tack_to_stbd_tack'
-                beating_angle = -self.beating_angle
+                beating_angle = -self.nav.beating_angle
                 continue_tack = boat_wind_angle > beating_angle
             if continue_tack:
-                self.goal_heading = self.wind_angle_to_heading(beating_angle)
+                self.goal_heading = self.nav.wind_angle_to_heading(beating_angle)
                 return self.sailing_state, self.goal_heading
             else:
                 # Tack completed
                 self.sailing_state = 'normal'
 
-        if self.position_xy.within(self.inner_zone):
+        if self.nav.position_xy.within(self.inner_zone):
             # We're safe: carry on with our current heading
             return self.sailing_state, self.goal_heading
         
         centroid = self.target_zone.centroid
-        centroid_ll = self.utm_to_latlon(centroid.x, centroid.y)
-        heading_to_centroid = self.position_ll.heading_initial(centroid_ll)
+        centroid_ll = self.nav.utm_to_latlon(centroid.x, centroid.y)
+        heading_to_centroid = self.nav.position_ll.heading_initial(centroid_ll)
 
-        centroid_wind_angle = self.heading_to_wind_angle(heading_to_centroid)
-        if abs(centroid_wind_angle) > self.beating_angle:
+        centroid_wind_angle = self.nav.heading_to_wind_angle(heading_to_centroid)
+        if abs(centroid_wind_angle) > self.nav.beating_angle:
             # We can sail directly towards the centroid
             if (centroid_wind_angle * boat_wind_angle) > 0:
                 # These two have the same sign, so we're on the right tack.
@@ -70,38 +68,24 @@ class StationKeeping:
                 # We need to tack before going towards the centroid
                 if centroid_wind_angle > 0:
                     switch_to = 'tack_to_port_tack'
-                    beating_angle = self.beating_angle
+                    beating_angle = self.nav.beating_angle
                 else:
                     switch_to = 'tack_to_stbd_tack'
-                    beating_angle = -self.beating_angle
+                    beating_angle = -self.nav.beating_angle
                 self.sailing_state = switch_to
-                return switch_to, self.wind_angle_to_heading(beating_angle)
+                return switch_to, self.nav.wind_angle_to_heading(beating_angle)
 
-        if boat_wind_angle > 0
+        if boat_wind_angle > 0:
             # On the port tack
-            beating_angle = self.beating_angle
+            beating_angle = self.nav.beating_angle
             other_tack = 'tack_to_stbd_tack'
         else:
-            beating_angle = -self.beating_angle
+            beating_angle = -self.nav.beating_angle
             other_tack = 'tack_to_port_tack'
         if abs(centroid_wind_angle) > 15:
             # Switch to the tack that will take us closest to the centroid
             if (centroid_wind_angle * boat_wind_angle) < 0:
-                return other_tack, self.wind_angle_to_heading
+                return other_tack, self.nav.wind_angle_to_heading(-beating_angle)
         
         # Sail as close to the wind as we can on our current tack
         return 'normal', self.wind_angle_to_heading(beating_angle)
-
-################
-#
-# General utility functions
-#
-################
-
-def angleSum(a,b):
-    return (a+b)%360
-
-def angleAbsDistance(a,b):
-    distanceA = abs((a - b) % 360)
-    distanceB = abs((b - a) % 360)
-    return min(distanceA, distanceB)

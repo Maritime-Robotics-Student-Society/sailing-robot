@@ -3,7 +3,7 @@ from nose.tools import assert_equal
 
 from LatLon import LatLon
 from sailing_robot.heading_planning import HeadingPlan
-from sailing_robot.navigation import angleAbsDistance
+from sailing_robot.navigation import Navigation, angleAbsDistance
 
 def test_angle_difference():
     assert_equal(angleAbsDistance(90, 50), 40)
@@ -18,9 +18,11 @@ class DummyNSF(object):
 
 class HeadingPlanTests(unittest.TestCase):
     def setUp(self):
-        self.hp = HeadingPlan(beating_angle=45, tack_line_offset=0.01)
+        nav = Navigation(beating_angle=45)
+        self.hp = HeadingPlan(nav, waypoint=LatLon(50.7, -0.98),
+                            tack_line_offset=0.01)
         self.hp.nav.update_position(DummyNSF(50.7, -1.02))
-        self.hp.waypoint = LatLon(50.7, -0.98)  # Head east
+        # Should head east
 
     def test_complete_tack_to_port(self):
         self.hp.sailing_state = 'tack_to_port_tack'
