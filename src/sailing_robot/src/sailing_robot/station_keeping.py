@@ -1,29 +1,21 @@
 """Code for staying inside a target region"""
 import LatLon as ll
-import shapely
-import pyproj
+from shapely.geometry import Polygon
 
-class HeadingPlan:
-    def __init__(self, beating_angle=45, markers=(), utm_zone=30,
+class StationKeeping:
+    def __init__(self, nav, markers=(), utm_zone=30,
                 buffer_width=10):
-        """Heading planning machinery.
+        """Machinery to stay within a marked area.
 
-        beating_angle is the closest angle we can sail to the wind -
-        the total dead zone is twice this angle. Measured in degrees.
+        nav is a Navigation object for common machinery.
 
         markers is a list of (lat, lon) points marking the area we need to stay in.
-        
-        utm_zone is the zone number of the UTM system to use. Southampton is in
-        zone 30, Portugal in zone 29. http://www.dmap.co.uk/utmworld.htm
-        Distance calculations will be less accurate the further from the
-        specified zone you are.
         
         buffer_width is a distance in metres. The boat will try to stay this
         far inside the boundaries of the target area. This is the margin for
         turning, errors, wind changes, and so on.
         """
-        self.projection = pyproj.Proj(proj='utm', zone=utm_zone, ellps='WGS84')
-        self.wind_direction = 0.
+        self.nav = nav
         self.markers = markers or [
             (50.8, 1.01),
             (50.8, 1.03),
@@ -34,69 +26,12 @@ class HeadingPlan:
             self.latlon_to_utm(*p) for p in self.markers
         ])
         self.inner_zone = self.target_zone.buffer(-buffer_width)
-        self.position_ll = ll.LatLon(50.8, 1.02)
-        self.position_xy = shapely.Point(self.latlon_to_utm(50.8, 1.02))
         self.beating_angle = beating_angle
-        self.heading = 0
         self.goal_heading = 0
         self.sailing_state = 'normal'  # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
-
-    ###################
-    #
-    # receive all needed ROS topics
-    #
-    ###################
-    def update_wind_direction(self, msg):
-        self.wind_direction = msg.data
-
-    def update_heading(self, msg):
-        self.heading = msg.data
-
-    def update_waypoint(self, msg):
-        self.waypoint = ll.LatLon(msg.latitude, msg.longitude)
-
-    def update_position(self, msg):
-        self.position_ll = ll.LatLon(msg.latitude, msg.longitude)
-        x, y = self.latlon_to_utm(msg.latitude, msg.longitude)
-        self.position_xy = shapely.Point(x, y)
-
-    def latlon_to_utm(self, lat, lon):
-        """Returns (x, y) coordinates in metres"""
-        return self.projection(lon.decimal_degree, lat.decimal_degree)
     
-    def utm_to_latlon(self, x, y):
-        """Returns a LatLon object"""
-        lon, lat = self.projection.inverse(x, y, inverse=True)
-        return ll.LatLon(lat, lon)
-
-    def absolute_wind_direction(self):
-        """Convert apparent wind direction to absolute wind direction"""
-        # This assumes that our speed is negligible relative to wind speed.
-        return angleSum(self.heading, self.wind_direction)
-
-    def angle_to_wind(self):
-        """Calculate angle relative to wind (-180 to 180)
-
-        Angle relative to wind is reversed from wind direction: if the wind is
-        coming from 90, the angle relative to the wind is -90.
-        """
-        wd = self.wind_direction
-        if wd > 180:
-            wd -= 360
-        return -wd
-
-    def heading_to_wind_angle(self, heading):
-        """Convert a compass heading (0-360) to an angle relative to the wind (+-180)
-        """
-        res = (heading - self.absolute_wind_direction()) % 360
-        if res > 180:
-            res -= 360
-        return res
-
-    def wind_angle_to_heading(self, wind_angle):
-        """Convert angle relative to the wind (+-180) to a compass heading (0-360).
-        """
-        return angleSum(self.absolute_wind_direction(), wind_angle)
+    def start(self):
+        pass
 
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
