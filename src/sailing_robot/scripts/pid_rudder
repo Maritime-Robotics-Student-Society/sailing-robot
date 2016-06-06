@@ -8,9 +8,9 @@ import sailing_robot.pid_control as _PID
 
 data = PID_Data()
 
-sail = rospy.get_param('/rudder')
+rudder = rospy.get_param('/rudder')
 
-controller = _PID.PID(sail['control']['Kp'], sail['control']['Ki'], sail['control']['Kd'], sail['maxAngle'], -sail['maxAngle'])
+controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'], rudder['maxAngle'], -rudder['maxAngle'])
 
 
 def node_publisher():
