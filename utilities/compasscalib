@@ -111,45 +111,37 @@ b.write_byte_data(LGD, LGD_CTRL_1, 0x0F) #turn on gyro and set to normal mode
 
 
 
-data_array = []
+data_X = []
+data_Y = []
 
-# !!! TODO use rospy rate!
-for i in range(200):
-  try:
-    #Read data from the chips ----------------------
-    time.sleep(0.1)
-    magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
-    MagX = magx*0.160
+for i in range(300):
+    try:
+        #Read data from the chips ----------------------
+        time.sleep(0.1)
+        magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
 
-    magy = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Y_MSB), b.read_byte_data(LSM, LSM_MAG_Y_LSB))
-    MagY = magy*0.160
+        magy = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Y_MSB), b.read_byte_data(LSM, LSM_MAG_Y_LSB))
 
-    magz = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Z_MSB), b.read_byte_data(LSM, LSM_MAG_Z_LSB))
-    MagZ = magz*0.160
+        magz = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Z_MSB), b.read_byte_data(LSM, LSM_MAG_Z_LSB))
 
-    data_array.append((magx, magy))
+        data_X.append(magx)
+        data_Y.append(magy)
 
-    data_X = [ data[0] for data in data_array ]
-    data_Y = [ data[1] for data in data_array ]
-    minx = min(data_X)
-    miny = min(data_Y)
-    maxx = max(data_X)
-    maxy = max(data_Y)
-    print
-    print(minx)
-    print(maxx)
-    print(miny)
-    print(maxy)
-  except KeyboardInterrupt:
-    print("Interrupted")
-    break
+        minx = min(data_X)
+        miny = min(data_Y)
+        maxx = max(data_X)
+        maxy = max(data_Y)
+        print
+        print(minx)
+        print(maxx)
+        print(miny)
+        print(maxy)
+    except KeyboardInterrupt:
+        print("Interrupted")
+        break
 
 
 
-
-
-data_X = [ data[0] for data in data_array ]
-data_Y = [ data[1] for data in data_array ]
 minx = min(data_X)
 miny = min(data_Y)
 
