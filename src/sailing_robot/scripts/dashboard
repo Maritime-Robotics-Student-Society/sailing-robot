@@ -2,10 +2,8 @@
 
 import rospy
 from std_msgs.msg import Float32, Float64, Int16, String
-import sailing_robot
-from sailing_robot.tasks import TasksRunner
-from sailing_robot.navigation import Navigation
 from sensor_msgs.msg import NavSatFix
+from sailing_robot.navigation import Navigation
 
 import json
 import os
