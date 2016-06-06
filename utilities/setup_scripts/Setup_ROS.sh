@@ -51,3 +51,5 @@ sudo ./src/catkin/bin/catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release 
 # Source new installation
 source /opt/ros/indigo/setup.bash
 echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+
+cd ~
