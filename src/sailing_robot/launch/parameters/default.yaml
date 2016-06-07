@@ -47,9 +47,9 @@
 #
 
 # PID values for rudder control
-/rudder/control/Kp: 0
+/rudder/control/Kp: 1
 /rudder/control/Ki: 0
-/rudder/control/Kd: 0
+/rudder/control/Kd: 0 
 
 # maximum angle
 # absolute value, in [degrees], see https://github.com/Maritime-Robotics-Student-Society/sailing-robot/wiki/Naming-conventions

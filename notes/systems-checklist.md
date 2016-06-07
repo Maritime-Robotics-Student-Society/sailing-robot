@@ -7,7 +7,7 @@ To ensure that things are running with real hardware. Setup steps:
 2. Connect RasPi to power source, and Arduinos to RasPi.
 3. Plug in all sensors and actuators
 4. On the RasPi, run `source devel/setup.bash`, and then
-   `roslaunch highlevel_control with-real-hardware.launch`
+   `roslaunch sailing_robot with-real-hardware.launch`
 
 Check that:
 
