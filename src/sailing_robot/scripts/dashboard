@@ -3,7 +3,6 @@
 import rospy
 from std_msgs.msg import Float32, Float64, Int16, String
 from sensor_msgs.msg import NavSatFix
-from sailing_robot.navigation import Navigation
 
 import json
 import os
@@ -66,7 +65,7 @@ class UpdateHandler(tornado.websocket.WebSocketHandler):
         json_msg = json.dumps(content)
         self.write_message(json_msg)
 
-def dashboard_server(nav):
+def dashboard_server():
     tornado.log.enable_pretty_logging()
     forwarder = MessageForwarder()
     app = tornado.web.Application([
@@ -87,8 +86,6 @@ def dashboard_server(nav):
 if __name__ == '__main__':
     try:
         rospy.init_node("serve_dashboard", anonymous=True)
-        nav = Navigation()
-        nav.subscribe_topics()
-        dashboard_server(nav)
+        dashboard_server()
     except rospy.ROSInterruptException:
         pass
