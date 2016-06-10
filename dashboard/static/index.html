@@ -53,14 +53,48 @@ body {
   <div id="connecting" class="overlay-box">
     Connecting...
   </div>
-  <table id='topics-table'>
-    <tr><td>/wind_direction_apparent</td><td id='value-wind_direction_apparent'></td></tr>
-    <tr><td>/rudder_control</td><td id='value-rudder_control'></td></tr>
-    <tr><td>/position</td><td id='value-position'></td></tr>
-  </table>
+  <table id='topics-table'><tbody></tbody></table>
 
 <script>
-id = document.getElementById.bind(document)
+id = document.getElementById.bind(document);
+elem = document.createElement.bind(document);
+text = document.createTextNode.bind(document);
+
+function construct(tag, children) {
+  var res = document.createElement(tag);
+  children.forEach(function(c) {
+    res.appendChild(c);
+  })
+  return res;
+}
+
+function format_value(msg) {
+  if (msg.latitude !== undefined) {
+    var lat_hemi = msg.latitude > 0 ? 'N' : 'S';
+    var lon_hemi = msg.longitude > 0 ? 'E' : 'W';
+    return String(Math.abs(msg.latitude)) + '° ' + lat_hemi + ' / '
+             + String(Math.abs(msg.longitude)) + '° ' + lon_hemi;
+  } else {
+    return String(msg.value);
+  }
+}
+
+function update_topic_table(msg) {
+  var topic_name = msg.topic;
+  var value_td = id('value-'+msg.topic);
+  if (value_td) {
+    value_td.firstChild.nodeValue = format_value(msg);
+  } else {
+    // Add new row to table
+    value_td = construct('td', [text(format_value(msg))]);
+    value_td.setAttribute('id', 'value-'+msg.topic);
+    var new_tr = construct('tr', [
+      construct('td', [text(msg.topic)]),
+      value_td
+    ]);
+    id('topics-table').firstChild.appendChild(new_tr);
+  }
+}
 
 window.addEventListener("load", function(event) {
   var ws = new WebSocket('ws://' + location.host + '/updates');
@@ -69,22 +103,7 @@ window.addEventListener("load", function(event) {
   };
   ws.onmessage = function(event) {
     var json_msg = JSON.parse(event.data);
-    // substring(1) to strip off leading /
-    var e = id('value-' + json_msg.topic.substring(1));
-    if (!e) {
-      return;
-    }
-    while (e.firstChild) { e.removeChild(e.firstChild); }
-    var new_text;
-    if (json_msg.latitude !== undefined) {
-      var lat_hemi = json_msg.latitude > 0 ? 'N' : 'S';
-      var lon_hemi = json_msg.longitude > 0 ? 'E' : 'W';
-      new_text = String(Math.abs(json_msg.latitude)) + '° ' + lat_hemi + ' / '
-               + String(Math.abs(json_msg.longitude)) + '° ' + lon_hemi;
-    } else {
-      new_text = String(json_msg.value);
-    }
-    e.appendChild(new Text(new_text));
+    update_topic_table(json_msg);
   };
   ws.onclose = function(event) {
     id('disconnected').style.display = 'block';
