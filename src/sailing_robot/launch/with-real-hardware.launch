@@ -21,7 +21,7 @@
     <node name = "pid_rudder" pkg="sailing_robot" type = "pid_rudder" />
     <node name = "pid_sail" pkg="sailing_robot" type = "pid_sail" />
     <node name = "heading" pkg="sailing_robot" type="imu-calibrated" />
-
+    <node name = "dashboard" pkg="sailing_robot" type = "dashboard" />
     <!--
     Launch Bridge to Arduino
     -->
