@@ -21,6 +21,9 @@ XOFFSET = 1082
 YOFFSET = -949
 XSCALE = 46352
 YSCALE = 43884
+ANGLEOFFSET = 90
+
+
 
 AVE_SIZE = 6   # averaging over the last AVE_SIZE values
 
@@ -140,12 +143,12 @@ def wind_direction_publisher():
         MagZ = magz #*0.160
 
         # calibration and axis change (Y->X and Z->Y)
-	MagX = (MagY - XOFFSET) * XSCALE
+        MagX = (MagY - XOFFSET) * XSCALE
         MagY = (MagZ - YOFFSET) * YSCALE
 
 
         wind_direction = math.atan2(MagX, MagY)*(180/math.pi)
-	wind_direction = (wind_direction - 90) % 360
+        wind_direction = (wind_direction - ANGLEOFFSET) % 360
 
         i = (i+1) % AVE_SIZE
         average_list[i] = wind_direction
