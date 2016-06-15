@@ -21,17 +21,18 @@
     <node name = "pid_rudder" pkg="sailing_robot" type = "pid_rudder" />
     <node name = "pid_sail" pkg="sailing_robot" type = "pid_sail" />
     <node name = "heading" pkg="sailing_robot" type="imu-calibrated" />
+    <node name = "wind_direction" pkg="sailing_robot" type="wind_direction_calibrated" />
     <node name = "dashboard" pkg="sailing_robot" type = "dashboard" />
     <!--
     Launch Bridge to Arduino
     -->
-  <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+  <!--node pkg="rosserial_python" type="serial_node.py" name="serial_node">
     <param name="port" value="/dev/ttyACM0"/>
     <param name="baud" value="9600"/>
   </node>
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node2">
     <param name="port" value="/dev/ttyACM1"/>
     <param name="baud" value="9600"/>
-  </node>
+  </node-->
 
 </launch>
