@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+#
+# Node receives current waypoint from path planner
+# calculates goal heading for reaching the waypoint as fast as possible
+
+import rospy
+from std_msgs.msg import Float32
+from std_msgs.msg import Float64
+from std_msgs.msg import String
+import sailing_robot
+from sailing_robot.tasks import TasksRunner
+from sailing_robot.navigation import Navigation
+from sensor_msgs.msg import NavSatFix
+
+
+def goal_heading_publisher(tasks_runner):
+    pub = rospy.Publisher("/goal_heading", Float32, queue_size=10)
+    pub_state = rospy.Publisher("/sailing_state", String, queue_size=10)
+    rate = rospy.Rate(rospy.get_param("/config/rate"))
+
+    tasks_runner.start_next_task()
+    while not rospy.is_shutdown():
+        state, goal_heading = tasks_runner.calculate_state_and_goal()
+        pub.publish(goal_heading)
+        pub_state.publish(state)
+        rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        rospy.init_node("publish_goal_heading", anonymous=True)
+        tasks = rospy.get_param("/tasks")
+        nav_options = rospy.get_param("/navigation")
+        nav = Navigation(**nav_options)
+        tasks_runner = TasksRunner(tasks, nav, log=rospy.loginfo)
+        tasks_runner.nav.subscribe_topics()
+        goal_heading_publisher(tasks_runner)
+    except rospy.ROSInterruptException:
+        pass
