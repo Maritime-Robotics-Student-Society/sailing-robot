@@ -22,7 +22,13 @@
     <node name = "pid_sail" pkg="sailing_robot" type = "pid_sail" />
     <node name = "heading" pkg="sailing_robot" type="imu-calibrated" />
     <node name = "wind_direction" pkg="sailing_robot" type="wind_direction_calibrated" />
+
+    <!-- Rosbag records messages for later investigation -->
+    <node name="record" pkg="rosbag" type="record" args="-a -o ~/sailing-record"/>
+
+    <!-- Serve an HTML dashboard so we can see what's going on -->
     <node name = "dashboard" pkg="sailing_robot" type = "dashboard" />
+
     <!--
     Launch Bridge to Arduino
     -->
