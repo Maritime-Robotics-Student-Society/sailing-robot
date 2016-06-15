@@ -1,0 +1,33 @@
+#include <unistd.h>
+#include "Navio/PWM.h"
+#include "Navio/Util.h"
+
+#define PWM_OUTPUT 0
+#define SERVO_MIN 1.250 /*mS*/
+#define SERVO_MAX 1.750 /*mS*/
+
+int main()
+{
+    PWM pwm;
+
+    if (check_apm()) {
+        return 1;
+    }
+
+    if (!pwm.init(PWM_OUTPUT)) {
+        fprintf(stderr, "Output Enable not set. Are you root?\n");
+        return 0;
+    }
+
+    pwm.enable(PWM_OUTPUT);
+    pwm.set_period(PWM_OUTPUT, 50);
+
+    while (true) {
+        pwm.set_duty_cycle(PWM_OUTPUT, SERVO_MIN);
+        sleep(1);
+        pwm.set_duty_cycle(PWM_OUTPUT, SERVO_MAX);
+        sleep(1);
+    }
+
+    return 0;
+}
