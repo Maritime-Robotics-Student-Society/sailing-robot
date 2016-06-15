@@ -1,4 +1,5 @@
 import LatLon as ll
+import math
 from shapely.geometry import Point
 
 from .navigation import Navigation, angleSum, angleAbsDistance
@@ -37,6 +38,13 @@ class HeadingPlan:
 
     def check_end_condition(self):
         return self.nav.position_xy.within(self.target_area)
+
+    def distance_heading_to_waypoint(self):
+        dx = self.waypoint_xy.x - self.nav.position_xy.x
+        dy = self.waypoint_xy.y - self.nav.position_xy.y
+        d = (dx**2 + dy**2) ** 0.5
+        h = math.degrees(math.atan2(dx, dy)) % 360
+        return d, h
 
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do

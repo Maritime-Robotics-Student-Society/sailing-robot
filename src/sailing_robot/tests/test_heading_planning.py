@@ -115,3 +115,10 @@ class HeadingPlanTests(unittest.TestCase):
         assert not self.hp.check_end_condition()
         self.hp.nav.update_position(DummyNSF(50.7, -0.9800001))
         assert self.hp.check_end_condition()
+
+    def test_distance_heading_to_waypoint(self):
+        d, h = self.hp.distance_heading_to_waypoint()
+        self.assertGreater(d, 2500)
+        self.assertLess(d, 3000)
+        self.assertGreater(h, 85)
+        self.assertLess(h, 95)

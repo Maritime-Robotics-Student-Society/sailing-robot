@@ -11,7 +11,7 @@ class Navigation(object):
         heading : Compass heading
         beating_angle : Closest absolute angle relative to the wind that we can
             sail
-        utm_zone : Sone number of the UTM system to use. Southampton is in
+        utm_zone : Zone number of the UTM system to use. Southampton is in
             zone 30, Portugal in zone 29. http://www.dmap.co.uk/utmworld.htm
             Distance calculations will be less accurate the further from the
             specified zone you are.
