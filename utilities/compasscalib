@@ -155,7 +155,7 @@ range_X = maxx - minx
 range_Y = maxy - miny
 
 
-print("offset X = " + str(offset_X))
-print("offset Y = " + str(offset_Y))
-print("range X = " + str(range_X))
-print("range Y = " + str(range_Y))
+print("XOFFSET = " + str(offset_X))
+print("YOFFSET = " + str(offset_Y))
+print("XSCALE = " + str(range_X))
+print("YSCALE = " + str(range_Y))
