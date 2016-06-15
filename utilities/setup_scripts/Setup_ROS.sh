@@ -52,4 +52,8 @@ sudo ./src/catkin/bin/catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release 
 source /opt/ros/indigo/setup.bash
 echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
 
+# Setup networking so other laptops can connect to the boat
+# master is the boat
+echo "export ROS_HOSTNAME=192.168.42.1" >> ~/.bashrc
+
 cd ~
