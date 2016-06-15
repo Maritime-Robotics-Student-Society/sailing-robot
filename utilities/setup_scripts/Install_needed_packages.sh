@@ -1,8 +1,11 @@
 #!/bin/sh 
 cd ~
 
-# Install Latlon and pynmea2 for gps
-yes | sudo pip install Latlon pynmea2
+# Install Geos headers (for shapely)
+sudo apt-get --assume-yes intall libgeos-dev
+
+# Install Latlon, shapely (navigation) and pynmea2 (reading GPS)
+yes | sudo pip install Latlon shapely pynmea2
 
 # Needed for serial
 yes | sudo pip install spidev
