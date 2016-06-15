@@ -1,10 +1,12 @@
 import LatLon as ll
+from shapely.geometry import Point
 
 from .navigation import Navigation, angleSum, angleAbsDistance
 
 class HeadingPlan:
     def __init__(self, nav, tack_line_offset=0.01,
-            waypoint=ll.LatLon(50.742810, 1.014469) #somewhere in the solent
+            waypoint=ll.LatLon(50.742810, 1.014469), # somewhere in the solent
+            target_radius=2,
             ):
         """Heading planning machinery.
 
@@ -21,6 +23,9 @@ class HeadingPlan:
         """
         self.nav = nav
         self.waypoint = waypoint
+        x, y = self.nav.latlon_to_utm(waypoint.lat.decimal_degree, waypoint.lon.decimal_degree)
+        self.waypoint_xy = Point(x, y)
+        self.target_area = self.waypoint_xy.buffer(target_radius)
         self.tack_line_offset = tack_line_offset
         self.wp_heading = 0
         self.side_heading = 0
@@ -29,6 +34,9 @@ class HeadingPlan:
     
     def start(self):
         pass
+
+    def check_end_condition(self):
+        return self.nav.position_xy.within(self.target_area)
 
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do

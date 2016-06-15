@@ -110,3 +110,8 @@ class HeadingPlanTests(unittest.TestCase):
         self.hp.nav.update_position(DummyNSF(50.72, -1.018))
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_port_tack')
+
+    def test_end_condition(self):
+        assert not self.hp.check_end_condition()
+        self.hp.nav.update_position(DummyNSF(50.7, -0.9800001))
+        assert self.hp.check_end_condition()

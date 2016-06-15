@@ -51,13 +51,8 @@ class TasksRunner(object):
                     self.task_ix, self.active_task.task_kind, '/'.join(endcond)
         ))
         self.active_task.start()
-    
-    @property
-    def step_conditions(self):
-        return self.active_task.end_conditions
         
     def calculate_state_and_goal(self):
-        for step_condition in self.step_conditions:
-            if step_condition.check():
-                self.start_next_task()
+        if self.active_task.check_end_condition():
+            self.start_next_task()
         return self.active_task.calculate_state_and_goal()
