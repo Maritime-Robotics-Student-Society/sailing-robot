@@ -33,6 +33,7 @@ class MessageForwarder(object):
     """Forward ROS messages to a websocket"""
     def __init__(self):
         self.sockets = []
+        self.loop = tornado.ioloop.IOLoop.current()
         for topic, rostype in simple_topics:
             self.simple_forwarding(topic, rostype)
         for topic in geo_topics:
@@ -43,16 +44,20 @@ class MessageForwarder(object):
         for s in self.sockets:
             s.send_json_message(content)
     
+    # The callbacks we give to ROS are called on separate threads, so we use
+    # loop.add_callback to ensure we actually send the data from the main thread.
     def simple_forwarding(self, topic_name, rostype):
         def forward(msg):
             self.broadcast({'topic': topic_name, 'value': msg.data})
-        return rospy.Subscriber(topic_name, rostype, forward)
+        return rospy.Subscriber(topic_name, rostype,
+                            lambda m: self.loop.add_callback(forward, m))
 
     def geo_forwarding(self, topic_name):
         def forward(msg):
             self.broadcast({'topic': topic_name, 'latitude': msg.latitude,
                             'longitude': msg.longitude})
-        return rospy.Subscriber(topic_name, NavSatFix, forward)
+        return rospy.Subscriber(topic_name, NavSatFix,
+                            lambda m: self.loop.add_callback(forward, m))
 
 class UpdateHandler(tornado.websocket.WebSocketHandler):
     def initialize(self, forwarder):
