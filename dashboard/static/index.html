@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>The Dread Pirate Robots' Dashboard</title>
+  
+<style>
+body {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: sans-serif;
+}
+
+
+#topics-table {
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+}
+
+#topics-table tr:nth-child(odd) {
+  background-color: #ddd;
+}
+
+#topics-table td {
+  min-width: 3em;
+  padding: 0.5em;
+}
+
+.overlay-box {
+    display: block;
+    position: fixed;
+    background-color: #b4cfea;
+    padding: 1em;
+    border: 1px solid black;
+    border-radius: 10px;
+    margin: 0px auto;
+    top: 1em;
+    left: 0px;
+    right: 0px;
+    width: 600px;
+    text-align: center;
+}
+</style>
+</head>
+
+<body role="document">
+  <div id="disconnected" class="overlay-box" style="display: none;">
+    Disconnected - refresh page when ROS is running to reconnect
+  </div>
+  <div id="connecting" class="overlay-box">
+    Connecting...
+  </div>
+  <table id='topics-table'><tbody></tbody></table>
+
+<script>
+id = document.getElementById.bind(document);
+elem = document.createElement.bind(document);
+text = document.createTextNode.bind(document);
+
+function construct(tag, children) {
+  var res = document.createElement(tag);
+  children.forEach(function(c) {
+    res.appendChild(c);
+  })
+  return res;
+}
+
+function format_value(msg) {
+  if (msg.latitude !== undefined) {
+    var lat_hemi = msg.latitude > 0 ? 'N' : 'S';
+    var lon_hemi = msg.longitude > 0 ? 'E' : 'W';
+    return String(Math.abs(msg.latitude)) + '° ' + lat_hemi + ' / '
+             + String(Math.abs(msg.longitude)) + '° ' + lon_hemi;
+  } else {
+    return String(msg.value);
+  }
+}
+
+function update_topic_table(msg) {
+  var topic_name = msg.topic;
+  var value_td = id('value-'+msg.topic);
+  if (value_td) {
+    value_td.firstChild.nodeValue = format_value(msg);
+  } else {
+    // Add new row to table
+    value_td = construct('td', [text(format_value(msg))]);
+    value_td.setAttribute('id', 'value-'+msg.topic);
+    var new_tr = construct('tr', [
+      construct('td', [text(msg.topic)]),
+      value_td
+    ]);
+    id('topics-table').firstChild.appendChild(new_tr);
+  }
+}
+
+window.addEventListener("load", function(event) {
+  var ws = new WebSocket('ws://' + location.host + '/updates');
+  ws.onopen = function(event) {
+    id('connecting').style.display = 'none';
+  };
+  ws.onmessage = function(event) {
+    var json_msg = JSON.parse(event.data);
+    update_topic_table(json_msg);
+  };
+  ws.onclose = function(event) {
+    id('disconnected').style.display = 'block';
+  };
+});
+</script>
+
+</body>
+</html>

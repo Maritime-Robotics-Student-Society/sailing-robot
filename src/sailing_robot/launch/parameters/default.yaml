@@ -40,6 +40,11 @@
 # The definition where we change tack when going upwind is based on crossing a line parallel to the wind direction, going through a point at a given distance to the waypoint.
 # See https://github.com/Maritime-Robotics-Student-Society/sailing-robot/blob/master/notes/upwind-tactics.svg# in [m]
 /navigation/tackline_distance: 5
+# Zone number of the UTM system to use. Southampton is in zone 30,
+# Portugal in zone 29. http://www.dmap.co.uk/utmworld.htm
+# Distance calculations will be less accurate the further from the specified
+# zone you are.
+/navigation/utm_zone: 30
 
 
 #

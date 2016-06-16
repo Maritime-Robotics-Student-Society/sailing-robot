@@ -21,7 +21,10 @@
     <node name = "pid_rudder" pkg="sailing_robot" type = "pid_rudder" />
     <node name = "pid_sail" pkg="sailing_robot" type = "pid_sail" />
     <node name = "heading" pkg="sailing_robot" type="imu-calibrated" />
-    <node name = "dashboard" pkg="sailing_robot" type="dashboard" />
+    <node name = "wind_direction" pkg="sailing_robot" type="wind_direction_calibrated" />
+
+    <!-- Rosbag records messages for later investigation -->
+    <node name="record" pkg="rosbag" type="record" args="-a -o ~/sailing-record"/>
     <!--
     Launch Bridge to Arduino
     -->
@@ -29,9 +32,9 @@
     <param name="port" value="/dev/ttyACM0"/>
     <param name="baud" value="9600"/>
   </node>
-  <node pkg="rosserial_python" type="serial_node.py" name="serial_node2">
+  <!--node pkg="rosserial_python" type="serial_node.py" name="serial_node2">
     <param name="port" value="/dev/ttyACM1"/>
     <param name="baud" value="9600"/>
-  </node>
+  </node-->
 
 </launch>

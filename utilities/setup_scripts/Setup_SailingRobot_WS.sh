@@ -14,6 +14,6 @@ catkin_make
 
 # Source new installation
 source devel/setup.bash
-echo "source devel/setup.bash" >> ~/.bashrc
+echo "source /home/pi/sailing-robot/devel/setup.bash" >> ~/.bashrc
 
 cd ~
