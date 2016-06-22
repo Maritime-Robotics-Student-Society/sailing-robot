@@ -230,3 +230,10 @@ if __name__ == "__main__":
     controller.update_PID(-.5)
     print controller
 
+def saturation(cmd,lowerlimits,higherlimits):
+    if cmd>higherlimits:
+        return higherlimits
+    elif cmd<lowerlimits:
+        return lowerlimits
+    else:
+        return cmd
