@@ -10,7 +10,7 @@ data = PID_Data()
 
 rudder = rospy.get_param('/rudder')
 
-controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'])
+controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'],rudder['maxAngle'], -rudder['maxAngle'])
 
 
 def node_publisher():
