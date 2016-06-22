@@ -21,6 +21,12 @@ XOFFSET = 1082
 YOFFSET = -949
 XSCALE = 46352
 YSCALE = 43884
+ANGLEOFFSET = 90
+
+
+
+AVE_SIZE = 6   # averaging over the last AVE_SIZE values
+
 
 def wind_direction_publisher():
     def twos_comp_combine(msb, lsb):
@@ -120,12 +126,15 @@ def wind_direction_publisher():
 
 
 
+    average_list = [0] * AVE_SIZE 
+    i = 0
+
     # !!! TODO use rospy rate!
     while not rospy.is_shutdown():
         #Read data from the chips ----------------------
         time.sleep(0.5)
-#         magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
-#         MagX = magx #*0.160
+        # magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
+        # MagX = magx #*0.160
         
         magy = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Y_MSB), b.read_byte_data(LSM, LSM_MAG_Y_LSB))
         MagY = magy #*0.160
@@ -133,22 +142,19 @@ def wind_direction_publisher():
         magz = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Z_MSB), b.read_byte_data(LSM, LSM_MAG_Z_LSB))
         MagZ = magz #*0.160
 
-        # calibration
-	MagX = (MagY - XOFFSET) * XSCALE
+        # calibration and axis change (Y->X and Z->Y)
+        MagX = (MagY - XOFFSET) * XSCALE
         MagY = (MagZ - YOFFSET) * YSCALE
-	
-        # handle division by zero
-#         if abs(MagY) <= 0.001:
-#             if MagY*MagX > 0:
-#                 heading = 90
-#             else:
-#                      heading = -90
-#         else:
+
+
         wind_direction = math.atan2(MagX, MagY)*(180/math.pi)
-	wind_direction = (wind_direction - 90) % 360
-        data = wind_direction
-        apparent_wind_direction_pub.publish(wind_direction)
-	rospy.logerr("wind_loop")
+        wind_direction = (wind_direction - ANGLEOFFSET) % 360
+
+        i = (i+1) % AVE_SIZE
+        average_list[i] = wind_direction
+        average_wind_direction = sum(average_list)/ float(AVE_SIZE)
+
+        apparent_wind_direction_pub.publish(average_wind_direction)
 
 if __name__ == '__main__':
     try:

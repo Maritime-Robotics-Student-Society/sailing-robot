@@ -10,7 +10,7 @@ data = PID_Data()
 
 rudder = rospy.get_param('/rudder')
 
-controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'], rudder['maxAngle'], -rudder['maxAngle'])
+controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'],rudder['maxAngle'], -rudder['maxAngle'])
 
 
 def node_publisher():
@@ -27,7 +27,8 @@ def node_publisher():
     while not rospy.is_shutdown():
 	rospy.loginfo("Sailing state: %r", data.sailing_state)
         if data.sailing_state == 'normal':
-            angle = controller.update_PID(data.goal_heading-data.heading)
+            rawangle = controller.update_PID(data.heading-data.goal_heading)
+            angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
             rospy.loginfo("Angle: %r", angle)
         else:
             angle = data.tack_rudder
