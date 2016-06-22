@@ -154,8 +154,28 @@ offset_Y = (maxy + miny)/2
 range_X = maxx - minx
 range_Y = maxy - miny
 
+print("Now hold the wind vane in direction of the bow")
+print "3"
+time.sleep(1)
+print "2"
+time.sleep(1)
+print "1"
+time.sleep(1)
+print "go!"
 
-print("offset X = " + str(offset_X))
-print("offset Y = " + str(offset_Y))
-print("range X = " + str(range_X))
-print("range Y = " + str(range_Y))
+magy = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Y_MSB), b.read_byte_data(LSM, LSM_MAG_Y_LSB))
+magz = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Z_MSB), b.read_byte_data(LSM, LSM_MAG_Z_LSB))
+
+magy = (magy - offset_X) * range_X
+magz = (magz - offset_Y) * range_Y
+angle_offset = math.atan2(magy, magz)*(180/math.pi)
+
+angle_offset = int((angle_offset + 45)/90)*90 % 360
+
+
+print
+print("XOFFSET = " + str(offset_X))
+print("YOFFSET = " + str(offset_Y))
+print("XSCALE = " + str(range_X))
+print("YSCALE = " + str(range_Y))
+print("ANGLEOFFSET = " + str(angle_offset))
