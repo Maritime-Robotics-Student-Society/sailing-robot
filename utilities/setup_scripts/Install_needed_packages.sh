@@ -12,4 +12,13 @@ yes | sudo pip install spidev
 
 # Install vim
 sudo apt-get --assume-yes install vim
+
+sudo apt-get install 
+
+
+
+# Set time zone to england (it is the same for portugal)
+sudo timedatectl set-timezone Europe/London
+
+
 cd ~
