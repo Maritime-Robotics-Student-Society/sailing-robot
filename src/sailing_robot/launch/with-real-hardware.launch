@@ -9,7 +9,7 @@
 
     <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
 
     <!--
     Nodes

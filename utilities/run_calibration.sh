@@ -18,7 +18,7 @@ echo '----------------------------------------------------------'
 
 read
 
-python compass_calib
+python2 calibration_scripts/compasscalib
 
 
 echo '----------------------------------------------------------'
@@ -27,7 +27,7 @@ echo 'hit enter when ready'
 echo '----------------------------------------------------------'
 read
 
-python wind_direction_calib
+python2 calibration_scripts/wind_direction_calib
 
 
 rosparam dump  ../src/sailing_robot/launch/parameters/calibration_${name}.yaml /calibration
