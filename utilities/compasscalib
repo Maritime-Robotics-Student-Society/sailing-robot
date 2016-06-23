@@ -13,7 +13,7 @@
 
 from std_msgs.msg import Float32
 import time, math
-
+import rospy
 
 def twos_comp_combine(msb, lsb):
     twos_comp = 256*msb + lsb
@@ -153,6 +153,13 @@ offset_Y = (maxy + miny)/2
 
 range_X = maxx - minx
 range_Y = maxy - miny
+
+rospy.set_param('/calibration/compass', {'XOFFSET': offset_Y,
+                                          'YOFFSET': offset_Y,
+                                          'XSCALE': range_X,
+                                          'YSCALE': range_Y,
+                                          })
+
 
 
 print("XOFFSET = " + str(offset_X))

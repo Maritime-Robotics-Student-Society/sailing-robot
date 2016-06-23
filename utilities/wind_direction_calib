@@ -13,6 +13,7 @@
 
 from std_msgs.msg import Float32
 import time, math
+import rospy
 
 
 def twos_comp_combine(msb, lsb):
@@ -171,6 +172,16 @@ magz = (magz - offset_Y) * range_Y
 angle_offset = math.atan2(magy, magz)*(180/math.pi)
 
 angle_offset = int((angle_offset + 45)/90)*90 % 360
+
+
+
+
+rospy.set_param('/calibration/wind_dir', {'XOFFSET': offset_Y,
+                                          'YOFFSET': offset_Y,
+                                          'XSCALE': range_X,
+                                          'YSCALE': range_Y,
+                                          'ANGLEOFFSET': angle_offset,
+                                          })
 
 
 print

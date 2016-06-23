@@ -17,11 +17,16 @@ import rospy
 from std_msgs.msg import Float32
 import time, math
 
-XOFFSET = 1082
-YOFFSET = -949
-XSCALE = 46352
-YSCALE = 43884
-ANGLEOFFSET = 90
+
+
+calib = rospy.get_param('/calibration/wind_dir')
+
+XOFFSET = calib['XOFFSET']
+YOFFSET = calib['YOFFSET']
+XSCALE = calib['XSCALE']
+YSCALE = calib['YSCALE']
+ANGLEOFFSET = calib['ANGLEOFFSET']
+
 
 
 
