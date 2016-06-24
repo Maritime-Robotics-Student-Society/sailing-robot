@@ -17,10 +17,15 @@ import rospy
 from std_msgs.msg import Float32
 import time, math
 
-XOFFSET = -93
-YOFFSET = -419
-XSCALE = 2744
-YSCALE = 2954
+
+calib = rospy.get_param('/calibration/compass')
+
+XOFFSET = calib['XOFFSET']
+YOFFSET = calib['YOFFSET']
+XSCALE = calib['XSCALE']
+YSCALE = calib['YSCALE']
+
+
 
 def heading_publisher():
     def twos_comp_combine(msb, lsb):

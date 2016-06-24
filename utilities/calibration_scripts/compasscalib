@@ -13,7 +13,7 @@
 
 from std_msgs.msg import Float32
 import time, math
-
+import rospy
 
 def twos_comp_combine(msb, lsb):
     twos_comp = 256*msb + lsb
@@ -27,7 +27,7 @@ busNum = 1
 b = SMBus(busNum)
 
 ## LSM303D Registers --------------------------------------------------------------
-LSM = 0x1e #Device I2C slave address
+LSM = 0x1d #Device I2C slave address
 
 LSM_WHOAMI_ADDRESS = 0x0F
 LSM_WHOAMI_CONTENTS = 0b1001001 #Device self-id
@@ -65,7 +65,7 @@ LSM_TEMP_LSB = 0x06
 
 # L3GD20H registers ----------------------------------------------------
 
-LGD = 0x6a #Device I2C slave address
+LGD = 0x6b #Device I2C slave address
 LGD_WHOAMI_ADDRESS = 0x0F
 LGD_WHOAMI_CONTENTS = 0b11010111 #Device self-id
 
@@ -118,14 +118,14 @@ for i in range(300):
     try:
         #Read data from the chips ----------------------
         time.sleep(0.1)
-        #magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
+        magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
 
         magy = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Y_MSB), b.read_byte_data(LSM, LSM_MAG_Y_LSB))
 
         magz = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Z_MSB), b.read_byte_data(LSM, LSM_MAG_Z_LSB))
 
-        data_X.append(magy)
-        data_Y.append(magz)
+        data_X.append(magx)
+        data_Y.append(magy)
 
         minx = min(data_X)
         miny = min(data_Y)
@@ -154,28 +154,15 @@ offset_Y = (maxy + miny)/2
 range_X = maxx - minx
 range_Y = maxy - miny
 
-print("Now hold the wind vane in direction of the bow")
-print "3"
-time.sleep(1)
-print "2"
-time.sleep(1)
-print "1"
-time.sleep(1)
-print "go!"
-
-magy = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Y_MSB), b.read_byte_data(LSM, LSM_MAG_Y_LSB))
-magz = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Z_MSB), b.read_byte_data(LSM, LSM_MAG_Z_LSB))
-
-magy = (magy - offset_X) * range_X
-magz = (magz - offset_Y) * range_Y
-angle_offset = math.atan2(magy, magz)*(180/math.pi)
-
-angle_offset = int((angle_offset + 45)/90)*90 % 360
+rospy.set_param('/calibration/compass', {'XOFFSET': offset_Y,
+                                          'YOFFSET': offset_Y,
+                                          'XSCALE': range_X,
+                                          'YSCALE': range_Y,
+                                          })
 
 
-print
+
 print("XOFFSET = " + str(offset_X))
 print("YOFFSET = " + str(offset_Y))
 print("XSCALE = " + str(range_X))
 print("YSCALE = " + str(range_Y))
-print("ANGLEOFFSET = " + str(angle_offset))
