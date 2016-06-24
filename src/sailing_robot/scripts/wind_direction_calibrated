@@ -157,7 +157,7 @@ def wind_direction_publisher():
 
         i = (i+1) % AVE_SIZE
         average_list[i] = wind_direction
-        average_wind_direction = sum(average_list)/ float(AVE_SIZE)
+        average_wind_direction = atan2(sum([ math.sin(x) for x in average_list]), sum([ math.cos(x) for x in average_list]))
 
         apparent_wind_direction_pub.publish(average_wind_direction)
 
