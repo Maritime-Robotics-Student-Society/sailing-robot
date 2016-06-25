@@ -39,7 +39,7 @@ def rudderservoPWM(data):
 
 if __name__ == '__main__':
     try:
-        rospy.init_node()
+        rospy.init_node('servo_control', anonymous=True)
         rospy.Subscriber('/rudder_control', Int16, rudderservoPWM)
         rospy.Subscriber('/sail_servo', UInt16, sailservoPWM)
         rospy.spin()

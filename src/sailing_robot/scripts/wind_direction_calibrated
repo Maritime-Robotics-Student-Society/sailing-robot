@@ -14,7 +14,7 @@
 from __future__ import division
 
 import rospy
-from std_msgs.msg import Float32
+from std_msgs.msg import Float64
 import time, math
 
 
@@ -164,7 +164,7 @@ def wind_direction_publisher():
 
 if __name__ == '__main__':
     try:
-        apparent_wind_direction_pub = rospy.Publisher('/wind_direction_apparent', Float32, queue_size=10)
+        apparent_wind_direction_pub = rospy.Publisher('/wind_direction_apparent', Float64, queue_size=10)
         rospy.init_node("publish_wind_direction_imu", anonymous=True)
         wind_direction_publisher()
     except rospy.ROSInterruptException:
