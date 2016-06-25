@@ -1,0 +1,16 @@
+
+# for simplified entry of path, simply add list of waypoint names
+/wp/list: ["1", "2", "1"]
+
+
+# distance within waypoint is accepted, in [m]
+/wp/acceptDistance: 1.0
+
+
+# Dictionary for looking up waypoints, using [lat, lon] format of NavSatFix
+#
+/wp/table: {"1" : [50.957567, -1.367289],
+            "2" : [50.957444, -1.366680],
+            }
+
+
