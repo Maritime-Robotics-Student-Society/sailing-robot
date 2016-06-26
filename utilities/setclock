@@ -1,0 +1,32 @@
+#!/usr/bin/python
+from __future__ import print_function
+
+import os
+import serial
+import subprocess
+import re
+import sys
+
+import pynmea2
+
+date = raw_input("Date [YYYY-MM-DD]> ").strip()
+if not re.match("\d{4}-\d{2}-\d{2}", date):
+    sys.exit("Date didn't match required format")
+
+def get_gps_time(streamreader):
+    while True:
+        for msg in streamreader.next():
+            if msg.sentence_type == 'GGA':
+                return msg.timestamp
+
+serial_port = serial.Serial("/dev/ttyAMA0", 9600, timeout=0.5)
+streamreader = pynmea2.NMEAStreamReader(serial_port)
+print("Getting time from GPS...")
+from datetime import time
+time = get_gps_time(streamreader)
+
+dts = date + 'T' + time.strftime('%H:%M:%S')
+print("Setting clock to:", dts)
+print("  (may require sudo password)")
+subprocess.check_call(["sudo", "date", "+%Y-%m-%dT%H:%M:%S", "-s", dts])
+print("Done")
