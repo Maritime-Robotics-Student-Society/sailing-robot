@@ -78,36 +78,40 @@ class HeadingPlanTests(unittest.TestCase):
     def test_tack_to_port(self):
         self.hp.nav.wind_direction = 90
         self.hp.nav.heading = 280  # We're reaching the wrong way!
+        self.hp.tack_wanted_sum = 75  # On tack threshold
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_port_tack')
 
     def test_tack_to_stbd(self):
         self.hp.nav.wind_direction = 270
         self.hp.nav.heading = 280  # We're reaching the wrong way!
+        self.hp.tack_wanted_sum = 75  # On tack threshold
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_stbd_tack')
 
     def test_to_windward_port_tack(self):
         self.hp.nav.wind_direction = 270
         self.hp.nav.heading = 180
+        self.hp.tack_wanted_sum = 15  # Below tack threshold
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'normal')
         self.assertEqual(goal, 135)
 
         # Time to switch tack
-        self.hp.nav.update_position(DummyNSF(50.68, -1.018))
+        self.hp.tack_wanted_sum = 85  # Above tack threshold
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_stbd_tack')
 
     def test_to_windward_stbd_tack(self):
         self.hp.nav.wind_direction = 90
         self.hp.nav.heading = 0
+        self.hp.tack_wanted_sum = 15  # Below tack threshold
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'normal')
         self.assertEqual(goal, 45)
 
         # Time to switch tack
-        self.hp.nav.update_position(DummyNSF(50.72, -1.018))
+        self.hp.tack_wanted_sum = 85  # Above tack threshold
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_port_tack')
 
