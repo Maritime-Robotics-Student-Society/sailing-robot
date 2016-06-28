@@ -57,7 +57,7 @@ sudo touch /etc/hostapd/hostapd.conf
 
 # Contents of hostapd config file
 sudo echo "interface=wlan0" >> /etc/hostapd/hostapd.conf
-sudo echo "driver=rt2800lib" >> /etc/hostapd/hostapd.conf
+sudo echo "driver=nl80211" >> /etc/hostapd/hostapd.conf
 sudo echo "ssid=Sail_Robot" >> /etc/hostapd/hostapd.conf
 sudo echo "hw_mode=g" >> /etc/hostapd/hostapd.conf
 sudo echo "channel=6" >> /etc/hostapd/hostapd.conf
@@ -71,7 +71,7 @@ sudo echo "rsn_pairwise=CCMP" >> /etc/hostapd/hostapd.conf
 # Commands below specific to RPi 3
 sudo echo "ieee80211n=1" >> /etc/hostapd/hostapd.conf
 sudo echo "wmm_enabled=1" >> /etc/hostapd/hostapd.conf
-sudo echo "ht_capab=[HT40][SHORT-GI-20][DSSS_CCK-40]" >> /etc/hostapd/hostapd.conf
+
 
 # Copy default hostapd file in case needed
 sudo cp /etc/default/hostapd /etc/default/hostapd.old
