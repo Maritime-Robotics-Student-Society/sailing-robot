@@ -17,7 +17,7 @@ yes | sudo pip install wiringpi2
 sudo apt-get --assume-yes install vim
 
 # Needed for dashboard
-yes |  pip install tornado
+yes | sudo pip install tornado
 
 # Set time zone to england (it is the same for portugal)
 sudo timedatectl set-timezone Europe/London
