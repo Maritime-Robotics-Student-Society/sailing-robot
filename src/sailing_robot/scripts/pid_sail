@@ -18,12 +18,17 @@ def node_publisher():
 
 
     while not rospy.is_shutdown():
-        angle_to_wind = abs(sail.apparent_wind_angle - 180)
+
+        if sail.apparent_wind_angle  > 180:
+            angle_to_wind = abs(360 - sail.apparent_wind_angle) 
+        else:   
+            angle_to_wind = abs(sail.apparent_wind_angle)
         sail_angle = 0.5 * angle_to_wind
-        sheetlength = np.sqrt(pullypivotdistance**2+boomsheetdistance**2 -\
-                        2*pullypivotdistance*boomsheetdistance*np.cos(sail_angle/180*np.pi))
-        angle = sheetlength*1000/saildata['winchDiameter']/np.pi*180
-        pub.publish(int(angle))
+#         sheetlength = np.sqrt(pullypivotdistance**2+boomsheetdistance**2 -\
+#                         2*pullypivotdistance*boomsheetdistance*np.cos(sail_angle/180*np.pi))
+#         angle = sheetlength*1000/saildata['winchDiameter']/np.pi*180
+#         pub.publish(int(angle))
+        pub.publish(int(sail_angle))
 
         rate.sleep()
 

@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+import wiringpi 
+import time
+import rospy
+from std_msgs.msg import UInt16, Int16
+
+def setup():
+    # use BCM GPIO numbers                                                        
+    wiringpi.wiringPiSetupGpio()
+
+    # enable PWM0 (BCM pin 18, 12 on RPi) for Sail Servo                                                                 
+    wiringpi.pinMode(18,2)
+    wiringpi.pwmSetMode(0)
+    wiringpi.pwmSetClock(400)
+    wiringpi.pwmSetRange(1024)
+    wiringpi.pwmWrite(18, 0)
+
+     # enable PWM1 (BCM pin 13, 33 on RPi) for Rudder Servo                                                                
+    wiringpi.pinMode(13,2)
+    wiringpi.pwmSetMode(0)
+    wiringpi.pwmSetClock(400)
+    wiringpi.pwmSetRange(1024)
+    wiringpi.pwmWrite(13, 0)
+
+def sailservoPWM(data):
+    degrees = data.data;
+    pwm = 400*(1.0*degrees/630) + 1500;
+    dutycycle = pwm/20000;
+    wiringpi.pwmWrite(18,int(dutycycle * 1024))
+
+
+def rudderservoPWM(data):
+    degrees = data.data;
+    pwm = 1000*(1.0*degrees + 90)/180 + 1000;
+    dutycycle = pwm/20000;
+    wiringpi.pwmWrite(13,int(dutycycle * 1024))
+
+        
+
+if __name__ == '__main__':
+    try:
+        rospy.init_node('servo_control', anonymous=True)
+        rospy.Subscriber('/rudder_control', Int16, rudderservoPWM)
+        rospy.Subscriber('/sail_servo', UInt16, sailservoPWM)
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass
+    
+
+    
+
