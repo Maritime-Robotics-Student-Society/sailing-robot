@@ -83,6 +83,7 @@ class HeadingPlan:
         
         rospy.logwarn('Want tack now: %d' % want_tack_now)
         rospy.logwarn('Want tack sum: %d' % self.tack_wanted_sum)
+        rospy.logwarn('Tack decision min: %d' % self.tack_wanted_sum)
 
         self.tack_wanted_sum += want_tack_now
         if self.tack_wanted_sum > self.tack_decision_min:
@@ -94,6 +95,7 @@ class HeadingPlan:
             else:
                 beating_angle = self.nav.beating_angle
                 tack_to = 'tack_to_port_tack'
+            self.sailing_state = tack_to
             return tack_to, self.nav.wind_angle_to_heading(beating_angle)
 
         # Update the rolling poll of whether we want to tack.
