@@ -23,15 +23,17 @@ def decimal_degrees(d_m, hemisphere):
     return res
 
 def pos_publisher():
+    gps_reader = pynmea2.NMEAStreamReader(input)
     while not rospy.is_shutdown():
-        gps_data = serial_port.readline()
-        if 'GGA' in gps_data:
-            fix = pynmea2.parse(gps_data)
+        for sentence in gps_reader.next():
+            if sentence.sentence_type != 'GGA':
+                continue
+
             msg = NavSatFix()
             if fix.lat == '':
                 continue
-            msg.latitude = decimal_degrees(fix.lat, fix.lat_dir)
-            msg.longitude = decimal_degrees(fix.lon, fix.lon_dir)
+            msg.latitude = decimal_degrees(sentence.lat, sentence.lat_dir)
+            msg.longitude = decimal_degrees(sentence.lon, sentence.lon_dir)
             pos_pub.publish(msg)
 
 if __name__ == '__main__':
