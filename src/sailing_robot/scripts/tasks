@@ -32,7 +32,7 @@ if __name__ == '__main__':
         #tasks = rospy.get_param("/tasks")
         tasks = tasks_from_wps(rospy.get_param("/wp"))
         nav_options = rospy.get_param("/navigation")
-        nav = Navigation(**nav_options)
+        nav = Navigation()#**nav_options)
         tasks_runner = TasksRunner(tasks, nav, log=rospy.loginfo)
         tasks_runner.nav.subscribe_topics()
         goal_heading_publisher(tasks_runner)
