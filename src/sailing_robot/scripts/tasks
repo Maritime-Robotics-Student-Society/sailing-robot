@@ -8,7 +8,7 @@ from std_msgs.msg import Float32
 from std_msgs.msg import Float64
 from std_msgs.msg import String
 import sailing_robot
-from sailing_robot.tasks import TasksRunner
+from sailing_robot.tasks import TasksRunner, tasks_from_wps
 from sailing_robot.navigation import Navigation
 from sensor_msgs.msg import NavSatFix
 
@@ -29,7 +29,8 @@ def goal_heading_publisher(tasks_runner):
 if __name__ == '__main__':
     try:
         rospy.init_node("publish_goal_heading", anonymous=True)
-        tasks = rospy.get_param("/tasks")
+        #tasks = rospy.get_param("/tasks")
+        tasks = tasks_from_wps(rospy.get_param("/wp"))
         nav_options = rospy.get_param("/navigation")
         nav = Navigation(**nav_options)
         tasks_runner = TasksRunner(tasks, nav, log=rospy.loginfo)
