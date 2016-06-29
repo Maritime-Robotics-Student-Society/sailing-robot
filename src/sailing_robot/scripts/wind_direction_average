@@ -21,17 +21,18 @@ def angle_average(ang_list):
 
 def wind_direction_average_publisher():
 
-    rate = rospy.Rate(rospy.get_param("/config/rate"))
+    sensor_rate = rospy.get_param("/config/rate")
+    rate = rospy.Rate(sensor_rate)
     AVE_TIME = rospy.get_param("/wind/trend_average_time")   # lengh of the averaging in seconds
-    AVE_SIZE = int(AVE_TIME / rate.expectedCycleTime())      # size of the averaging sample
+    AVE_SIZE = AVE_TIME * sensor_rate      # size of the averaging sample
     average_list = collections.deque(maxlen = AVE_SIZE)
 
     while not rospy.is_shutdown():
         wind_direction = (wind_direction_apparent + heading) % 360
 
-        average_list.apppend(wind_direction)
+        average_list.append(wind_direction)
         
-        wind_direction_average = math.mean(average_list)
+        wind_direction_average = sum(list(average_list)) / len(average_list)
         wind_direction_average_pub.publish(wind_direction_average)
 
         rate.sleep()
