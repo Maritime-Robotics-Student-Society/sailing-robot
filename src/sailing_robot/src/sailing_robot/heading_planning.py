@@ -80,8 +80,8 @@ class HeadingPlan:
             # These two have different signs, so we want the other tack
             want_tack_now = 1
         
-        rospy.loginfo('Want tack now: %d' % want_tack_now)
-        rospy.loginfo('Want tack sum: %d' % self.tack_wanted_sum)
+        rospy.logwarn('Want tack now: %d' % want_tack_now)
+        rospy.logwarn('Want tack sum: %d' % self.tack_wanted_sum)
 
         self.tack_wanted_sum += want_tack_now
         if self.tack_wanted_sum > self.tack_decision_min:
