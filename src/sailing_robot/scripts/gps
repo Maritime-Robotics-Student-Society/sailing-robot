@@ -24,7 +24,7 @@ def decimal_degrees(d_m, hemisphere):
     return res
 
 def pos_publisher():
-    gps_reader = pynmea2.NMEAStreamReader(input)
+    gps_reader = pynmea2.NMEAStreamReader(serial_port)
     while not rospy.is_shutdown():
         for sentence in gps_reader.next():
             if sentence.sentence_type != 'GGA':
