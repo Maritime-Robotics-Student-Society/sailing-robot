@@ -7,6 +7,20 @@ from .navigation import Navigation
 from .heading_planning import HeadingPlan
 from .station_keeping import StationKeeping
 
+def tasks_from_wps(wp_params):
+    target_radius = wp_params['acceptRadius']
+    coordinates = wp_params['table']
+    res = []
+    for wpid in wp_params['list']:
+        lat, lon = coordinates[wpid]
+        res.append({
+            'kind': 'to_waypoint',
+            'lat': lat,
+            'lon': lon,
+            'target_radius': target_radius
+        })
+    return res
+
 class TimedEnd(object):
     def __init__(self, seconds):
         self.seconds = seconds
@@ -31,8 +45,8 @@ class TasksRunner(object):
         kind = taskdict['kind']
         if kind == 'to_waypoint':
             wp = LatLon(taskdict['lat'], taskdict['lon'])
-            # Other parameters?
-            task = HeadingPlan(waypoint=wp, nav=self.nav)
+            kw = {'target_radius': taskdict['target_radius']}
+            task = target_HeadingPlan(waypoint=wp, nav=self.nav, **kw)
         elif kind == 'keep_station':
             markers = [tuple(p) for p in taskdict['markers']]
             task = StationKeeping(self.nav, markers,

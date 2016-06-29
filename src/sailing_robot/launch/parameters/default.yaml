@@ -56,6 +56,14 @@
 /rudder/control/Ki: 0
 /rudder/control/Kd: 0 
 
+
+# servo PWM control 
+
+/rudder/PWMoffset: 0
+/rudder/servolowerlimits: 1140
+/rudder/servohigherlimits: 1900
+
+
 # maximum angle
 # absolute value, in [degrees], see https://github.com/Maritime-Robotics-Student-Society/sailing-robot/wiki/Naming-conventions
 /rudder/maxAngle: 40
@@ -77,7 +85,11 @@
 # maximum angle
 # in [degrees]
 /sail/maxAngle: 90
-
+# servo PWM control 
+  
+/sail/PWMoffset: 0
+/sail/servolowerlimits: 1100
+/sail/servohigherlimits: 1900
 # Safe value for the boat sail to be set at
 # in [degrees]
 /sail/initialAngle: 90

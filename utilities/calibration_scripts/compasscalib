@@ -154,7 +154,7 @@ offset_Y = (maxy + miny)/2
 range_X = maxx - minx
 range_Y = maxy - miny
 
-rospy.set_param('/calibration/compass', {'XOFFSET': offset_Y,
+rospy.set_param('/calibration/compass', {'XOFFSET': offset_X,
                                           'YOFFSET': offset_Y,
                                           'XSCALE': range_X,
                                           'YSCALE': range_Y,

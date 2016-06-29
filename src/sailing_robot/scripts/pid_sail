@@ -5,6 +5,7 @@ import numpy as np
 from std_msgs.msg import Float64, UInt16, String
 
 from sailing_robot.sail_data import Sail_data
+import sailing_robot.pid_control as _PID
 
 sail = Sail_data()
 saildata = rospy.get_param('/sail')
@@ -23,7 +24,9 @@ def node_publisher():
             angle_to_wind = abs(360 - sail.apparent_wind_angle) 
         else:   
             angle_to_wind = abs(sail.apparent_wind_angle)
-        sail_angle = 0.5 * angle_to_wind
+        rawsail_angle = 0.5 * angle_to_wind
+        sail_angle = _PID.saturation(rawsail_angle, -saildata["maxAngle"], \
+            saildata["maxAngle"])
 #         sheetlength = np.sqrt(pullypivotdistance**2+boomsheetdistance**2 -\
 #                         2*pullypivotdistance*boomsheetdistance*np.cos(sail_angle/180*np.pi))
 #         angle = sheetlength*1000/saildata['winchDiameter']/np.pi*180

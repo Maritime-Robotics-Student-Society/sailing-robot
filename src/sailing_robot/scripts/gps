@@ -4,6 +4,7 @@ import serial
 import pynmea2
 import re
 import rospy
+from std_msgs.msg import Int16
 from sensor_msgs.msg import NavSatFix
 
 serial_port = serial.Serial("/dev/ttyAMA0", 9600, timeout=0.5)
@@ -23,20 +24,28 @@ def decimal_degrees(d_m, hemisphere):
     return res
 
 def pos_publisher():
+    gps_reader = pynmea2.NMEAStreamReader()
     while not rospy.is_shutdown():
-        gps_data = serial_port.readline()
-        if 'GGA' in gps_data:
-            fix = pynmea2.parse(gps_data)
-            msg = NavSatFix()
-            if fix.lat == '':
+        line = serial_port.readline()
+        if not line.strip():
+            continue
+
+        for sentence in gps_reader.next(line):
+            if sentence.sentence_type != 'GGA':
                 continue
-            msg.latitude = decimal_degrees(fix.lat, fix.lat_dir)
-            msg.longitude = decimal_degrees(fix.lon, fix.lon_dir)
+
+            msg = NavSatFix()
+            if sentence.lat == '':
+                continue
+            msg.latitude = decimal_degrees(sentence.lat, sentence.lat_dir)
+            msg.longitude = decimal_degrees(sentence.lon, sentence.lon_dir)
             pos_pub.publish(msg)
+            nsats_pub.publish(int(sentence.num_sats))
 
 if __name__ == '__main__':
     try:
         pos_pub = rospy.Publisher('/position', NavSatFix, queue_size=10)
+        nsats_pub = rospy.Publisher('/gps_satellites', Int16, queue_size=10)
         rospy.init_node("publish_gps_position", anonymous=True)
         pos_publisher()
     except rospy.ROSInterruptException:
