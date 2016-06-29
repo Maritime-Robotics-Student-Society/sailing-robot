@@ -25,6 +25,7 @@ def decimal_degrees(d_m, hemisphere):
 
 def pos_publisher():
     gps_reader = pynmea2.NMEAStreamReader()
+    serial_port.readline()  # Discard first line in case it's partial
     while not rospy.is_shutdown():
         line = serial_port.readline()
         if not line.strip():
