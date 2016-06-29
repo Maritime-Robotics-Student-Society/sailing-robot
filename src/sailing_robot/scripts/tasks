@@ -16,11 +16,17 @@ from sensor_msgs.msg import NavSatFix
 def goal_heading_publisher(tasks_runner):
     pub = rospy.Publisher("/goal_heading", Float32, queue_size=10)
     pub_state = rospy.Publisher("/sailing_state", String, queue_size=10)
+    distance_to_wp = rospy.Publisher("/distance_to_waypoint", Float32, queue_size=10)
+    heading_to_wp = rospy.Publisher("/heading_to_waypoint", Float32, queue_size=10)
     rate = rospy.Rate(rospy.get_param("/config/rate"))
 
     tasks_runner.start_next_task()
     while not rospy.is_shutdown():
         state, goal_heading = tasks_runner.calculate_state_and_goal()
+        if isinstance(tasks_runner.active_task, HeadingPlan):
+            d, h = tasks_runner.active_task.distance_heading_to_waypoint()
+            distance_to_wp.publish(d)
+            heading_to_wp.publish(h)
         pub.publish(goal_heading)
         pub_state.publish(state)
         rate.sleep()
