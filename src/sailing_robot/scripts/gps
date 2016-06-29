@@ -35,7 +35,7 @@ def pos_publisher():
                 continue
 
             msg = NavSatFix()
-            if fix.lat == '':
+            if sentence.lat == '':
                 continue
             msg.latitude = decimal_degrees(sentence.lat, sentence.lat_dir)
             msg.longitude = decimal_degrees(sentence.lon, sentence.lon_dir)
