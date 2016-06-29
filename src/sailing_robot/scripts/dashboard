@@ -22,6 +22,7 @@ simple_topics = [
     ('/wind_direction_apparent', Float64),
     ('/distance_to_waypoint', Float32),
     ('/heading_to_waypoint', Float32),
+    ('/gps_satellites', Int16),
 ]
 
 geo_topics = [

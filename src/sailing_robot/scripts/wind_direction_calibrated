@@ -14,7 +14,7 @@
 from __future__ import division
 
 import rospy
-from std_msgs.msg import Float32
+from std_msgs.msg import Float64
 import time, math
 
 
@@ -157,13 +157,14 @@ def wind_direction_publisher():
 
         i = (i+1) % AVE_SIZE
         average_list[i] = wind_direction
-        average_wind_direction = atan2(sum([ math.sin(x) for x in average_list]), sum([ math.cos(x) for x in average_list]))
+        average_wind_direction = math.atan2(sum([ math.sin(x*math.pi/180) for x in average_list]),
+                        sum([ math.cos(x*math.pi/180) for x in average_list]))*180/math.pi % 360
 
         apparent_wind_direction_pub.publish(average_wind_direction)
 
 if __name__ == '__main__':
     try:
-        apparent_wind_direction_pub = rospy.Publisher('/wind_direction_apparent', Float32, queue_size=10)
+        apparent_wind_direction_pub = rospy.Publisher('/wind_direction_apparent', Float64, queue_size=10)
         rospy.init_node("publish_wind_direction_imu", anonymous=True)
         wind_direction_publisher()
     except rospy.ROSInterruptException:
