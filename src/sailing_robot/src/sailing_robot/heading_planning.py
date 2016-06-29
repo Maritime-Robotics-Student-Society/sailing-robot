@@ -2,6 +2,7 @@ from collections import deque
 import LatLon as ll
 import math
 from shapely.geometry import Point
+import rospy
 
 from .navigation import Navigation, angleSum, angleAbsDistance
 
