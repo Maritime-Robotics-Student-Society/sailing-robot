@@ -19,21 +19,24 @@ import time, math
 
 
 
-calib = rospy.get_param('/calibration/wind_dir')
-
-XOFFSET = calib['XOFFSET']
-YOFFSET = calib['YOFFSET']
-XSCALE = calib['XSCALE']
-YSCALE = calib['YSCALE']
-ANGLEOFFSET = calib['ANGLEOFFSET']
-
-
-
-
-AVE_SIZE = 6   # averaging over the last AVE_SIZE values
-
 
 def wind_direction_publisher():
+
+    calib = rospy.get_param('/calibration/wind_dir')
+
+    XOFFSET = calib['XOFFSET']
+    YOFFSET = calib['YOFFSET']
+    XSCALE = calib['XSCALE']
+    YSCALE = calib['YSCALE']
+    ANGLEOFFSET = calib['ANGLEOFFSET']
+
+
+    average_time = rospy.get_param("/wind/sensor_average_time")
+    sensor_rate = rospy.get_param("/config/rate")
+    AVE_SIZE = average_time * sensor_rate   # averaging over the last AVE_SIZE values
+
+    rate = rospy.Rate(sensor_rate)
+
     def twos_comp_combine(msb, lsb):
         twos_comp = 256*msb + lsb
         if twos_comp >= 32768:
@@ -137,7 +140,7 @@ def wind_direction_publisher():
     # !!! TODO use rospy rate!
     while not rospy.is_shutdown():
         #Read data from the chips ----------------------
-        time.sleep(0.5)
+        rate.sleep(0.5)
         # magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
         # MagX = magx #*0.160
         
