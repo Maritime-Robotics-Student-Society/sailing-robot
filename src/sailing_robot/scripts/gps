@@ -30,7 +30,7 @@ def pos_publisher():
         if not line.strip():
             continue
 
-        for sentence in gps_reader.next(data):
+        for sentence in gps_reader.next(line):
             if sentence.sentence_type != 'GGA':
                 continue
 
