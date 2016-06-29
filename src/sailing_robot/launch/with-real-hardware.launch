@@ -18,9 +18,9 @@
     -->
     <!-- These are currently dummies, need to be replaced with real nodes -->
     <!-- <node name="publish_heading" pkg='sailing_robot' type="publish_heading"/> -->
-    <node name="publish_position" pkg='sailing_robot' type="gps"/>
-    <node name = "go_through_wp_list" pkg="sailing_robot" type = "run_through_wp_list" />
-    <!--<node name = "tasks" pkg="sailing_robot" type = "tasks" />-->
+    <node name="gps" pkg='sailing_robot' type="gps"/>
+    <!--<node name = "go_through_wp_list" pkg="sailing_robot" type = "run_through_wp_list" /> -->
+    <node name = "tasks" pkg="sailing_robot" type = "tasks" />
     <node name = "heading_control" pkg="sailing_robot" type = "heading_control" />
     <node name = "tack" pkg="sailing_robot" type = "tack" />
     <node name = "pid_rudder" pkg="sailing_robot" type = "pid_rudder" />
