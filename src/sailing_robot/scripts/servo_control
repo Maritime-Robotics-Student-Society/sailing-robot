@@ -3,27 +3,60 @@ import time
 import pigpio
 import rospy
 from std_msgs.msg import UInt16, Int16
+saildata = rospy.get_param('/sail')
+pullypivotdistance = saildata['pullypivotDistance']
+boomsheetdistance = saildata['boomsheetDistance']
+sailservoPWMoffset = saildata['PWMoffset']
+sailservolowerlimits = saildata['servolowerlimits']
+sailservohigherlimits = saildata['servohigherlimits']
+sailservoneturalpoint = (sailservolowerlimits + sailservohigherlimits)/2
+sailservorange = (sailservohigherlimits - sailservolowerlimits)
 
+rudderdata = rospy.get_param('/rudder')
+rudderservoPWMoffset = rudderdata['PWMoffset']
+rudderservolowerlimits = rudderdata['servolowerlimits']
+rudderservohigherlimits = rudderdata['servohigherlimits']
+rudderservoneturalpoint = (rudderservolowerlimits + rudderservohigherlimits) /2
+rudderservorange = (rudderservohigerlimits - rudderservolowerlimits)
 
 def setup():
     pi = pigpio.pi()
-    pi.set_mode(18, pigpio.OUTPUT) # GPIO 18 as sail servo pin
-    pi.set_mode(33, pigpio.OUTPUT) # GPIO 33 as rudder servo pin
+    pi.set_mode(24, pigpio.OUTPUT) # GPIO 24/RPi PIN 18 as sail servo pin
+    pi.set_mode(13, pigpio.OUTPUT) # GPIO 13/RPi PIN 33 as rudder servo pin
     
-def sailservoPWM(data):
-    degrees = data.data;
-    pwm = 400*(1.0*degrees/630) + 1500;
-    pi.set_servo_pulsewidth(18, pwm);
+def sailservoPWMcontrol(data):
+'''
+Sail Servo PWM control take in the maximum sail angle from topic /sail_servo.
+Maximum angle then convert into the sheet length in meters.
+This value will then used to calculate the rotation anlge (should between 0 to 1260)
+Final stage of servo control is transfer rotation angle into PWM output and use 
+pigpio service to control the servo.  
+'''
+    sail_angle = data.data;
+    sheetlength = np.sqrt(pullypivotdistance**2+boomsheetdistance**2 -\
+     2*pullypivotdistance*boomsheetdistance*np.cos(sail_angle/180*np.pi))
+    
+    degrees = sheetlength*1000/saildata['winchDiameter']/np.pi*180;
+    pwm = sailservorange*(1.0*degrees)/1260 + sailservoneturalpoint + \
+             sailservoPWMoffset;
+    pi.set_servo_pulsewidth(24, pwm);
 
-def rudderservoPWM(data):
+def rudderservoPWMcontrol(data):
+'''
+This function takes in the /rudder_control (90 to -90) value and directly write PWM
+signal to the rudder servo. Netural point was determined by the start and end points.
+rudderservoPWMoffset is used for software level trim. 
+'''
     degrees = data.data;
-    pwm = 1000*(1.0*degrees + 90)/180 + 1000;
-    pi.set_servo_pulsewidth(33, pwm);
+    pwm = rudderservorange*(1.0*degrees)/180 + rudderservoneturalpoint +\
+         rudderservoPWMoffset;
+    pi.set_servo_pulsewidth(13, pwm);
         
 
 if __name__ == '__main__':
     try:
         rospy.init_node('servo_control', anonymous=True)
+        setup();
         rospy.Subscriber('/rudder_control', Int16, rudderservoPWM)
         rospy.Subscriber('/sail_servo', UInt16, sailservoPWM)
         rospy.spin()
