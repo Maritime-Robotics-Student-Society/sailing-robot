@@ -11,7 +11,7 @@
 
     <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/eastleighWaypoints.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/boldrewood_waypoints.yaml" command="load"/>
 
     <!--
     Nodes
