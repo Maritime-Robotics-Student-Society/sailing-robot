@@ -70,3 +70,7 @@ class TasksRunner(object):
         if self.active_task.check_end_condition():
             self.start_next_task()
         return self.active_task.calculate_state_and_goal()
+        if isinstance(self.active_task, HeadingPlan):
+            d, h = self.active_task.distance_heading_to_waypoint()
+            distance_to_wp.publish(d)
+            heading_to_wp.publish(h)
