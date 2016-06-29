@@ -89,6 +89,7 @@ class HeadingPlan:
             else:
                 beating_angle = self.nav.beating_angle
                 tack_to = 'tack_to_port_tack'
+            self.sailing_state = tack_to
             return tack_to, self.nav.wind_angle_to_heading(beating_angle)
 
         # Update the rolling poll of whether we want to tack.

@@ -27,7 +27,10 @@ def node_publisher():
     while not rospy.is_shutdown():
 	rospy.loginfo("Sailing state: %r", data.sailing_state)
         if data.sailing_state == 'normal':
-            rawangle = controller.update_PID(data.heading-data.goal_heading)
+            angle_diff = data.heading - data.goal_heading
+            if angle_diff > 180:
+                angle_diff -= 360
+            rawangle = controller.update_PID(angle_diff)
             angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
             rospy.loginfo("Angle: %r", angle)
         else:
