@@ -2,7 +2,6 @@ from collections import deque
 import LatLon as ll
 import math
 from shapely.geometry import Point
-import rospy
 
 from .navigation import Navigation, angleSum, angleAbsDistance
 
@@ -70,7 +69,6 @@ class HeadingPlan:
             else:
                 # Tack completed
                 self.sailing_state = 'normal'
-                rospy.logerr("Completed tack")
                 self.tack_wanted.clear()
                 self.tack_wanted_sum = 0
 
@@ -80,10 +78,6 @@ class HeadingPlan:
         if (wp_wind_angle * boat_wind_angle) < 0:
             # These two have different signs, so we want the other tack
             want_tack_now = 1
-        
-        rospy.logwarn('Want tack now: %d' % want_tack_now)
-        rospy.logwarn('Want tack sum: %d' % self.tack_wanted_sum)
-        rospy.logwarn('Tack decision min: %d' % self.tack_wanted_sum)
 
         self.tack_wanted_sum += want_tack_now
         if self.tack_wanted_sum > self.tack_decision_min:
