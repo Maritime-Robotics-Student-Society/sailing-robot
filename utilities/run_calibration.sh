@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+rostopic list 2>&1 /dev/null || echo "roscore need to be running"; exit 1
+
+
 defaultname='laser'
 
 echo "Name of the calibration file [" $defaultname "]"
