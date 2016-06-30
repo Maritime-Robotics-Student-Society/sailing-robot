@@ -5,12 +5,6 @@ from LatLon import LatLon
 from sailing_robot.heading_planning import HeadingPlan
 from sailing_robot.navigation import Navigation, angleAbsDistance
 
-def test_angle_difference():
-    assert_equal(angleAbsDistance(90, 50), 40)
-    assert_equal(angleAbsDistance(50, 90), 40)
-    assert_equal(angleAbsDistance(350, 40), 50)
-    assert_equal(angleAbsDistance(40, 350), 50)
-
 class DummyNSF(object):
     def __init__(self, latitude, longitude):
         self.latitude = latitude
