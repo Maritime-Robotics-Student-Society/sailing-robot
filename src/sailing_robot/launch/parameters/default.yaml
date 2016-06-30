@@ -59,7 +59,7 @@
 
 # servo PWM control 
 
-/rudder/PWMoffset: 0
+/rudder/PWMoffset: 85
 /rudder/servolowerlimits: 1140
 /rudder/servohigherlimits: 1900
 
@@ -97,9 +97,9 @@
 # Length over which the sheet can be varied
 # (EXAMPLE, PROBABLY NOT ACTUALLY USED)
 # in [m]
-/sail/boomsheetDistance: 0.18
+/sail/boomsheetDistance: 0.31
 /sail/heightofboom: 0.1
-/sail/pullypivotDistance: 0.22
+/sail/pullypivotDistance: 0.31
 
 # Diameter of the sail winch
 # in [mm]
