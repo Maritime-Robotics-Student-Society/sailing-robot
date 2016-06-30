@@ -77,8 +77,8 @@ class Navigation(object):
     def angle_average(self, angle_list):
         """Compute the average angle of a list of angles (the result is % 360)
         """
-        return math.degree(math.atan2(sum([ math.sin(math.radian(x)) for x in ang_list]),
-                                      sum([ math.cos(math.radian(x)) for x in ang_list]))) % 360
+        return math.degree(math.atan2(sum([ math.sin(math.radian(x)) for x in angle_list]),
+                                      sum([ math.cos(math.radian(x)) for x in angle_list]))) % 360
 
     def subscribe_topics(self):
         """Subscribe to ROS topics to keep this nav object up to date.
