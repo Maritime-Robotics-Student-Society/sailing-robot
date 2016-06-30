@@ -31,12 +31,12 @@ def sailservoPWMcontrol(data):
     """  Sail Servo PWM control take in the maximum sail angle from topic /sail_servo. Maximum angle then convert into the sheet length in meters. This value will then used to calculate the rotation anlge (should between 0 to 1260)Final stage of servo control is transfer rotation angle into PWM output a    nd use pigpio service to control the servo.  """
     pi = pigpio.pi();
     sail_angle = data.data;
-    sheetlength2D = np.sqrt(pullypivotdistance**2+boomsheetdistance**2 -\
-     2*pullypivotdistance*boomsheetdistance*np.cos(1.0*sail_angle/180*np.pi))
-    sheetlength = np.sqrt(boomheight**2 + sheetlength**2)
-    degrees = sheetlength*1000/saildata['winchDiameter']/np.pi*180;
-    pwm = sailservorange*(1.0*degrees)/1260 + sailservoneturalpoint + \
-             sailservoPWMoffset;
+    sheetlength2D = np.sqrt(pullypivotdistance**2 + boomsheetdistance**2 -\
+    2*pullypivotdistance*boomsheetdistance*np.cos(1.0*sail_angle/180*np.pi))
+    sheetlength = np.sqrt(sheetlength2D**2 + boomheight**2)
+    degrees = sheetlength*1000/(25)/np.pi*180
+    pwm = sailservorange*(1.0*degrees-630)/1260 + sailservoneturalpoint + \
+        sailservoPWMoffset;
     pi.set_servo_pulsewidth(24, pwm);
 
 def rudderservoPWMcontrol(data):
