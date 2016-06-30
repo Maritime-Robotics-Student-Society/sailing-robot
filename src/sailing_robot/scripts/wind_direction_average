@@ -39,7 +39,7 @@ class Wind_direction_average():
     def wind_direction_average_publisher(self):
 
         while not rospy.is_shutdown():
-            wind_direction = (wind_direction_apparent + heading) % 360
+            wind_direction = (self.wind_direction_apparent + self.heading) % 360
 
             self.average_list.append(wind_direction)
 
