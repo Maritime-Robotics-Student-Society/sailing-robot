@@ -87,7 +87,7 @@
 /sail/maxAngle: 90
 # servo PWM control 
   
-/sail/PWMoffset: 0
+/sail/PWMoffset: -100
 /sail/servolowerlimits: 1100
 /sail/servohigherlimits: 1900
 # Safe value for the boat sail to be set at
@@ -98,12 +98,12 @@
 # (EXAMPLE, PROBABLY NOT ACTUALLY USED)
 # in [m]
 /sail/boomsheetDistance: 0.31
-/sail/heightofboom: 0.1
+/sail/heightofboom: 0.07
 /sail/pullypivotDistance: 0.31
 
 # Diameter of the sail winch
 # in [mm]
-/sail/winchDiameter: 38
+/sail/winchDiameter: 50
 
 
 #
