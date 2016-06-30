@@ -1,3 +1,4 @@
+import math
 from LatLon import LatLon
 from pyproj import Proj
 from shapely.geometry import Point
@@ -73,6 +74,12 @@ class Navigation(object):
         """
         return angleSum(self.absolute_wind_direction(), wind_angle)
     
+    def angle_average(self, angle_list):
+        """Compute the average angle of a list of angles (the result is % 360)
+        """
+        return math.degree(math.atan2(sum([ math.sin(math.radian(x)) for x in ang_list]),
+                                      sum([ math.cos(math.radian(x)) for x in ang_list]))) % 360
+
     def subscribe_topics(self):
         """Subscribe to ROS topics to keep this nav object up to date.
         

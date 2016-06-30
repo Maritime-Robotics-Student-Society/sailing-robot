@@ -1,15 +1,10 @@
 #!/usr/bin/python
 
-import math
 import collections
 import rospy
 from std_msgs.msg import Float32, Float64
+from sailing_robot.navigation import angle_average
 
-
-
-def angle_average(ang_list):
-    return math.atan2(sum([ math.sin(x*math.pi/180) for x in ang_list]),
-                      sum([ math.cos(x*math.pi/180) for x in ang_list]))*180/math.pi % 360
 
 
 class Wind_direction_average():
