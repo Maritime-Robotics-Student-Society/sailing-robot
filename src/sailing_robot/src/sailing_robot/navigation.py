@@ -73,13 +73,7 @@ class Navigation(object):
         """Convert angle relative to the wind (+-180) to a compass heading (0-360).
         """
         return angleSum(self.absolute_wind_direction(), wind_angle)
-    
-    def angle_average(self, angle_list):
-        """Compute the average angle of a list of angles (the result is % 360)
-        """
-        return math.degree(math.atan2(sum([ math.sin(math.radian(x)) for x in angle_list]),
-                                      sum([ math.cos(math.radian(x)) for x in angle_list]))) % 360
-
+   
     def subscribe_topics(self):
         """Subscribe to ROS topics to keep this nav object up to date.
         
@@ -103,3 +97,9 @@ def angleAbsDistance(a,b):
     distanceA = abs((a - b) % 360)
     distanceB = abs((b - a) % 360)
     return min(distanceA, distanceB)
+
+def angle_average(angle_list):
+    """Compute the average angle of a list of angles (the result is % 360)
+    """
+    return math.degree(math.atan2(sum([ math.sin(math.radian(x)) for x in angle_list]),
+                                  sum([ math.cos(math.radian(x)) for x in angle_list]))) % 360
