@@ -2,15 +2,12 @@
 
 
 publish_led() {
-
-  rostopic pub -1 /led_blink std_msgs/Int16MultiArray -- "layout:
-  dim:
-  - label: ''
-    size: 0
-    stride: 0
-  data_offset: 0
-data: [$1, $2, $3]" &> /dev/null &
-
+  shift=300
+  r=$1
+  g=$2
+  b=$3
+  intcolor=$(echo "$r*$shift*$shift + $g*$shift + $b" | bc)
+  rostopic pub -1 /led_blink std_msgs/Int16 --  $intcolor &> /dev/null &
 }
 
 
@@ -36,7 +33,7 @@ else
 
   publish_led 255 0  0 # red
 
-#  killall -9 roscore
+  killall -9 roscore
   killall -9 rosmaster
 
 fi
