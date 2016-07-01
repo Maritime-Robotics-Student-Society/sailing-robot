@@ -25,6 +25,12 @@
 #include <math.h>
 ros::NodeHandle  nh;
 
+float demand = 0;
+float upperLimit = 100;
+float lowerLimit = 45;
+float maxSailAngle = 90;
+float minSailAngle = 0;
+float sailServo = lowerLimit;
 
 Servo servo;
 Servo rudderservo;
@@ -34,7 +40,19 @@ void servo_cb( const std_msgs::UInt16& cmd_msg){
   //servo.writeMicroseconds(pwm); //set servo angle, should be from 0-180  
   //digitalWrite(13, HIGH-digitalRead(13));  //toggle led 
   //str_msg.data = pwm;
-  servo.write(55*cmd_msg.data/90 + 45)
+  demand = cmd_msg.data;
+
+  sailServo = (upperLimit - lowerLimit)*(demand-minSailAngle)/(maxSailAngle-minSailAngle) + lowerLimit;
+  //apply lower limit so servo can't break boat
+  if (sailServo < lowerLimit){
+    sailServo = lowerLimit;
+  }
+  //apply upper limit so servo can't break boat
+  if (sailServo > upperLimit){
+    sailServo = upperLimit;
+  }
+    
+  servo.write(sailServo);
 }
 
 void rudder_servo(const std_msgs::Int16& cmd_msg){
@@ -55,6 +73,8 @@ void setup(){
   
   servo.attach(9);  // sail servo attached to pin 9
   rudderservo.attach(10); // rudder servo attached to pin 10
+
+
 }
 
 void loop(){
