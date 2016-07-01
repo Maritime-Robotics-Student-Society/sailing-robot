@@ -101,5 +101,5 @@ def angleAbsDistance(a,b):
 def angle_average(angle_list):
     """Compute the average angle of a list of angles (the result is % 360)
     """
-    return math.degree(math.atan2(sum([ math.sin(math.radian(x)) for x in angle_list]),
-                                  sum([ math.cos(math.radian(x)) for x in angle_list]))) % 360
+    return math.degrees(math.atan2(sum([ math.sin(math.radians(x)) for x in angle_list]),
+                                   sum([ math.cos(math.radians(x)) for x in angle_list]))) % 360
