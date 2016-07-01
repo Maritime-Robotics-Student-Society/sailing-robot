@@ -45,7 +45,7 @@ class TasksRunner(object):
         kind = taskdict['kind']
         if kind == 'to_waypoint':
             wp = LatLon(taskdict['lat'], taskdict['lon'])
-            kw = {'target_radius': taskdict['target_radius']}
+            kw = {'target_radius': taskdict.get('target_radius', 2.0)}
             task = HeadingPlan(waypoint=wp, nav=self.nav, **kw)
         elif kind == 'keep_station':
             markers = [tuple(p) for p in taskdict['markers']]

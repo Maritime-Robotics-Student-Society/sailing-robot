@@ -63,10 +63,7 @@ class Navigation(object):
     def heading_to_wind_angle(self, heading):
         """Convert a compass heading (0-360) to an angle relative to the wind (+-180)
         """
-        res = (heading - self.absolute_wind_direction()) % 360
-        if res > 180:
-            res -= 360
-        return res
+        return angle_subtract(heading, self.absolute_wind_direction())
 
     def wind_angle_to_heading(self, wind_angle):
         """Convert angle relative to the wind (+-180) to a compass heading (0-360).
@@ -96,3 +93,13 @@ def angleAbsDistance(a,b):
     distanceA = abs((a - b) % 360)
     distanceB = abs((b - a) % 360)
     return min(distanceA, distanceB)
+
+def angle_subtract(a, b):
+    """Find the difference between two angles.
+    
+    The result should be between -180 (if a<b) and +180 (if a>b)
+    """
+    res = (a - b) % 360
+    if res > 180:
+        res -= 360
+    return res

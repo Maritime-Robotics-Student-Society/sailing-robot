@@ -18,16 +18,17 @@ from std_msgs.msg import Float32
 import time, math
 
 
-calib = rospy.get_param('/calibration/compass')
-
-XOFFSET = calib['XOFFSET']
-YOFFSET = calib['YOFFSET']
-XSCALE = calib['XSCALE']
-YSCALE = calib['YSCALE']
-
-
-
 def heading_publisher():
+
+    rate = rospy.Rate(rospy.get_param("/config/rate"))
+    calib = rospy.get_param('/calibration/compass')
+
+    XOFFSET = calib['XOFFSET']
+    YOFFSET = calib['YOFFSET']
+    XSCALE = calib['XSCALE']
+    YSCALE = calib['YSCALE']
+
+
     def twos_comp_combine(msb, lsb):
         twos_comp = 256*msb + lsb
         if twos_comp >= 32768:
@@ -123,12 +124,9 @@ def heading_publisher():
     b.write_byte_data(LGD, LGD_CTRL_1, 0x0F) #turn on gyro and set to normal mode
 
 
-
-
-    # !!! TODO use rospy rate!
     while not rospy.is_shutdown():
         #Read data from the chips ----------------------
-        time.sleep(0.5)
+        rate.sleep()
         magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
         MagX = magx #*0.160
         
