@@ -24,7 +24,7 @@ def node_publisher():
         rawsail_angle = 0.5 * angle_to_wind
         sail_angle = _PID.saturation(rawsail_angle, -saildata["maxAngle"], \
             saildata["maxAngle"])
-       pub.publish(int(sail_angle))
+        pub.publish(int(sail_angle))
 
         rate.sleep()
 
