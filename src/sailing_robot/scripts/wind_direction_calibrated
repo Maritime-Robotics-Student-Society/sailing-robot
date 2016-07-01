@@ -137,10 +137,9 @@ def wind_direction_publisher():
     average_list = [0] * AVE_SIZE 
     i = 0
 
-    # !!! TODO use rospy rate!
     while not rospy.is_shutdown():
         #Read data from the chips ----------------------
-        rate.sleep(0.5)
+        rate.sleep()
         # magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
         # MagX = magx #*0.160
         
