@@ -7,7 +7,7 @@ publish_led() {
   g=$2
   b=$3
   intcolor=$(echo "$r*$shift*$shift + $g*$shift + $b" | bc)
-  rostopic pub -1 /led_blink std_msgs/Int16 --  $intcolor &> /dev/null &
+  rostopic pub -1 /led_blink std_msgs/Int32 --  $intcolor &> /dev/null &
 }
 
 
