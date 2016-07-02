@@ -3,6 +3,8 @@
 import serial
 import pynmea2
 import re
+import traceback
+
 import rospy
 from std_msgs.msg import Int16
 from sensor_msgs.msg import NavSatFix
@@ -31,7 +33,16 @@ def pos_publisher():
         if not line.strip():
             continue
 
-        for sentence in gps_reader.next(line):
+        try:
+            batch = gps_reader.next(line)
+        except (pynmea2.ParseError, pynmea2.ChecksumError, UnicodeError):
+            s = "Error parsing GPS data.\nbuffer={!r}\nline={!r}\n{}".format(
+                        gps_reader.buffer, line, traceback.format_exc()
+            )
+            rospy.logerr(s)
+            continue
+
+        for sentence in batch:
             if sentence.sentence_type != 'GGA':
                 continue
 
