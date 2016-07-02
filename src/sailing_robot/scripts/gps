@@ -40,6 +40,7 @@ def pos_publisher():
                         gps_reader.buffer, line, traceback.format_exc()
             )
             rospy.logerr(s)
+            gps_reader.stream = b''
             continue
 
         for sentence in batch:
