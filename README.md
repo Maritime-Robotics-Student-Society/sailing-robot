@@ -1,6 +1,6 @@
 # Sailing Robot Project
 [![Build Status](https://travis-ci.org/Maritime-Robotics-Student-Society/sailing-robot.svg?branch=master)](https://travis-ci.org/Maritime-Robotics-Student-Society/sailing-robot) 
-[![Code ship]](https://codeship.com/projects/c7f9b0a0-ab07-0133-6c63-4a9cc2c4d260/status?branch=master)
+[![Code ship](https://codeship.com/projects/c7f9b0a0-ab07-0133-6c63-4a9cc2c4d260/status?branch=master)]()
 [![Support us](http://imgh.us/donate_1.svg)](https://southampton.hubbub.net/p/sailrobot) and see your name below!
 
 ```
