@@ -1,0 +1,48 @@
+<launch>
+    <!--
+    General test file to launch all existing nodes to talk to real hardware
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/eastleighWaypoints.yaml" command="load"/>
+
+    <!--
+    Nodes
+    -->
+    <!-- These are currently dummies, need to be replaced with real nodes -->
+    <!-- <node name="publish_heading" pkg='sailing_robot' type="publish_heading"/> -->
+    <node name="publish_position" pkg='sailing_robot' type="gps"/>
+    <node name = "go_through_wp_list" pkg="sailing_robot" type = "run_through_wp_list" />
+    <node name = "heading_control" pkg="sailing_robot" type = "heading_control" />
+    <node name = "tack" pkg="sailing_robot" type = "tack" />
+    <node name = "pid_rudder" pkg="sailing_robot" type = "pid_rudder" />
+    <node name = "pid_sail" pkg="sailing_robot" type = "pid_sail" />
+    <node name = "heading" pkg="sailing_robot" type="imu-calibrated" />
+    <node name = "wind_direction" pkg="sailing_robot" type="wind_direction_calibrated" />
+
+    <!-- Rosbag records messages for later investigation -->
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-record"/>
+
+    <!-- Serve an HTML dashboard so we can see what's going on -->
+    <node name = "dashboard" pkg="sailing_robot" type = "dashboard" />
+
+    <!--
+    Launch Bridge to Arduino
+    -->
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="9600"/>
+  </node>
+  <!--node pkg="rosserial_python" type="serial_node.py" name="serial_node2">
+    <param name="port" value="/dev/ttyACM1"/>
+    <param name="baud" value="9600"/>
+  </node-->
+
+</launch>

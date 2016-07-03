@@ -1,0 +1,34 @@
+<launch>
+    <!--
+    General test file to launch all existing nodes to talk to real hardware
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
+
+    <!--
+    Nodes
+    -->
+    <!-- These are currently dummies, need to be replaced with real nodes -->
+    <!-- <node name="publish_heading" pkg='sailing_robot' type="publish_heading"/> -->
+    <node name="publish_position" pkg='sailing_robot' type="gps"/>
+    <node name="publish_waypoint" pkg='sailing_robot' type="dummy_wp"/>
+    <node name = "heading_control" pkg="sailing_robot" type = "heading_control" />
+    <node name = "tack" pkg="sailing_robot" type = "tack" />
+    <node name = "pid_rudder" pkg="sailing_robot" type = "pid_rudder" />
+    <node name = "pid_sail" pkg="sailing_robot" type = "pid_sail" />
+    <node name = "heading" pkg="sailing_robot" type="imu-calibrated" />
+    <node name = "wind_direction" pkg="sailing_robot" type="wind_direction_calibrated" />
+
+    <!-- Rosbag records messages for later investigation -->
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-record"/>
+
+    <!-- Serve an HTML dashboard so we can see what's going on -->
+    <node name = "dashboard" pkg="sailing_robot" type = "dashboard" />
+
+</launch>
