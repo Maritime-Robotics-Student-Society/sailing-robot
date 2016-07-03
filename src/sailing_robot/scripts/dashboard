@@ -18,6 +18,7 @@ STATIC_PATH = os.path.expanduser('~/sailing-robot/dashboard/static')
 simple_topics = [
     ('/heading', Float32),
     ('/goal_heading', Float32),
+    ('/goal_wind_angle', Float32),
     ('/rudder_control', Int16),
     ('/sailing_state', String),
     ('/wind_direction_apparent', Float64),
