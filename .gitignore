@@ -46,3 +46,8 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+
+# ignore logs: rosbags and csv files
+*.csv
+*.bag
+*.bag.active

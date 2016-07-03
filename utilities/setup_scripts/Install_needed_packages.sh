@@ -16,6 +16,9 @@ yes | sudo pip install wiringpi2
 # Install vim
 sudo apt-get --assume-yes install vim
 
+# Install bc
+sudo apt-get --assume-yes install bc
+
 # Needed for dashboard
 yes | sudo pip install tornado
 
