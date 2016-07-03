@@ -1,29 +1,30 @@
 # Sailing Robot Project
 [![Build Status](https://travis-ci.org/Maritime-Robotics-Student-Society/sailing-robot.svg?branch=master)](https://travis-ci.org/Maritime-Robotics-Student-Society/sailing-robot) [![Support us](http://imgh.us/donate_1.svg)](https://southampton.hubbub.net/p/sailrobot) and see your name below!
 
-                   ***                                Source code repository for Southampton University 
-                   * ***                              sailing robot team.
-                   *   ***                          
-                   *     **                         
-                   *      **                          
-                   *        *                         
-                   *        **          ***** ******
-                   *         * * *** ******      ** 
-                   *         **                 *** 
-                   *          **  Southampton  ***  
-                   *  Our      *   University ***   
-                 ***  sponsors *            ****     Thanks for the support from:
-              **** *           *          *****      University of Southampton
-            ***    *     *******        *****        Matt Brown
-          ***      *******           ****  *         Alistair Lynn
-        ***        *            *****    **          Simone Provenzano
-      ***          *        *****      ***           Kerrine Lee
-    ***            *    *****        ***             Alessandro Romano
-     **            ******        *****               Le Kwong Yong
-      **        ****         ****                    andybs
-       *********      ********                       Alex Ziang
-        *        *****                               
-        ********                                     University Alumni 
-                                                     and anonymous donators like you
-
- 
+```
+                -..                       This is our code repository of Southampton Sailing Robot Team. We are building an
+               oMNm+.                     autonomous sailing robot that compete for the 2016 World Sailing Robot Competi-  
+               o: ./o/                    tion (WSRC 2016). Our code is based on Robotic Opearating System (ROS) framework.
+               o:`Ns.                     Check WiKi page for more information. 
+               o: dMMy-                   
+               o: sMMMMy`                 Our project wouldn't be possible without the kind help of our sponsor. There are:
+             : o: /MMMMMN/               
+            :+ +/ .MMMMMMMs               Southampton University 
+            m/ +/  MMMMMMMMd`             Southampton University Alumni (matching funding)
+           sM- +/  NMMMMMMMMd`            Bob Preston
+          :MM- +/  NMMMMMMMMMm.           Alistair Lynn
+         .NMM. +/  NMMMMMMMMMMm`          Timfkmiller
+         dMMM. +/  MMMMMMMMMMMMd`         Matt Brown
+        yMMMM. +/ `MMMMMMMMMMMMMh         schneider
+       oMMMMM- +/ -MMMMMMMMMMMMMMo        Soon Sun Gan
+      +MMMMMM: +/ +MMMMMMMMMMMMMMM:       arnaud_wiertz
+     +MMMMMMM+ ++ sMMMMMMMMMMMMMMMN`      Kerrine Lee
+    /MNNmmNNMs /+ dMMMMMMMMMMMMMMMMh      Alessandro Romano
+    .`      `` -: yso/::-....--:/+oy.     Lee Kwong Yong
+  `southamptonuniversitysailingrobot-     andybs
+   .odMMMMMMMMMMMMMMMMMMMMMMMMMMMMms-     Simone Provenzano
+     `-:////////////////////////-         Alex Ziang 
+                                          
+                                          and many anonymous donors who support us silently.
+                                          Thank you for your support!
+```
