@@ -1,7 +1,7 @@
 # Sailing Robot Project
 [![Build Status](https://travis-ci.org/Maritime-Robotics-Student-Society/sailing-robot.svg?branch=master)](https://travis-ci.org/Maritime-Robotics-Student-Society/sailing-robot) 
 [![Code ship](https://codeship.com/projects/c7f9b0a0-ab07-0133-6c63-4a9cc2c4d260/status?branch=master)]()
-[![Support us](http://imgh.us/donate_1.svg)](https://southampton.hubbub.net/p/sailrobot) and see your name below!
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TUL52K7SWV2GL) and see your name below!
 
 ```
                                           This is Southampton Sailing Robot Team's code repository.
