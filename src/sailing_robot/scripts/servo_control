@@ -54,14 +54,12 @@ if __name__ == '__main__':
     pi = pigpio.pi();
     try:
         rospy.init_node('servo_control', anonymous=True)
+        rospy.Subscriber('/rudder_control', Int16, rudderservoPWMcontrol)
+        rospy.Subscriber('/sail_servo', UInt16, sailservoPWMcontrol)
         r = rospy.Rate(20)
-        while not rospy.is_shutdown():
-            rospy.Subscriber('/rudder_control', Int16, rudderservoPWMcontrol)
-            rospy.Subscriber('/sail_servo', UInt16, sailservoPWMcontrol)
-            r.sleep()
+        rospy.spin()
     except rospy.ROSInterruptException:
         pass
     
 
     
-
