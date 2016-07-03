@@ -18,7 +18,7 @@ class Wind_direction_average():
         sensor_rate = rospy.get_param("/config/rate")
         self.rate = rospy.Rate(sensor_rate)
         AVE_TIME = rospy.get_param("/wind/trend_average_time")   # lengh of the averaging in seconds
-        AVE_SIZE = AVE_TIME * sensor_rate                        # size of the averaging sample
+        AVE_SIZE = int(AVE_TIME * sensor_rate)                        # size of the averaging sample
         self.average_list = collections.deque(maxlen = AVE_SIZE)
         self.wind_direction_average_publisher()
 

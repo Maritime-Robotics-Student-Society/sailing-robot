@@ -28,7 +28,7 @@
     <node name = "heading" pkg="sailing_robot" type="imu-calibrated" />
     <node name = "servo_control" pkg="sailing_robot" type="servo_control" />
     <node name = "wind_direction" pkg="sailing_robot" type="wind_direction_calibrated" />
-    <node name = "blink_on_sailing_state" pkg="sailing_robot" type="blink_on_sailing_state" />
+    <!--node name = "blink_on_sailing_state" pkg="sailing_robot" type="blink_on_sailing_state" /-->
 
     <!-- Rosbag records messages for later investigation -->
     <!-- <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-record"/> -->
