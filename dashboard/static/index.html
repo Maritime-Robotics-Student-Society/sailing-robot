@@ -109,6 +109,7 @@ function update_topic_table(msg) {
     for (var i=0; i < tbody.children.length; i++) {
       if (tbody.children[i].lastChild.getAttribute('id') > ('value-'+msg.topic)) {
         insert_before = tbody.children[i];
+        break;
       }
     }
     tbody.insertBefore(new_tr, insert_before);
