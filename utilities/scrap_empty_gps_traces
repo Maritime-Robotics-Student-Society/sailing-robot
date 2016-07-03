@@ -1,0 +1,12 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import glob
+import os
+
+target_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print("Looking for files in", target_dir)
+
+for file in glob.glob(os.path.join(target_dir, 'gps-trace-*.csv')):
+    if os.stat(file).st_size == 0:
+        print("Removing empty file", os.path.basename(file))
+        os.unlink(file)
