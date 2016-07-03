@@ -2,12 +2,13 @@
 [![Build Status](https://travis-ci.org/Maritime-Robotics-Student-Society/sailing-robot.svg?branch=master)](https://travis-ci.org/Maritime-Robotics-Student-Society/sailing-robot) [![Support us](http://imgh.us/donate_1.svg)](https://southampton.hubbub.net/p/sailrobot) and see your name below!
 
 ```
-                -..                       This is our code repository of Southampton Sailing Robot Team. We are building an
-               oMNm+.                     autonomous sailing robot that compete for the 2016 World Sailing Robot Competi-  
-               o: ./o/                    tion (WSRC 2016). Our code is based on Robotic Opearating System (ROS) framework.
-               o:`Ns.                     Check WiKi page for more information. 
+                                          This is Southampton Sailing Robot Team's code repository.
+                -..                       We are building an one meter long autonomous sailing boat  
+               oMNm+.                     that compete for the 2016 World Sailing Robot Competition.
+               o: ./o/                    These code are based on ROS framework. 
+               o:`Ns.                     Click WiKi page for more information. 
                o: dMMy-                   
-               o: sMMMMy`                 Our project wouldn't be possible without the kind help of our sponsor. There are:
+               o: sMMMMy`                 Our project wouldn't be possible without kind sponsors: 
              : o: /MMMMMN/               
             :+ +/ .MMMMMMMs               Southampton University 
             m/ +/  MMMMMMMMd`             Southampton University Alumni (matching funding)
