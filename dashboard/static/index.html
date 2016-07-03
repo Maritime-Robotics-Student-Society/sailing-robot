@@ -122,11 +122,13 @@ function rosout_handling(target_id) {
   var recent_msgs = [];
   var keep_n_msgs = 1000;
   var trim_at_n_msgs = 1500;
+  var show_n_msgs = 20;
   var current_level = 4;  // 4: warning
 
   function rerender() {
     var new_tbody = construct('tbody', recent_msgs
           .filter(function(m) {return m.level >= current_level;})
+          .slice(-show_n_msgs)
           .map(function(m) {return construct('tr', [construct('td', [text(m.msg)])])})
         );
     output_table.replaceChild(new_tbody, output_table.firstChild);
