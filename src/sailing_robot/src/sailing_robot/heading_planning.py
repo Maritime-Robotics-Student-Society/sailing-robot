@@ -3,12 +3,12 @@ import LatLon as ll
 import math
 from shapely.geometry import Point
 from std_msgs.msg import Float32
-import rospy
+# import rospy
 
 
 from .navigation import Navigation, angleSum, angleAbsDistance
 
-goal_wind_angle_pub = rospy.Publisher("/goal_wind_angle", Float32, queue_size=10)
+# goal_wind_angle_pub = rospy.Publisher("/goal_wind_angle", Float32, queue_size=10)
 
 class HeadingPlan:
     def __init__(self, nav, tack_line_offset=0.01,
@@ -111,6 +111,6 @@ class HeadingPlan:
             # On the starboard tack
             goal_wind_angle = min(goal_wind_angle, -self.nav.beating_angle)
 
-        goal_wind_angle_pub.publish(goal_wind_angle)
+        # goal_wind_angle_pub.publish(goal_wind_angle)
 
         return 'normal', self.nav.wind_angle_to_heading(goal_wind_angle)
