@@ -11,7 +11,7 @@ class Blink_on_sailing_state():
         rospy.init_node("publish_led_blink_on_sailing_state", anonymous=True)
         rospy.Subscriber('/sailing_state', String, self.update_sailing_state)
         self.sailing_state = "normal"
-        self.rate = rospy.get_param("/config/rate")
+        self.rate = rospy.Rate(rospy.get_param("/config/rate"))
         self.blink_publisher()
 
 

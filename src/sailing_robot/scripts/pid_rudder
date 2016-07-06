@@ -33,7 +33,8 @@ def node_publisher():
             angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
             rospy.loginfo("Angle: %r", angle)
         else:
-            angle = data.tack_rudder
+            rawangle = data.tack_rudder
+            angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
 
         pub.publish(int(angle))
 

@@ -8,7 +8,8 @@ from std_msgs.msg import Float32
 from std_msgs.msg import Float64
 from std_msgs.msg import String
 import sailing_robot
-from sailing_robot.tasks import TasksRunner, tasks_from_wps
+from sailing_robot.tasks import tasks_from_wps
+from sailing_robot.tasks_ros import RosTasksRunner
 from sailing_robot.navigation import Navigation
 from sailing_robot.heading_planning import HeadingPlan
 from sensor_msgs.msg import NavSatFix
@@ -17,17 +18,11 @@ from sensor_msgs.msg import NavSatFix
 def goal_heading_publisher(tasks_runner):
     pub = rospy.Publisher("/goal_heading", Float32, queue_size=10)
     pub_state = rospy.Publisher("/sailing_state", String, queue_size=10)
-    distance_to_wp = rospy.Publisher("/distance_to_waypoint", Float32, queue_size=10)
-    heading_to_wp = rospy.Publisher("/heading_to_waypoint", Float32, queue_size=10)
     rate = rospy.Rate(rospy.get_param("/config/rate"))
 
     tasks_runner.start_next_task()
     while not rospy.is_shutdown():
         state, goal_heading = tasks_runner.calculate_state_and_goal()
-        if isinstance(tasks_runner.active_task, HeadingPlan):
-            d, h = tasks_runner.active_task.distance_heading_to_waypoint()
-            distance_to_wp.publish(d)
-            heading_to_wp.publish(h)
         pub.publish(goal_heading)
         pub_state.publish(state)
         rate.sleep()
@@ -40,7 +35,7 @@ if __name__ == '__main__':
         tasks = tasks_from_wps(rospy.get_param("/wp"))
         nav_options = rospy.get_param("/navigation")
         nav = Navigation()#**nav_options)
-        tasks_runner = TasksRunner(tasks, nav, log=rospy.loginfo)
+        tasks_runner = RosTasksRunner(tasks, nav)
         tasks_runner.nav.subscribe_topics()
         goal_heading_publisher(tasks_runner)
     except rospy.ROSInterruptException:

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-rostopic list 2>&1 /dev/null || echo "roscore needs to be running"; exit 1
+#rostopic list 2>&1 /dev/null || echo "roscore needs to be running"; exit 1
 
 
 defaultname='laser'

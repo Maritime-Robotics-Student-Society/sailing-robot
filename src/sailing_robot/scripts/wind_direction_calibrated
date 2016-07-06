@@ -33,7 +33,7 @@ def wind_direction_publisher():
 
     average_time = rospy.get_param("/wind/sensor_average_time")
     sensor_rate = rospy.get_param("/config/rate")
-    AVE_SIZE = average_time * sensor_rate   # averaging over the last AVE_SIZE values
+    AVE_SIZE = int(average_time * sensor_rate)   # averaging over the last AVE_SIZE values
 
     rate = rospy.Rate(sensor_rate)
 

@@ -109,7 +109,7 @@ def heading_publisher():
         print 'No LSM303D detected on bus on I2C bus '+str(busNum)+'.'
 
     if b.read_byte_data(LGD, LGD_WHOAMI_ADDRESS) == LGD_WHOAMI_CONTENTS:
-        print 'L3GD20H detected successfully on I2C bus '+str(busNum)+'.'
+       print 'L3GD20H detected successfully on I2C bus '+str(busNum)+'.'
     else:
         print 'No L3GD20H detected on bus on I2C bus '+str(busNum)+'.'
 

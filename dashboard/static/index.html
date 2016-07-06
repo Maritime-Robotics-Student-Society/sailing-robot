@@ -14,13 +14,13 @@ body {
 }
 
 
-#topics-table {
+.zebra_table {
     margin: 0 auto;
     border: 1px solid #ddd;
     border-collapse: collapse;
 }
 
-#topics-table tr:nth-child(odd) {
+.zebra_table tr:nth-child(odd) {
   background-color: #ddd;
 }
 
@@ -53,7 +53,17 @@ body {
   <div id="connecting" class="overlay-box">
     Connecting...
   </div>
-  <table id='topics-table'><tbody></tbody></table>
+  <table id='topics-table' class='zebra_table'><tbody></tbody></table>
+
+  <h2>/rosout</h2>
+  <div id='rosout'>
+    <a id='rosout-level-debug' href='#'>Debug</a> -
+    <a id='rosout-level-info' href='#'>Info</a> -
+    <a id='rosout-level-warn' href='#'>Warn</a> -
+    <a id='rosout-level-error' href='#'>Error</a> -
+    <a id='rosout-level-fatal' href='#'>Fatal</a>
+    <table id='rosout-display' class='zebra_table'><tbody></tbody></table>
+  </div>
 
 <script>
 id = document.getElementById.bind(document);
@@ -92,18 +102,72 @@ function update_topic_table(msg) {
       construct('td', [text(msg.topic)]),
       value_td
     ]);
-    id('topics-table').firstChild.appendChild(new_tr);
+
+    // Insert it into the table in alphabetical order
+    var tbody = id('topics-table').firstChild;
+    var insert_before = null;
+    for (var i=0; i < tbody.children.length; i++) {
+      if (tbody.children[i].lastChild.getAttribute('id') > ('value-'+msg.topic)) {
+        insert_before = tbody.children[i];
+        break;
+      }
+    }
+    tbody.insertBefore(new_tr, insert_before);
   }
+}
+
+function rosout_handling(target_id) {
+  var target = id(target_id);
+  var output_table = target.querySelector('#rosout-display');
+  var recent_msgs = [];
+  var keep_n_msgs = 1000;
+  var trim_at_n_msgs = 1500;
+  var show_n_msgs = 20;
+  var current_level = 4;  // 4: warning
+
+  function rerender() {
+    var new_tbody = construct('tbody', recent_msgs
+          .filter(function(m) {return m.level >= current_level;})
+          .slice(-show_n_msgs)
+          .map(function(m) {return construct('tr', [construct('td', [text(m.msg)])])})
+        );
+    output_table.replaceChild(new_tbody, output_table.firstChild);
+  }
+
+  function switch_level(level) {
+    current_level = level;
+    rerender();
+  }
+  target.querySelector('#rosout-level-debug').addEventListener('click', function() {switch_level(1);});
+  target.querySelector('#rosout-level-info').addEventListener('click', function() {switch_level(2);});
+  target.querySelector('#rosout-level-warn').addEventListener('click', function() {switch_level(4);});
+  target.querySelector('#rosout-level-error').addEventListener('click', function() {switch_level(8);});
+  target.querySelector('#rosout-level-fatal').addEventListener('click', function() {switch_level(16);});
+
+  function append_msg(m) {
+    recent_msgs.push(m);
+    if (recent_msgs.length > trim_at_n_msgs) {
+      var n_discard = trim_at_n_msgs - recent_msgs.length;
+      recent_msgs = recent_msgs.slice(n_discard, n_discard + keep_n_msgs);
+    }
+    rerender();
+  }
+  return append_msg;
 }
 
 window.addEventListener("load", function(event) {
   var ws = new WebSocket('ws://' + location.host + '/updates');
+  var push_rosout = rosout_handling('rosout');
   ws.onopen = function(event) {
     id('connecting').style.display = 'none';
   };
   ws.onmessage = function(event) {
     var json_msg = JSON.parse(event.data);
-    update_topic_table(json_msg);
+    if (json_msg.topic === '/rosout') {
+      push_rosout(json_msg);
+    } else {
+      update_topic_table(json_msg);
+    }
   };
   ws.onclose = function(event) {
     id('disconnected').style.display = 'block';
