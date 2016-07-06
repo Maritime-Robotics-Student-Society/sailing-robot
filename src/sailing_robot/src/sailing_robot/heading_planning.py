@@ -6,6 +6,41 @@ from shapely.geometry import Point
 from .navigation import Navigation, angleSum, angleAbsDistance
 from .taskbase import TaskBase
 
+class TackVoting(object):
+    def __init__(self, nsamples, threshold):
+        self.nsamples = nsamples
+        self.threshold = threshold
+        self.votes = deque(maxlen=nsamples)
+        self.votes_sum = 50
+
+    def vote(self, value):
+        # 0: Want starboard tack
+        # 1: Want port tack
+        if len(self.votes) >= self.nsamples:
+            self.votes_sum -= self.votes.popleft()
+        self.votes.append(value)
+        self.votes_sum += value
+
+    def tack_now(self, current_tack):
+        # 0: Currently on starboard tack
+        # 1: Currently on port tack
+        if current_tack:
+            # Port: tack to starboard?
+            return self.votes_sum < (self.nsamples - self.threshold)
+        else:
+            # Starboard: tack to port?
+            return self.votes_sum > self.threshold
+
+    def reset(self, current_tack):
+        # 0: Reached starboard tack
+        # 1: Reached port tack
+        if current_tack:
+            self.votes.extend([1] * self.nsamples)
+            self.votes_sum = self.nsamples
+        else:
+            self.votes.clear()
+            self.votes_sum = 0
+
 class HeadingPlan(TaskBase):
     def __init__(self, nav, tack_line_offset=0.01,
             waypoint=ll.LatLon(50.742810, 1.014469), # somewhere in the solent
@@ -35,10 +70,8 @@ class HeadingPlan(TaskBase):
         self.side_heading = 0
         self.alternate_heading = 0
         self.sailing_state = 'normal'  # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
-        self.tack_decision_samples = tack_decision_samples
-        self.tack_decision_min = int(tack_decision_threshold * tack_decision_samples)
-        self.tack_wanted = deque(maxlen=tack_decision_samples)
-        self.tack_wanted_sum = 0
+        self.tack_voting = TackVoting(tack_decision_samples,
+                         int(tack_decision_threshold * tack_decision_samples))
     
     def start(self):
         pass
@@ -79,39 +112,33 @@ class HeadingPlan(TaskBase):
                 return self.sailing_state, self.nav.wind_angle_to_heading(beating_angle)
             else:
                 # Tack completed
+                self.log('info', 'Finished tack (%s)', self.sailing_state)
+                self.tack_voting.reset(boat_wind_angle > 0)
                 self.sailing_state = 'normal'
-                self.tack_wanted.clear()
-                self.tack_wanted_sum = 0
+
+        on_port_tack = boat_wind_angle > 0
 
         wp_heading = self.nav.position_ll.heading_initial(self.waypoint)
         wp_wind_angle = self.nav.heading_to_wind_angle(wp_heading)
-        want_tack_now = 0
-        if (wp_wind_angle * boat_wind_angle) < 0:
-            # These two have different signs, so we want the other tack
-            want_tack_now = 1
+        # Tack voting: 0 for starboard tack, 1 for port tack
+        current_tack_vote = int(wp_wind_angle > 0)
+        self.tack_voting.vote(current_tack_vote)
 
-        self.tack_wanted_sum += want_tack_now
-        if self.tack_wanted_sum > self.tack_decision_min:
-            # We have reached the threshold to trigger a tack
-            if boat_wind_angle > 0:
-                # On the port tack
-                beating_angle = -self.nav.beating_angle
+        tack_now = self.tack_voting.tack_now(on_port_tack)
+
+        if tack_now:
+            if on_port_tack:
                 tack_to = 'tack_to_stbd_tack'
+                beating_angle = -self.nav.beating_angle
             else:
-                beating_angle = self.nav.beating_angle
                 tack_to = 'tack_to_port_tack'
+                beating_angle = self.nav.beating_angle
             self.sailing_state = tack_to
             return tack_to, self.nav.wind_angle_to_heading(beating_angle)
 
-        # Update the rolling poll of whether we want to tack.
-        if len(self.tack_wanted) >= self.tack_decision_samples:
-            self.tack_wanted_sum -= self.tack_wanted.popleft()
-        self.tack_wanted.append(want_tack_now)
-
         # Continue on our current tack
         goal_wind_angle = wp_wind_angle
-        if boat_wind_angle > 0:
-            # On the port tack
+        if on_port_tack:
             goal_wind_angle = max(goal_wind_angle, self.nav.beating_angle)
         else:
             # On the starboard tack
