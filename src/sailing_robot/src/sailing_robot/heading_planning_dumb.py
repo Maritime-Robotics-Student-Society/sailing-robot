@@ -1,4 +1,6 @@
-class HeadingPlan:
+from .taskbase import TaskBase
+
+class HeadingPlan(TaskBase):
     def __init__(self, nav,
             waypoint=ll.LatLon(50.742810, 1.014469), # somewhere in the solent
             target_radius=2,
@@ -27,8 +29,16 @@ class HeadingPlan:
         h = math.degrees(math.atan2(dx, dy)) % 360
         return d, h
 
+    debug_topics = [
+        ('/distance_to_waypoint', 'Float32'),
+        ('/heading_to_waypoint', 'Float32'),
+    ]
+
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
         """
+        dwp, hwp = self.distance_heading_to_waypoint()
+        self.debug_pub('/distance_to_waypoint', dwp)
+        self.debug_pub('/heading_to_waypoint', hwp)
         wp_heading = self.nav.position_ll.heading_initial(self.waypoint)
         return 'normal', wp_heading

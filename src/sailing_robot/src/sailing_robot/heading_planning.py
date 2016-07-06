@@ -2,15 +2,11 @@ from collections import deque
 import LatLon as ll
 import math
 from shapely.geometry import Point
-from std_msgs.msg import Float32
-# import rospy
-
 
 from .navigation import Navigation, angleSum, angleAbsDistance
+from .taskbase import TaskBase
 
-# goal_wind_angle_pub = rospy.Publisher("/goal_wind_angle", Float32, queue_size=10)
-
-class HeadingPlan:
+class HeadingPlan(TaskBase):
     def __init__(self, nav, tack_line_offset=0.01,
             waypoint=ll.LatLon(50.742810, 1.014469), # somewhere in the solent
             target_radius=2,
@@ -50,6 +46,12 @@ class HeadingPlan:
     def check_end_condition(self):
         return self.nav.position_xy.within(self.target_area)
 
+    debug_topics = [
+        ('/heading_to_waypoint', 'Float32'),
+        ('/distance_to_waypoint', 'Float32'),
+        ('/goal_wind_angle', 'Float32'),
+    ]
+
     def distance_heading_to_waypoint(self):
         dx = self.waypoint_xy.x - self.nav.position_xy.x
         dy = self.waypoint_xy.y - self.nav.position_xy.y
@@ -60,6 +62,10 @@ class HeadingPlan:
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
         """
+        dwp, hwp = self.distance_heading_to_waypoint()
+        self.debug_pub('/distance_to_waypoint', dwp)
+        self.debug_pub('/heading_to_waypoint', hwp)
+
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':
             # A tack is in progress
@@ -111,6 +117,6 @@ class HeadingPlan:
             # On the starboard tack
             goal_wind_angle = min(goal_wind_angle, -self.nav.beating_angle)
 
-        # goal_wind_angle_pub.publish(goal_wind_angle)
+        self.debug_pub('/goal_wind_angle', goal_wind_angle)
 
         return 'normal', self.nav.wind_angle_to_heading(goal_wind_angle)

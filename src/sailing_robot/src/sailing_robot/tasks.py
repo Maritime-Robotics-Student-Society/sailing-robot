@@ -2,6 +2,7 @@ from __future__ import print_function
 
 from LatLon import LatLon
 import time
+import types
 
 from .navigation import Navigation
 from .heading_planning import HeadingPlan
@@ -31,15 +32,29 @@ class TimedEnd(object):
     
     def check(self):
         return (time.time() > self.ends_at)
-    
 
 class TasksRunner(object):
-    def __init__(self, tasks, nav, log=print):
+    def __init__(self, tasks, nav):
         self.task_ix = -1
         self.active_task = None
-        self.log = log
         self.nav = nav
+        self.debug_topics = {}
         self.tasks = [self._make_task(d) for d in tasks]
+
+    @staticmethod
+    def log(level, msg, *values):
+        print(msg % values)
+
+    def register_debug_topics(self, topics):
+        pass
+
+    def debug_pub(self, topic, value):
+        try:
+            datatype, pub = self.debug_topics[topic]
+        except KeyError:
+            self.log('warning', 'Tried to publish to missing topic: %s', topic)
+
+        pub.publish(value)
     
     def _make_task(self, taskdict):
         kind = taskdict['kind']
@@ -61,7 +76,7 @@ class TasksRunner(object):
         self.task_ix += 1
         self.active_task = self.tasks[self.task_ix]
         endcond = '' # TODO
-        self.log("Running task {}: {} with end condition {}".format(
+        self.log('info', "Running task {}: {} with end condition {}".format(
                     self.task_ix, self.active_task.task_kind, '/'.join(endcond)
         ))
         self.active_task.start()
