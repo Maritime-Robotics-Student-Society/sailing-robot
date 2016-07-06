@@ -1,3 +1,4 @@
+import LatLon as ll
 from .taskbase import TaskBase
 
 class HeadingPlan(TaskBase):
