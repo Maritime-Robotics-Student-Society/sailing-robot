@@ -8,6 +8,10 @@ import rospy
 from .tasks import TasksRunner
 
 class RosTasksRunner(TasksRunner):
+    def __init__(self, *args, **kwargs):
+        self.debug_topics = {}
+        super(RosTasksRunner, self).__init__(*args, **kwargs)
+
     @staticmethod
     def log(level, msg, *values):
         if level == 'fatal':
@@ -37,7 +41,15 @@ class RosTasksRunner(TasksRunner):
             
             pub = rospy.Publisher(topic, dt, queue_size=10)
             self.debug_topics[topic] = (datatype_s, pub)
-    
+
+    def debug_pub(self, topic, value):
+        try:
+            datatype, pub = self.debug_topics[topic]
+        except KeyError:
+            self.log('warning', 'Tried to publish to missing topic: %s', topic)
+
+        pub.publish(value)
+
     def _make_task(self, taskdict):
         task = super(RosTasksRunner, self)._make_task(taskdict)
         

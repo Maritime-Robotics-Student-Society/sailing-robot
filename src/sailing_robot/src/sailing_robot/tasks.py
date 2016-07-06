@@ -38,23 +38,11 @@ class TasksRunner(object):
         self.task_ix = -1
         self.active_task = None
         self.nav = nav
-        self.debug_topics = {}
         self.tasks = [self._make_task(d) for d in tasks]
 
     @staticmethod
     def log(level, msg, *values):
         print(msg % values)
-
-    def register_debug_topics(self, topics):
-        pass
-
-    def debug_pub(self, topic, value):
-        try:
-            datatype, pub = self.debug_topics[topic]
-        except KeyError:
-            self.log('warning', 'Tried to publish to missing topic: %s', topic)
-
-        pub.publish(value)
     
     def _make_task(self, taskdict):
         kind = taskdict['kind']
