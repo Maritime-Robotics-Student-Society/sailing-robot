@@ -25,7 +25,7 @@ class RosTasksRunner(TasksRunner):
         else:
             rospy.logdebug(msg, *values)
 
-    def register_debug_topics(self, topics)
+    def register_debug_topics(self, topics):
         for (topic, datatype_s) in topics:
             if (topic in self.debug_topics) \
                     and (self.debug_topics[topic][0] == datatype_s):
