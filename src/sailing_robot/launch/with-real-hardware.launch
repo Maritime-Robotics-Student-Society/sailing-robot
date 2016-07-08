@@ -28,15 +28,15 @@
     <node name = "heading" pkg="sailing_robot" type="imu-calibrated" />
     <node name = "servo_control" pkg="sailing_robot" type="servo_control" />
     <node name = "wind_direction" pkg="sailing_robot" type="wind_direction_calibrated" />
-    <node name = "blink_on_sailing_state" pkg="sailing_robot" type="blink_on_sailing_state" />
+    <node name = "debugging_blink_on_sailing_state" pkg="sailing_robot" type="debugging_blink_on_sailing_state" />
 
     <!-- Rosbag records messages for later investigation -->
     <!-- <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-record"/> -->
     <!-- Also record GPS data as required by the competition -->
-    <node name="gps_log" pkg='sailing_robot' type="gps_log"/>
+    <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/>
 
     <!-- Serve an HTML dashboard so we can see what's going on -->
-    <node name = "dashboard" pkg="sailing_robot" type = "dashboard" />
+    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
 
     <!--
     Launch Bridge to Arduino

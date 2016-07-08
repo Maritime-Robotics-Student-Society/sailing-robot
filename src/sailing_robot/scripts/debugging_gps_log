@@ -22,7 +22,7 @@ def record():
 
 if __name__ == '__main__':
     try:
-        rospy.init_node("gps_log", anonymous=True)
+        rospy.init_node("debugging_gps_log", anonymous=True)
         record()
     except rospy.ROSInterruptException:
         pass
