@@ -1,13 +1,16 @@
 
 # Wind conditions:
 
-# wind speed in knots
-/wind/speed: 10
+# wind speed in m/s (1m/s = 1.9kts)
+/wind/speed: 5
 
-# wind direction
+# wind direction relative to north
 /wind/direction: 15
 
 
-
+# Boat velocity
+# velocity of the boat at 90° from the wind in with 1 m/s wind speed 
+# for example in a 10kts wind, if the boat goes at 3kts, the coefficient is 0.3
+/velocity_coefficient: 0.3
 
 
