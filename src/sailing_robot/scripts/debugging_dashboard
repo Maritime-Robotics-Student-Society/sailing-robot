@@ -105,7 +105,7 @@ def dashboard_server():
 
 if __name__ == '__main__':
     try:
-        rospy.init_node("serve_dashboard", anonymous=True)
+        rospy.init_node("debugging_dashboard", anonymous=True)
         dashboard_server()
     except rospy.ROSInterruptException:
         pass
