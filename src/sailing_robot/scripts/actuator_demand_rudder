@@ -22,7 +22,7 @@ def node_publisher():
     :rtype: object
     """
     pub = rospy.Publisher('/rudder_control', Int16, queue_size=10)  # Use UInt 16 here to minimize the memory use
-    rospy.init_node('rudder_servo', anonymous=True)
+    rospy.init_node('actuator_demand_rudder', anonymous=True)
     rate = rospy.Rate(10)
 
     while not rospy.is_shutdown():

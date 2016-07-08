@@ -11,7 +11,7 @@ saildata = rospy.get_param('/sail')
 
 def node_publisher():
     pub = rospy.Publisher('/sail_servo', UInt16, queue_size=10)
-    rospy.init_node('sail_servo', anonymous=True)
+    rospy.init_node('actuator_demand_sail', anonymous=True)
     rate = rospy.Rate(10)
 
 
