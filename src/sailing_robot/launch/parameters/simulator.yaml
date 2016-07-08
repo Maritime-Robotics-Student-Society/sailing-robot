@@ -2,27 +2,27 @@
 # Wind conditions:
 
 # wind speed in m/s (1m/s = 1.9kts)
-/wind/speed: 5
+/simulation/wind/speed: 5
 
 # wind direction relative to north
-/wind/direction: 15
+/simulation/wind/direction: 15
 
 
 # Boat velocity
 # velocity of the boat at 90° from the wind in with 1 m/s wind speed 
 # for example in a 10kts wind, if the boat goes at 3kts, the coefficient is 0.3
-/velocity/coefficient: 0.3
+/simulation/velocity/coefficient: 0.3
 
 # Minimum velocity of the boat (in m/s)
-/velocity/minimum: 0.5
+/simulation/velocity/minimum: 0.5
 
 
 
 # Initial position
-/position_init/latitude: 50.936981
-/position_init/longitude: -1.405315
+/simulation/position_init/latitude: 50.936981
+/simulation/position_init/longitude: -1.405315
 
 
 # Heading coefficient
 # just a multiplocator coefficient for the heading control in case of need
-/heading/coefficient: 1.0
+/simulation/heading/coefficient: 1.0
