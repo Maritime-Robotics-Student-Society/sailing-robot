@@ -17,7 +17,7 @@
     Nodes
     -->
     <!-- These are currently dummies, need to be replaced with real nodes -->
-    <!-- <node name="publish_heading" pkg='sailing_robot' type="publish_heading"/> -->
+    <!-- <node name="dummy_heading" pkg='sailing_robot' type="dummy_heading"/> -->
     <node name="gps" pkg='sailing_robot' type="gps"/>
     <!--<node name = "heading_control" pkg="sailing_robot" type = "heading_control" />-->
     <node name = "tasks" pkg="sailing_robot" type = "tasks" />
