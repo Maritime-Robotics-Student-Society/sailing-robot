@@ -21,8 +21,8 @@ class Position_simu():
         rospy.init_node("simulation_position", anonymous=True)
 
         rospy.Subscriber('/heading', Float32, self.update_heading)
-        rospy.Subscriber('/velocity', velocity, self.update_velocity)
         self.heading = 0
+        rospy.Subscriber('/velocity', velocity, self.update_velocity)
         self.velocity = (0,0,0)
 
         self.freq = rospy.get_param("/config/rate")

@@ -24,7 +24,9 @@ class Velocity_simu():
         rospy.init_node("simulation_velocity", anonymous=True)
 
         rospy.Subscriber('/wind_direction_apparent', Float32, self.update_wind_direction)
+        self.wind_direction = 0
         rospy.Subscriber('/wind_speed_apparent', Float32, self.update_wind_speed)
+        self.wind_speed = 0
 
         self.velocity_coefficient = rospy.get_param("/simulator/velocity/coefficient")
         self.velocity_minimum = rospy.get_param("/simulator/velocity/minimum")
