@@ -11,7 +11,7 @@ class Wind_direction_average():
     def __init__(self):
         self.wind_direction_average_pub = rospy.Publisher('/wind_direction_average', Float32, queue_size=10)
 
-        rospy.init_node("publish_wind_direction_average", anonymous=True)
+        rospy.init_node("sensor_processed_wind_direction", anonymous=True)
         rospy.Subscriber('/heading', Float32, self.update_heading)
         rospy.Subscriber('/wind_direction_apparent', Float64, self.update_wind_direction)
 
