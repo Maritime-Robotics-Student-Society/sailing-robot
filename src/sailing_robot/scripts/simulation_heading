@@ -20,7 +20,7 @@ class Heading_simu():
         rospy.Subscriber('/velocity', velocity, self.update_velocity)
         self.velocity = [0,0,0]
 
-        self.heading = 0
+        self.heading = rospy.get_param("/simulation/heading_init")
 
         self.diff_heading_coefficient = rospy.get_param("/simulation/heading/coefficient")
         self.freq = rospy.get_param("/config/rate")
@@ -41,6 +41,7 @@ class Heading_simu():
         if self.rudder == 0:
             return 0
 
+
         Ay = -0.25    # -1/4 of the size of the boat [m]
         r = 0.05      # radius of the rudder [m]
         By = Ay*2
@@ -53,14 +54,14 @@ class Heading_simu():
         x = (-(-Cx**2-Cy**2+Ay*Cy+math.sqrt(Cx**4+Cy**4-2*Ay*Cy**3+Ay**2*Cy**2+2*Cx**2*Cy**2-4*Cx**2*d**2-2*Ay*Cx**2*Cy+4*Ay*Cx**2*d))/(2*Cx))
         #x=(-(-Cx**2-Cy**2+Ay*Cy-(math.sqrt(Cx**4+Cy**4-2*Ay*Cy**3+Ay**2*Cy**2+2*Cx**2*Cy**2-4*Cx**2*d**2-2*Ay*Cx**2*Cy+4*Ay*Cx**2*d)))/(2*Cx))
 
-        return -math.atan2(y,x)
+        return -math.degrees(math.atan2(y,x)) + 90
 
 
     def heading_publisher(self):
 
         while not rospy.is_shutdown():
            
-            self.heading = self.diff_heading_coefficient * self.diff_heading() + self.heading % 360
+            self.heading = (self.diff_heading_coefficient * self.diff_heading() + self.heading) % 360
 
             self.heading_pub.publish(self.heading)
             self.rate.sleep()
