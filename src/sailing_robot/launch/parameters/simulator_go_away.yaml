@@ -4,7 +4,7 @@
 /simulation/wind/speed: 5
 
 # wind direction relative to north
-/simulation/wind/direction: 305
+/simulation/wind/direction: 0
 
 
 # Boat velocity
@@ -21,7 +21,7 @@
 /simulation/position_init/latitude: 50.936981
 /simulation/position_init/longitude: -1.405315
 
-/simulation/heading_init: 0.0
+/simulation/heading_init: +90.0
 
 
 # Heading coefficient
