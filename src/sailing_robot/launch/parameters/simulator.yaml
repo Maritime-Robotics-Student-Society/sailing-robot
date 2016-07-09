@@ -21,7 +21,7 @@
 /simulation/position_init/latitude: 50.936981
 /simulation/position_init/longitude: -1.405315
 
-/simulation/heading_init: 0.0
+/simulation/heading_init: -90.0
 
 
 # Heading coefficient
