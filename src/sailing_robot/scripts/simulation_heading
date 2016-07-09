@@ -4,7 +4,8 @@
 
 
 import rospy
-from std_msgs.msg import Float64, Float32
+from std_msgs.msg import Float32, Int16
+from sailing_robot.msg import velocity
 import time, math
 
 
@@ -17,11 +18,11 @@ class Heading_simu():
         rospy.Subscriber('/rudder_control', Int16, self.update_rudder)
         self.rudder = 0
         rospy.Subscriber('/velocity', velocity, self.update_velocity)
-        self.velocity = (0,0,0)
+        self.velocity = [0,0,0]
 
         self.heading = 0
 
-        self.diff_heading_coefficient = rospy.get_param("/simulator/heading/coefficient")
+        self.diff_heading_coefficient = rospy.get_param("/simulation/heading/coefficient")
         self.freq = rospy.get_param("/config/rate")
         self.rate = rospy.Rate(self.freq)
 
@@ -34,7 +35,7 @@ class Heading_simu():
         self.rudder = msg.data
 
     def update_velocity(self, msg):
-        self.velocity = msg.data
+        self.velocity = (msg.velx, msg.vely, msg.velz)
 
     def diff_heading(self):
         if self.rudder == 0:
@@ -59,7 +60,7 @@ class Heading_simu():
 
         while not rospy.is_shutdown():
            
-            self.heading = self.diff_heading_coefficient * self.diff_heading() + self.heading()
+            self.heading = self.diff_heading_coefficient * self.diff_heading() + self.heading
 
             self.heading_pub.publish(self.heading)
             self.rate.sleep()
@@ -67,7 +68,7 @@ class Heading_simu():
 
 if __name__ == '__main__':
     try:
-        Wind_direction_simu()
+        Heading_simu()
     except rospy.ROSInterruptException:
         pass
 

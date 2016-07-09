@@ -28,10 +28,12 @@ class Velocity_simu():
         rospy.Subscriber('/wind_speed_apparent', Float32, self.update_wind_speed)
         self.wind_speed = 0
 
-        self.velocity_coefficient = rospy.get_param("/simulator/velocity/coefficient")
-        self.velocity_minimum = rospy.get_param("/simulator/velocity/minimum")
+        self.velocity_coefficient = rospy.get_param("/simulation/velocity/coefficient")
+        self.velocity_minimum = rospy.get_param("/simulation/velocity/minimum")
 
         self.rate = rospy.Rate(rospy.get_param("/config/rate"))
+
+        self.velocity = velocity()
 
         rospy.loginfo("Velocity simulated")
         self.polardef()
@@ -100,18 +102,18 @@ class Velocity_simu():
     def velocity_publisher(self):
 
         while not rospy.is_shutdown():
-            # wind direction between 0 and 180°
-            wind_direction_180 =  180 - math.abs(self.wind_direction - 180) 
+            # wind direction between 0 and 180 degree
+            wind_direction_180 =  180 - abs(self.wind_direction - 180) 
 
             velx = self.polar( wind_direction_180 ) * self.wind_speed * self.velocity_coefficient
             if velx < self.velocity_minimum:
                 velx = self.velocity_minimum
-
-            vely = 0
-            velz = 0
             
-            velarray = (velx, vely, velz)
-            self.velocity_pub(velarray)
+
+            self.velocity.velx = velx
+            self.velocity.vely = 0
+            self.velocity.velz = 0
+            self.velocity_pub.publish(self.velocity)
 
             self.rate.sleep()
 

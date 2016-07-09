@@ -9,7 +9,7 @@ import time, math
 from sensor_msgs.msg import NavSatFix
 from sailing_robot.msg import velocity
 
-from sailing_robot import Navigation
+from sailing_robot.navigation import Navigation
 
 
 class Position_simu():
@@ -23,15 +23,16 @@ class Position_simu():
         rospy.Subscriber('/heading', Float32, self.update_heading)
         self.heading = 0
         rospy.Subscriber('/velocity', velocity, self.update_velocity)
-        self.velocity = (0,0,0)
+        self.velocity = [0,0,0]
 
         self.freq = rospy.get_param("/config/rate")
         self.rate = rospy.Rate(self.freq)
 
-        init_position_lat = rospy.get_param("/simulator/position_init/latitude")
-        init_position_lon = rospy.get_param("/simulator/position_init/longitude")
+        init_position_lat = rospy.get_param("/simulation/position_init/latitude")
+        init_position_lon = rospy.get_param("/simulation/position_init/longitude")
 
-        self.utm_position = Navigation.latlon_to_utm(init_position_lat, init_position_lon)
+        self.nav = Navigation()
+        self.utm_position = self.nav.latlon_to_utm(init_position_lat, init_position_lon)
 
         rospy.loginfo("Position simulated")
 
@@ -42,7 +43,7 @@ class Position_simu():
         self.heading = msg.data
 
     def update_velocity(self, msg):
-        self.velocity = msg.data
+        self.velocity = (msg.velx, msg.vely, msg.velz)
 
     def position_publisher(self):
 
@@ -51,21 +52,21 @@ class Position_simu():
             dx = (self.velocity[0] * math.cos(math.radians(self.heading)) + \
                 self.velocity[1] * math.sin(math.radians(self.heading))) / self.freq
 
-            dy = (self.velocity[0] * math.sin(math.radian(self.heading)) - \
+            dy = (self.velocity[0] * math.sin(math.radians(self.heading)) - \
                 self.velocity[1] * math.cos(math.radians(self.heading))) / self.freq
             
             self.utm_position = (self.utm_position[0] + dx, self.utm_position[1] + dy)
 
-            position = Navigation.utm_to_latlon(self.utm_position)
+            position = self.nav.utm_to_latlon(self.utm_position[0], self.utm_position[1])
 
-            self.position_pub(position)
+            self.position_pub.publish(position)
 
             self.rate.sleep()
 
 
 if __name__ == '__main__':
     try:
-        Wind_direction_simu()
+        Position_simu()
     except rospy.ROSInterruptException:
         pass
 
