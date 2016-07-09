@@ -60,7 +60,7 @@ class Heading_simu():
 
         while not rospy.is_shutdown():
            
-            self.heading = self.diff_heading_coefficient * self.diff_heading() + self.heading
+            self.heading = self.diff_heading_coefficient * self.diff_heading() + self.heading % 360
 
             self.heading_pub.publish(self.heading)
             self.rate.sleep()

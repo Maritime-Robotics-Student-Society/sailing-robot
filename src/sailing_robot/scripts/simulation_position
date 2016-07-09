@@ -8,6 +8,7 @@ from std_msgs.msg import Float64, Float32
 import time, math
 from sensor_msgs.msg import NavSatFix
 from sailing_robot.msg import velocity
+from LatLon import LatLon
 
 from sailing_robot.navigation import Navigation
 
@@ -30,6 +31,7 @@ class Position_simu():
 
         init_position_lat = rospy.get_param("/simulation/position_init/latitude")
         init_position_lon = rospy.get_param("/simulation/position_init/longitude")
+
 
         self.nav = Navigation()
         self.utm_position = self.nav.latlon_to_utm(init_position_lat, init_position_lon)
@@ -55,11 +57,18 @@ class Position_simu():
             dy = (self.velocity[0] * math.sin(math.radians(self.heading)) - \
                 self.velocity[1] * math.cos(math.radians(self.heading))) / self.freq
             
+
+            msg = NavSatFix()
             self.utm_position = (self.utm_position[0] + dx, self.utm_position[1] + dy)
 
             position = self.nav.utm_to_latlon(self.utm_position[0], self.utm_position[1])
+            msg.latitude = position.lat.decimal_degree
+            msg.longitude = position.lon.decimal_degree
+            
 
-            self.position_pub.publish(position)
+
+
+            self.position_pub.publish(msg)
 
             self.rate.sleep()
 

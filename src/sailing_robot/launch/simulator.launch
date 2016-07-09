@@ -25,6 +25,7 @@
     <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" />
     <node name = "actuator_demand_sail" pkg="sailing_robot" type = "actuator_demand_sail" />
     <node name = "simulation_wind_direction" pkg="sailing_robot" type="simulation_wind_direction" />
+    <node name = "simulation_wind_speed" pkg="sailing_robot" type="simulation_wind_speed" />
     <node name = "simulation_heading" pkg="sailing_robot" type="simulation_heading" />
 
     <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/>
