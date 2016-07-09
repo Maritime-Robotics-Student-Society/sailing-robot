@@ -1,0 +1,91 @@
+#!/usr/bin/env python
+
+from visualization_msgs.msg import Marker
+from visualization_msgs.msg import MarkerArray
+from sensor_msgs.msg import NavSatFix
+from std_msgs.msg import Float64, Float32
+
+from sailing_robot.navigation import Navigation
+import rospy
+import math
+
+
+
+class Debugging_2D_plot():
+    def __init__(self):
+        
+        self.publisher = rospy.Publisher('debugging_2D_plot', MarkerArray, queue_size=10)
+
+        rospy.init_node("debugging_2D_plot", anonymous=True)
+
+        rospy.Subscriber('/position', NavSatFix, self.update_position)
+
+        init_position_lat = rospy.get_param("/simulation/position_init/latitude")
+        init_position_lon = rospy.get_param("/simulation/position_init/longitude")
+
+        self.nav = Navigation()
+        self.position = self.nav.latlon_to_utm(init_position_lat, init_position_lon)
+        self.init_position = self.position
+
+        self.markerArray = MarkerArray()
+
+        self.rate = rospy.Rate(rospy.get_param("/config/rate"))
+
+        self.count = 0
+        self.MARKERS_MAX = 100
+        self.marker_publish()
+
+
+    def update_position(self, msg):
+        self.position = self.nav.latlon_to_utm( msg.latitude, msg.longitude)
+
+    def marker_publish(self):
+
+
+        while not rospy.is_shutdown():
+
+            marker = Marker()
+            marker.header.frame_id = "map"
+            marker.type = marker.SPHERE
+            marker.action = marker.ADD
+            marker.scale.x = 0.2
+            marker.scale.y = 0.2
+            marker.scale.z = 0.2
+            marker.color.a = 1.0
+            marker.color.r = 1.0
+            marker.color.g = 1.0
+            marker.color.b = 0.0
+            marker.pose.orientation.w = 1.0
+            marker.pose.position.x = self.position[0] - self.init_position[0]
+            marker.pose.position.y = self.position[1] - self.init_position[1]
+
+            marker.pose.position.z = 0 
+
+            # We add the new marker to the MarkerArray, removing the oldest
+            # marker from it when necessary
+            if(self.count > self.MARKERS_MAX):
+                self.markerArray.markers.pop(0)
+
+            self.markerArray.markers.append(marker)
+
+            # Renumber the marker IDs
+            id = 0
+            for m in self.markerArray.markers:
+                m.id = id
+                id += 1
+
+            # Publish the MarkerArray
+            self.publisher.publish(self.markerArray)
+
+            self.count += 1
+
+            self.rate.sleep() 
+
+
+
+if __name__ == '__main__':
+    try:
+        Debugging_2D_plot()
+    except rospy.ROSInterruptException:
+        pass
+
