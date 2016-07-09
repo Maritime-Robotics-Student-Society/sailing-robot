@@ -11,6 +11,11 @@ import time, math
 
 class Heading_simu():
     def __init__(self):
+        """
+            Compute the heading thanks to the rudder angle and the boat velocity
+            The boat moves on a circle defined by the keel and the rudder
+        """
+
         self.heading_pub = rospy.Publisher('/heading', Float32, queue_size=10)
 
         rospy.init_node("simulation_heading", anonymous=True)

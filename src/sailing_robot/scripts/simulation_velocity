@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Simulator for the speed
+# Simulator for the boat velocity
 
 
 
@@ -17,6 +17,7 @@ import time, math
 
 class Velocity_simu():
     """ Node to simulate boat velocity based on polar and the wind direction and speed
+        A minimum velocity is set in the parameter file to be able to tack correctly
     """
     def __init__(self):
         self.velocity_pub = rospy.Publisher('/velocity', velocity, queue_size=10)

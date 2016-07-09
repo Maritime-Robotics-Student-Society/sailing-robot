@@ -10,6 +10,9 @@ import time, math
 
 class Wind_direction_simu():
     def __init__(self):
+        """ 
+            Simulate the wind direction based on its heading and the direction given in the parameter file
+        """
         self.wind_direction_pub = rospy.Publisher('/wind_direction_apparent', Float64, queue_size=10)
 
         rospy.init_node("simulation_wind_direction", anonymous=True)

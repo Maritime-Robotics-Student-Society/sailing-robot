@@ -10,6 +10,9 @@ import time, math
 
 class Wind_speed_simu():
     def __init__(self):
+        """
+            Simulate the wind speed only based on the parameter file
+        """
         self.wind_speed_pub = rospy.Publisher('/wind_speed_apparent', Float64, queue_size=10)
 
         rospy.init_node("simulation_wind_speed", anonymous=True)

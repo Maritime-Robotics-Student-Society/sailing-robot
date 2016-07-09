@@ -13,7 +13,7 @@
 
     <rosparam file="$(find sailing_robot)/launch/parameters/boldrewood_waypoints.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" ns="/simulation" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>
 
     <!--
     Nodes
