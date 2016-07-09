@@ -52,7 +52,7 @@
 #
 
 # PID values for rudder control
-/rudder/control/Kp: -0.5
+/rudder/control/Kp: 0.5
 /rudder/control/Ki: 0
 /rudder/control/Kd: 0.1
 
