@@ -13,7 +13,9 @@ class Wind_direction_average():
 
         rospy.init_node("sensor_processed_wind_direction", anonymous=True)
         rospy.Subscriber('/heading', Float32, self.update_heading)
-        rospy.Subscriber('/wind_direction_apparent', Float64, self.update_wind_direction)
+        self.heading = 0
+        rospy.Subscriber('/wind_direction_apparent', Float64, self.update_wind_direction_apparent)
+        self.wind_direction_apparent = 0
 
         sensor_rate = rospy.get_param("/config/rate")
         self.rate = rospy.Rate(sensor_rate)
