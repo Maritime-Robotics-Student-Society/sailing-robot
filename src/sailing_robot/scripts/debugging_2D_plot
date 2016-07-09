@@ -3,7 +3,7 @@
 from visualization_msgs.msg import Marker
 from visualization_msgs.msg import MarkerArray
 from sensor_msgs.msg import NavSatFix
-from std_msgs.msg import Float64, Float32
+from std_msgs.msg import Float64, Float32, String
 
 from sailing_robot.navigation import Navigation
 import rospy
@@ -12,14 +12,19 @@ import math
 
 
 class Debugging_2D_plot():
+    """
+        Node that publish object to RViz
+    """
     def __init__(self):
         
         self.publisher = rospy.Publisher('debugging_2D_plot', MarkerArray, queue_size=10)
 
         rospy.init_node("debugging_2D_plot", anonymous=True)
 
-        rospy.Subscriber('/position', NavSatFix, self.update_position)
+        rospy.Subscriber('/sailing_state', String, self.update_sailing_state)
+        self.sailing_state = 'normal'
 
+        rospy.Subscriber('/position', NavSatFix, self.update_position)
         init_position_lat = rospy.get_param("/simulation/position_init/latitude")
         init_position_lon = rospy.get_param("/simulation/position_init/longitude")
 
@@ -35,6 +40,8 @@ class Debugging_2D_plot():
         self.MARKERS_MAX = 100
         self.marker_publish()
 
+    def update_sailing_state(self, msg):
+        self.sailing_state = msg.data
 
     def update_position(self, msg):
         self.position = self.nav.latlon_to_utm( msg.latitude, msg.longitude)
@@ -51,10 +58,23 @@ class Debugging_2D_plot():
             marker.scale.x = 0.2
             marker.scale.y = 0.2
             marker.scale.z = 0.2
-            marker.color.a = 1.0
-            marker.color.r = 1.0
-            marker.color.g = 1.0
-            marker.color.b = 0.0
+
+            if self.sailing_state == 'tack_to_port_tack':
+                marker.color.a = 1.0
+                marker.color.r = 1.0
+                marker.color.g = 0.0
+                marker.color.b = 0.0
+            elif  self.sailing_state == 'tack_to_stb_tack':
+                marker.color.a = 1.0
+                marker.color.r = 0.0
+                marker.color.g = 1.0
+                marker.color.b = 0.0
+            else:
+                marker.color.a = 1.0
+                marker.color.r = 1.0
+                marker.color.g = 1.0
+                marker.color.b = 0.0
+
             marker.pose.orientation.w = 1.0
             marker.pose.position.x = self.position[0] - self.init_position[0]
             marker.pose.position.y = self.position[1] - self.init_position[1]
