@@ -13,7 +13,7 @@ import math
 
 class Debugging_2D_plot():
     """
-        Node that publish object to RViz
+        Node that publish visualisation objects (for RViz)
     """
     def __init__(self):
         
@@ -64,7 +64,7 @@ class Debugging_2D_plot():
                 marker.color.r = 1.0
                 marker.color.g = 0.0
                 marker.color.b = 0.0
-            elif  self.sailing_state == 'tack_to_stb_tack':
+            elif  self.sailing_state == 'tack_to_stbd_tack':
                 marker.color.a = 1.0
                 marker.color.r = 0.0
                 marker.color.g = 1.0
