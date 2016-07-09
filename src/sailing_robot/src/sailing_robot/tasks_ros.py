@@ -36,7 +36,7 @@ class RosTasksRunner(TasksRunner):
                 dt_mod, dt_cls = datatype_s.split(':', 1)
             else:
                 dt_mod = 'std_msgs.msg'
-                dt_cls = topic
+                dt_cls = datatype_s
             mod = importlib.import_module(dt_mod)
             dt = getattr(mod, dt_cls)
             
