@@ -11,9 +11,9 @@
   -->
 
   <node name="sail_to_wp" pkg="sailing_robot" type="heading_control"/>
-  <node name="publish_dummy_apparent_wind" pkg='sailing_robot' type="publish_apparent_wind_direction"/>
-  <node name="publish_dummy_position" pkg='sailing_robot' type="publish_position"/>
-  <node name="dashboard" pkg='sailing_robot' type="dashboard"/>
+  <node name="dummy_apparent_wind" pkg='sailing_robot' type="dummy_apparent_wind_direction"/>
+  <node name="dummy_position" pkg='sailing_robot' type="dummy_position"/>
+  <node name="debugging_dashboard" pkg='sailing_robot' type="debugging_dashboard"/>
 
 
     <!--
