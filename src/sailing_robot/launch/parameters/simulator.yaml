@@ -5,7 +5,7 @@
 /simulation/wind/speed: 5
 
 # wind direction relative to north
-/simulation/wind/direction: 15
+/simulation/wind/direction: 0
 
 
 # Boat velocity

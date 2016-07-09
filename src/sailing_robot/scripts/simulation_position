@@ -51,11 +51,11 @@ class Position_simu():
 
         while not rospy.is_shutdown():
             
-            dx = (self.velocity[0] * math.cos(math.radians(self.heading)) + \
-                self.velocity[1] * math.sin(math.radians(self.heading))) / self.freq
-
-            dy = (self.velocity[0] * math.sin(math.radians(self.heading)) - \
+            dx = (self.velocity[0] * math.sin(math.radians(self.heading)) - \
                 self.velocity[1] * math.cos(math.radians(self.heading))) / self.freq
+
+            dy = (self.velocity[0] * math.cos(math.radians(self.heading)) + \
+                self.velocity[1] * math.sin(math.radians(self.heading))) / self.freq
             
 
             msg = NavSatFix()
@@ -65,8 +65,6 @@ class Position_simu():
             msg.latitude = position.lat.decimal_degree
             msg.longitude = position.lon.decimal_degree
             
-
-
 
             self.position_pub.publish(msg)
 
