@@ -1,0 +1,48 @@
+#!/usr/bin/python
+#
+# Simulator for the wind direction node
+
+
+import rospy
+from std_msgs.msg import Float64, Float32
+import time, math
+
+
+class Wind_direction_simu():
+    def __init__(self):
+        """ 
+            Simulate the wind direction based on its heading and the direction given in the parameter file
+        """
+        self.wind_direction_pub = rospy.Publisher('/wind_direction_apparent', Float64, queue_size=10)
+
+        rospy.init_node("simulation_wind_direction", anonymous=True)
+
+        rospy.Subscriber('/heading', Float32, self.update_heading)
+        self.heading = rospy.get_param("/simulation/heading_init")
+
+        self.rate = rospy.Rate(rospy.get_param("/config/rate"))
+        self.wind_direction_north = rospy.get_param("/simulation/wind/direction")
+
+        rospy.loginfo("Wind direction simulated")
+        self.wind_direction_publisher()
+
+
+    def update_heading(self, msg):
+        self.heading = msg.data
+
+
+    def wind_direction_publisher(self):
+
+        while not rospy.is_shutdown():
+            wind_direction = (self.wind_direction_north - self.heading) % 360
+            self.wind_direction_pub.publish(wind_direction)
+
+            self.rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        Wind_direction_simu()
+    except rospy.ROSInterruptException:
+        pass
+
