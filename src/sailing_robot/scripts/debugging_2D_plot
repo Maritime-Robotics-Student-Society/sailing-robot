@@ -18,12 +18,14 @@ class Debugging_2D_plot():
     def __init__(self):
         
         self.publisher = rospy.Publisher('debugging_2D_plot', MarkerArray, queue_size=10)
+        self.publisher_waypoint = rospy.Publisher('debugging_2D_plot_wp', MarkerArray, queue_size=10)
 
         rospy.init_node("debugging_2D_plot", anonymous=True)
 
         rospy.Subscriber('/sailing_state', String, self.update_sailing_state)
         self.sailing_state = 'normal'
 
+        #rospy.Subscriber('/current_wp', NavSatFix, self.update_current_wp)
         rospy.Subscriber('/position', NavSatFix, self.update_position)
         init_position_lat = rospy.get_param("/simulation/position_init/latitude")
         init_position_lon = rospy.get_param("/simulation/position_init/longitude")
@@ -37,8 +39,49 @@ class Debugging_2D_plot():
         self.rate = rospy.Rate(rospy.get_param("/config/rate"))
 
         self.count = 0
-        self.MARKERS_MAX = 100
+        self.MARKERS_MAX = 500
+        self.generate_wp_Array()
         self.marker_publish()
+
+
+    def generate_wp_Array(self):
+        wp_list = rospy.get_param('/wp/list')
+        wp_table = rospy.get_param('/wp/table')
+
+        wp_list = list(set(wp_list)) # only print each waypoint once
+
+        self.wp_Array = MarkerArray()
+
+        count = 0
+        for wp in wp_list:
+            wp_coord = wp_table[wp]
+
+            current_wp_position = self.nav.latlon_to_utm( wp_coord[0], wp_coord[1])
+            #current_wp_position = self.nav.latlon_to_utm( msg.latitude, msg.longitude)
+            current_wp = Marker()
+
+            current_wp.header.frame_id = "map"
+            current_wp.type = current_wp.SPHERE
+            current_wp.action = current_wp.ADD
+            current_wp.scale.x = 1.5
+            current_wp.scale.y = 1.5
+            current_wp.scale.z = 1.5
+
+            current_wp.color.a = 1.0
+            current_wp.color.r = 200.0/255.0
+            current_wp.color.g = 162.0/255.0
+            current_wp.color.b = 200.0/255.0
+            current_wp.pose.orientation.w = 1.0
+            current_wp.pose.position.x = current_wp_position[0] - self.init_position[0]
+            current_wp.pose.position.y = current_wp_position[1] - self.init_position[1]
+            current_wp.pose.position.z = 0 
+            current_wp.id = count
+
+            self.wp_Array.markers.append(current_wp)
+            count += 1
+
+
+
 
     def update_sailing_state(self, msg):
         self.sailing_state = msg.data
@@ -55,9 +98,9 @@ class Debugging_2D_plot():
             marker.header.frame_id = "map"
             marker.type = marker.SPHERE
             marker.action = marker.ADD
-            marker.scale.x = 0.2
-            marker.scale.y = 0.2
-            marker.scale.z = 0.2
+            marker.scale.x = 1
+            marker.scale.y = 1
+            marker.scale.z = 1
 
             if self.sailing_state == 'tack_to_port_tack':
                 marker.color.a = 1.0
@@ -94,8 +137,10 @@ class Debugging_2D_plot():
                 m.id = id
                 id += 1
 
-            # Publish the MarkerArray
+
+
             self.publisher.publish(self.markerArray)
+            self.publisher_waypoint.publish(self.wp_Array)
 
             self.count += 1
 
