@@ -59,7 +59,7 @@ if __name__ == '__main__':
     try:
         pos_pub = rospy.Publisher('/position', NavSatFix, queue_size=10)
         nsats_pub = rospy.Publisher('/gps_satellites', Int16, queue_size=10)
-        rospy.init_node("sensor_gps", anonymous=True)
+        rospy.init_node("sensor_driver_gps", anonymous=True)
         pos_publisher()
     except rospy.ROSInterruptException:
         pass
