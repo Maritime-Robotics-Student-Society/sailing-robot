@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+Supply browser view of ros topics in local network
+"""
 
 import rospy
 from std_msgs.msg import Float32, Float64, Int16, UInt16, String
