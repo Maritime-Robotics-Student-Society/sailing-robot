@@ -36,8 +36,8 @@ class Navigation(object):
     
     def utm_to_latlon(self, x, y):
         """Returns a LatLon object"""
-        lon, lat = self.projection.inverse(x, y, inverse=True)
-        return ll.LatLon(lat, lon)
+        lon, lat = self.projection(x, y, inverse=True)
+        return LatLon(lat, lon)
 
     def update_heading(self, msg):
         self.heading = msg.data

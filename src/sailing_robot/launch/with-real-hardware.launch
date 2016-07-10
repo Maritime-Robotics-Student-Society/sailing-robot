@@ -17,26 +17,25 @@
     Nodes
     -->
     <!-- These are currently dummies, need to be replaced with real nodes -->
-    <!-- <node name="publish_heading" pkg='sailing_robot' type="publish_heading"/> -->
-    <node name="gps" pkg='sailing_robot' type="gps"/>
-    <!--<node name = "go_through_wp_list" pkg="sailing_robot" type = "run_through_wp_list" /> -->
+    <!-- <node name="dummy_heading" pkg='sailing_robot' type="dummy_heading"/> -->
+    <node name="sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps"/>
     <!--<node name = "heading_control" pkg="sailing_robot" type = "heading_control" />-->
     <node name = "tasks" pkg="sailing_robot" type = "tasks" />
     <node name = "tack" pkg="sailing_robot" type = "tack" />
-    <node name = "pid_rudder" pkg="sailing_robot" type = "pid_rudder" />
-    <node name = "pid_sail" pkg="sailing_robot" type = "pid_sail" />
-    <node name = "heading" pkg="sailing_robot" type="imu-calibrated" />
-    <node name = "servo_control" pkg="sailing_robot" type="servo_control" />
-    <node name = "wind_direction" pkg="sailing_robot" type="wind_direction_calibrated" />
-    <node name = "blink_on_sailing_state" pkg="sailing_robot" type="blink_on_sailing_state" />
+    <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" />
+    <node name = "actuator_demand_sail" pkg="sailing_robot" type = "actuator_demand_sail" />
+    <node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu" />
+    <node name = "actuator_driver_servos" pkg="sailing_robot" type="actuator_driver_servos" />
+    <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction" />
+    <node name = "debugging_blink_on_sailing_state" pkg="sailing_robot" type="debugging_blink_on_sailing_state" />
 
     <!-- Rosbag records messages for later investigation -->
     <!-- <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-record"/> -->
     <!-- Also record GPS data as required by the competition -->
-    <node name="gps_log" pkg='sailing_robot' type="gps_log"/>
+    <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/>
 
     <!-- Serve an HTML dashboard so we can see what's going on -->
-    <node name = "dashboard" pkg="sailing_robot" type = "dashboard" />
+    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
 
     <!--
     Launch Bridge to Arduino
