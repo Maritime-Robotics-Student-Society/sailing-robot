@@ -167,7 +167,7 @@ def wind_direction_publisher():
 if __name__ == '__main__':
     try:
         apparent_wind_direction_pub = rospy.Publisher('/wind_direction_apparent', Float64, queue_size=10)
-        rospy.init_node("publish_wind_direction_imu", anonymous=True)
+        rospy.init_node("sensor_driver_wind_direction", anonymous=True)
         wind_direction_publisher()
     except rospy.ROSInterruptException:
         pass
