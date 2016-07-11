@@ -51,3 +51,6 @@ CATKIN_IGNORE
 *.csv
 *.bag
 *.bag.active
+
+# ignore automatically generated docs files
+/src/sailing_robot/doc/*

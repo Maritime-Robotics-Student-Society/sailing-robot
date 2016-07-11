@@ -1,4 +1,11 @@
 #!/usr/bin/python
+"""
+Blink LEDs to indicate sailing state
+\n
+Publishes: messages that encode a colour in an Int32
+\n
+Subscribes: sailing state
+"""
 
 import rospy
 from std_msgs.msg import Int32, String
