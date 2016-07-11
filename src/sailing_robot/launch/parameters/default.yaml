@@ -77,7 +77,7 @@
 # Sail Parameters
 #
 
-# PID values for rudder control
+# PID values for sail control
 /sail/control/Kp: 0
 /sail/control/Ki: 0
 /sail/control/Kd: 0
@@ -111,9 +111,9 @@
 #
 # To avoid noise of the wind sensor, we average it over a time
 # in [seconds]
-/wind/sensor_average_time: 5.0
+/wind/sensor_average_time: 2.0
 
 # The route planning should consider the longer term trend of the wind direction
 # so a longer average is calculated
 # in [seconds]
-/wind/trend_average_time: 10.0
+/wind/trend_average_time: 40.0
