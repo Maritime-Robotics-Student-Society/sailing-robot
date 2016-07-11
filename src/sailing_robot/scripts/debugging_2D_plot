@@ -8,6 +8,7 @@ from std_msgs.msg import Float64, Float32, String
 from sailing_robot.navigation import Navigation
 import rospy
 import math
+import time
 
 
 
@@ -26,13 +27,9 @@ class Debugging_2D_plot():
         self.sailing_state = 'normal'
 
         #rospy.Subscriber('/current_wp', NavSatFix, self.update_current_wp)
-        rospy.Subscriber('/position', NavSatFix, self.update_position)
-        init_position_lat = rospy.get_param("/simulation/position_init/latitude")
-        init_position_lon = rospy.get_param("/simulation/position_init/longitude")
-
         self.nav = Navigation()
-        self.position = self.nav.latlon_to_utm(init_position_lat, init_position_lon)
-        self.init_position = self.position
+        rospy.Subscriber('/position', NavSatFix, self.update_position)
+        self.gps_fix_lock = True
 
         self.markerArray = MarkerArray()
 
@@ -40,6 +37,12 @@ class Debugging_2D_plot():
 
         self.count = 0
         self.MARKERS_MAX = 500
+
+        while self.gps_fix_lock and not rospy.is_shutdown():
+            self.rate.sleep()
+        self.init_position = self.position
+
+
         self.generate_wp_Array()
         self.marker_publish()
 
@@ -88,6 +91,7 @@ class Debugging_2D_plot():
 
     def update_position(self, msg):
         self.position = self.nav.latlon_to_utm( msg.latitude, msg.longitude)
+        self.gps_fix_lock = False
 
     def marker_publish(self):
 
