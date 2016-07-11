@@ -30,12 +30,13 @@ class Position_simu():
         self.freq = rospy.get_param("/config/rate")
         self.rate = rospy.Rate(self.freq)
 
-        init_position_lat = rospy.get_param("/simulation/position_init/latitude")
-        init_position_lon = rospy.get_param("/simulation/position_init/longitude")
-
+        # Read init position form the /wp parameters
+        wp_list = rospy.get_param('/wp/list')
+        wp_table = rospy.get_param('/wp/table')
+        init_position = wp_table[wp_list[0]]
 
         self.nav = Navigation()
-        self.utm_position = self.nav.latlon_to_utm(init_position_lat, init_position_lon)
+        self.utm_position = self.nav.latlon_to_utm(init_position[0], init_position[1])
 
         rospy.loginfo("Position simulated")
 

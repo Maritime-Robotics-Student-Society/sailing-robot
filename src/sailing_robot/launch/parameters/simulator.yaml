@@ -16,12 +16,7 @@
 /simulation/velocity/minimum: 0.5
 
 
-
-# Initial position
-/simulation/position_init/latitude: 50.936981
-/simulation/position_init/longitude: -1.405315
-
-/simulation/heading_init: -90.0
+/simulation/heading_init: 270.0
 
 
 # Heading coefficient
