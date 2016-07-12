@@ -3,20 +3,24 @@
     General test file to launch all existing nodes to talk to real hardware
     -->
 
-    <!--
-    Parameters
-    -->
-
-    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
-
-    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
-
-    <rosparam file="$(find sailing_robot)/launch/parameters/boldrewood_waypoints.yaml" command="load"/>
-    <!--rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/-->
-
-    <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>
-
     <group ns = "pirate">
+        <!--
+        Parameters
+        -->
+        <param name = "simulation/boatColour/red" value = "200"/>
+        <param name = "simulation/boatColour/green" value = "0"/>
+        <param name = "simulation/boatColour/blue" value = "256"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/boldrewood_waypoints.yaml" command="load"/>
+        <!--rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/-->
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>
+
+
         <!--
         Nodes
         -->
@@ -36,6 +40,23 @@
     </group>
 
     <group ns = "greenBoat">
+        <!--
+        Parameters
+        -->
+        <param name = "simulation/boatColour/red" value = "0"/>
+        <param name = "simulation/boatColour/green" value = "256"/>
+        <param name = "simulation/boatColour/blue" value = "100"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/boldrewood_waypoints.yaml" command="load"/>
+        <!--rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/-->
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>
+
+
         <!--
         Nodes
         -->
