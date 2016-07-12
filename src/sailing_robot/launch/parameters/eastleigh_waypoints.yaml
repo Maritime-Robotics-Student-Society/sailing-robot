@@ -1,16 +1,16 @@
 
 # for simplified entry of path, simply add list of waypoint names
 # starts with list entry 0, continues until end is reached
-/wp/list: ["11", "9", "10", "11"]
+wp/list: ["11", "9", "10", "11"]
 
 
 # distance within waypoint is accepted, in [m]
-/wp/acceptRadius: 1.5
+wp/acceptRadius: 1.5
 
 
 # Dictionary for looking up waypoints, using [lat, lon] format of NavSatFix
 #
-/wp/table: {"1" : [50.957567, -1.367289],
+wp/table: {"1" : [50.957567, -1.367289],
             "2" : [50.957444, -1.366680],
             "3" : [50.957391,   -1.367093], 
             "4" : [50.957302,   -1.366713], 
