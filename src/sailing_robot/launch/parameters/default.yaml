@@ -6,16 +6,16 @@
 
 # apparent wind direction, for tests with a human simulated constant wind direction
 # in degrees, conventions like for wind_direction_apparent topic
-/dummy/wind_direction_apparent: 0
+dummy/wind_direction_apparent: 0
 
 # dummy heading, for tests without the compass working
 # in degrees
-/dummy/heading: 25
+dummy/heading: 25
 
 # dummy latitude/longitude paramters for tests indoors, without position fix
 # in degrees
-/dummy/latitude: 50.936981
-/dummy/longitude: -1.405315
+dummy/latitude: 50.936981
+dummy/longitude: -1.405315
 
 # P2: 50.93716  &  -1.405683
 # P3: 50.936908 &  -1.406061
@@ -27,7 +27,7 @@
 
 # ROS rate
 # in [Hz]
-/config/rate: 10
+config/rate: 10
 
 #
 # Navigation
@@ -36,15 +36,15 @@
 
 # Angle area from going directly uptwind to the end of the deadzone (the total angular area of the deadzone is therefore 2*navigation/deadzone
 # in [degrees]
-/navigation/deadzone: 45
+navigation/deadzone: 45
 # The definition where we change tack when going upwind is based on crossing a line parallel to the wind direction, going through a point at a given distance to the waypoint.
 # See https://github.com/Maritime-Robotics-Student-Society/sailing-robot/blob/master/notes/upwind-tactics.svg# in [m]
-/navigation/tackline_distance: 5
+navigation/tackline_distance: 5
 # Zone number of the UTM system to use. Southampton is in zone 30,
 # Portugal in zone 29. http://www.dmap.co.uk/utmworld.htm
 # Distance calculations will be less accurate the further from the specified
 # zone you are.
-/navigation/utm_zone: 30
+navigation/utm_zone: 30
 
 
 #
@@ -52,25 +52,25 @@
 #
 
 # PID values for rudder control
-/rudder/control/Kp: 0.5
-/rudder/control/Ki: 0
-/rudder/control/Kd: 0.1
+rudder/control/Kp: 0.5
+rudder/control/Ki: 0
+rudder/control/Kd: 0.1
 
 
 # servo PWM control 
 
-/rudder/PWMoffset: 85
-/rudder/servolowerlimits: 1140
-/rudder/servohigherlimits: 1900
+rudder/PWMoffset: 85
+rudder/servolowerlimits: 1140
+rudder/servohigherlimits: 1900
 
 
 # maximum angle
 # absolute value, in [degrees], see https://github.com/Maritime-Robotics-Student-Society/sailing-robot/wiki/Naming-conventions
-/rudder/maxAngle: 40
+rudder/maxAngle: 40
 
 # initial position
 # in [degrees]
-/rudder/initialAngle: 0
+rudder/initialAngle: 0
 
 
 #
@@ -78,32 +78,32 @@
 #
 
 # PID values for sail control
-/sail/control/Kp: 0
-/sail/control/Ki: 0
-/sail/control/Kd: 0
+sail/control/Kp: 0
+sail/control/Ki: 0
+sail/control/Kd: 0
 
 # maximum angle
 # in [degrees]
-/sail/maxAngle: 90
+sail/maxAngle: 90
 # servo PWM control 
   
-/sail/PWMoffset: 0
-/sail/servolowerlimits: 1100
-/sail/servohigherlimits: 1900
+sail/PWMoffset: 0
+sail/servolowerlimits: 1100
+sail/servohigherlimits: 1900
 # Safe value for the boat sail to be set at
 # in [degrees]
-/sail/initialAngle: 90
+sail/initialAngle: 90
 
 # Length over which the sheet can be varied
 # (EXAMPLE, PROBABLY NOT ACTUALLY USED)
 # in [m]
-/sail/boomsheetDistance: 0.31
-/sail/heightofboom: 0.05
-/sail/pullypivotDistance: 0.34
+sail/boomsheetDistance: 0.31
+sail/heightofboom: 0.05
+sail/pullypivotDistance: 0.34
 
 # Diameter of the sail winch
 # in [mm]
-/sail/winchDiameter: 50
+sail/winchDiameter: 50
 
 
 #
@@ -111,9 +111,9 @@
 #
 # To avoid noise of the wind sensor, we average it over a time
 # in [seconds]
-/wind/sensor_average_time: 2.0
+wind/sensor_average_time: 2.0
 
 # The route planning should consider the longer term trend of the wind direction
 # so a longer average is calculated
 # in [seconds]
-/wind/trend_average_time: 40.0
+wind/trend_average_time: 40.0

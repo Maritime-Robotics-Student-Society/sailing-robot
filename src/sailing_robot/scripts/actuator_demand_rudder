@@ -9,7 +9,7 @@ from sailing_robot.navigation import angle_subtract
 
 data = PID_Data()
 
-rudder = rospy.get_param('/rudder')
+rudder = rospy.get_param('rudder')
 
 controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'],rudder['maxAngle'], -rudder['maxAngle'])
 
@@ -21,7 +21,7 @@ def node_publisher():
     PID controller was used in other conditions.
     :rtype: object
     """
-    pub = rospy.Publisher('/rudder_control', Int16, queue_size=10)  # Use UInt 16 here to minimize the memory use
+    pub = rospy.Publisher('rudder_control', Int16, queue_size=10)  # Use UInt 16 here to minimize the memory use
     rospy.init_node('actuator_demand_rudder', anonymous=True)
     rate = rospy.Rate(10)
 
@@ -44,10 +44,10 @@ print(data.goal_heading)
 
 if __name__ == '__main__':
     try:
-        rospy.Subscriber('/goal_heading', Float32, data.update_goal_heading)
-        rospy.Subscriber('/heading', Float32, data.update_heading)
-        rospy.Subscriber('/sailing_state', String, data.update_sailing_state)
-        rospy.Subscriber('/tack_rudder', Float32, data.update_tack_rudder)
+        rospy.Subscriber('goal_heading', Float32, data.update_goal_heading)
+        rospy.Subscriber('heading', Float32, data.update_heading)
+        rospy.Subscriber('sailing_state', String, data.update_sailing_state)
+        rospy.Subscriber('tack_rudder', Float32, data.update_tack_rudder)
         node_publisher()
     except rospy.ROSInterruptException:
         pass

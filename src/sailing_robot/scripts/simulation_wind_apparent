@@ -16,25 +16,25 @@ class Wind_simu():
             Simulate the apparent wind direction and speed based on the heading of the boat, its velocity 
             and the direction/speed given in the parameter file
         """
-        self.wind_direction_pub = rospy.Publisher('/wind_direction_apparent', Float64, queue_size=10)
-        self.wind_speed_pub = rospy.Publisher('/wind_speed_apparent', Float64, queue_size=10)
+        self.wind_direction_pub = rospy.Publisher('wind_direction_apparent', Float64, queue_size=10)
+        self.wind_speed_pub = rospy.Publisher('wind_speed_apparent', Float64, queue_size=10)
 
         rospy.init_node("simulation_wind_apparent", anonymous=True)
 
-        rospy.Subscriber('/heading', Float32, self.update_heading)
-        self.heading = rospy.get_param("/simulation/heading_init")
+        rospy.Subscriber('heading', Float32, self.update_heading)
+        self.heading = rospy.get_param("simulation/heading_init")
 
-        self.wind_speed = rospy.get_param("/simulation/wind/speed")
+        self.wind_speed = rospy.get_param("simulation/wind/speed")
 
-        rospy.Subscriber('/velocity', velocity, self.update_velocity)
+        rospy.Subscriber('velocity', velocity, self.update_velocity)
         self.velocity = [0,0,0]
 
-        self.rate = rospy.Rate(rospy.get_param("/config/rate"))
-        self.wind_direction_north = rospy.get_param("/simulation/wind/direction")
+        self.rate = rospy.Rate(rospy.get_param("config/rate"))
+        self.wind_direction_north = rospy.get_param("simulation/wind/direction")
 
         #Noise
-        self.wind_direction_noise_range = rospy.get_param('/simulation/wind/noise_direction_range')
-        self.wind_speed_noise_range = rospy.get_param('/simulation/wind/noise_speed_range')
+        self.wind_direction_noise_range = rospy.get_param('simulation/wind/noise_direction_range')
+        self.wind_speed_noise_range = rospy.get_param('simulation/wind/noise_speed_range')
 
         rospy.loginfo("Wind direction simulated")
         self.wind_publisher()

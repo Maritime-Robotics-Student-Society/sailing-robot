@@ -22,7 +22,7 @@ import time, math
 
 def wind_direction_publisher():
 
-    calib = rospy.get_param('/calibration/wind_dir')
+    calib = rospy.get_param('calibration/wind_dir')
 
     XOFFSET = calib['XOFFSET']
     YOFFSET = calib['YOFFSET']
@@ -31,8 +31,8 @@ def wind_direction_publisher():
     ANGLEOFFSET = calib['ANGLEOFFSET']
 
 
-    average_time = rospy.get_param("/wind/sensor_average_time")
-    sensor_rate = rospy.get_param("/config/rate")
+    average_time = rospy.get_param("wind/sensor_average_time")
+    sensor_rate = rospy.get_param("config/rate")
     AVE_SIZE = int(average_time * sensor_rate)   # averaging over the last AVE_SIZE values
 
     rate = rospy.Rate(sensor_rate)
@@ -166,7 +166,7 @@ def wind_direction_publisher():
 
 if __name__ == '__main__':
     try:
-        apparent_wind_direction_pub = rospy.Publisher('/wind_direction_apparent', Float64, queue_size=10)
+        apparent_wind_direction_pub = rospy.Publisher('wind_direction_apparent', Float64, queue_size=10)
         rospy.init_node("sensor_driver_wind_direction", anonymous=True)
         wind_direction_publisher()
     except rospy.ROSInterruptException:

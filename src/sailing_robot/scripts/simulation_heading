@@ -16,19 +16,19 @@ class Heading_simu():
             The boat moves on a circle defined by the keel and the rudder
         """
 
-        self.heading_pub = rospy.Publisher('/heading', Float32, queue_size=10)
+        self.heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
 
         rospy.init_node("simulation_heading", anonymous=True)
 
-        rospy.Subscriber('/rudder_control', Int16, self.update_rudder)
+        rospy.Subscriber('rudder_control', Int16, self.update_rudder)
         self.rudder = 0
-        rospy.Subscriber('/velocity', velocity, self.update_velocity)
+        rospy.Subscriber('velocity', velocity, self.update_velocity)
         self.velocity = [0,0,0]
 
-        self.heading = rospy.get_param("/simulation/heading_init")
+        self.heading = rospy.get_param("simulation/heading_init")
 
-        self.diff_heading_coefficient = rospy.get_param("/simulation/heading/coefficient")
-        self.freq = rospy.get_param("/config/rate")
+        self.diff_heading_coefficient = rospy.get_param("simulation/heading/coefficient")
+        self.freq = rospy.get_param("config/rate")
         self.rate = rospy.Rate(self.freq)
 
 

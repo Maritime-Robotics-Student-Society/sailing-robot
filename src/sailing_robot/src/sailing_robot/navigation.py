@@ -79,9 +79,9 @@ class Navigation(object):
         from rospy import Subscriber
         from std_msgs.msg import Float32, Float64
         from sensor_msgs.msg import NavSatFix
-        Subscriber('/heading', Float32, self.update_heading)
-        Subscriber('/wind_direction_apparent', Float64, self.update_wind_direction)
-        Subscriber('/position', NavSatFix, self.update_position)
+        Subscriber('heading', Float32, self.update_heading)
+        Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
+        Subscriber('position', NavSatFix, self.update_position)
 
 ################
 # General utility functions
