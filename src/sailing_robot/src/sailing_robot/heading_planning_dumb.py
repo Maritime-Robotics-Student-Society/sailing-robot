@@ -1,4 +1,7 @@
 import LatLon as ll
+import math
+from shapely.geometry import Point
+
 from .taskbase import TaskBase
 
 class HeadingPlan(TaskBase):
