@@ -11,14 +11,14 @@ import pynmea2
 from std_msgs.msg import Float32
 from sensor_msgs.msg import NavSatFix
 
-currentLatitude = rospy.get_param("/dummy/latitude")
-currentLongitude = rospy.get_param("/dummy/longitude")
+currentLatitude = rospy.get_param("dummy/latitude")
+currentLongitude = rospy.get_param("dummy/longitude")
 
 position = NavSatFix()
 
 def position_publisher():
 
-    rate = rospy.Rate(rospy.get_param("/config/rate"))
+    rate = rospy.Rate(rospy.get_param("config/rate"))
     
     # if str.find('GGA') > 0:
     #     msg = pynmea2.parse(str)
@@ -38,7 +38,7 @@ def position_publisher():
 
 if __name__ == '__main__':
     try:
-        position_pub = rospy.Publisher('/position', NavSatFix, queue_size=10)
+        position_pub = rospy.Publisher('position', NavSatFix, queue_size=10)
         rospy.init_node("publish_dummy_position_data", anonymous=True)
         
         # serialPort = serial.Serial("/dev/ttyAMA0", 9600, timeout=0.5)

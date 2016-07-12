@@ -5,7 +5,7 @@ import rospy
 from std_msgs.msg import UInt16, Int16
 import numpy as np
 
-saildata = rospy.get_param('/sail')
+saildata = rospy.get_param('sail')
 pullypivotdistance = saildata['pullypivotDistance']
 boomsheetdistance = saildata['boomsheetDistance']
 boomheight = saildata['heightofboom']
@@ -15,7 +15,7 @@ sailservohigherlimits = saildata['servohigherlimits']
 sailservoneturalpoint = (sailservolowerlimits + sailservohigherlimits)/2
 sailservorange = (sailservohigherlimits - sailservolowerlimits)
 
-rudderdata = rospy.get_param('/rudder')
+rudderdata = rospy.get_param('rudder')
 rudderservoPWMoffset = rudderdata['PWMoffset']
 rudderservolowerlimits = rudderdata['servolowerlimits']
 rudderservohigherlimits = rudderdata['servohigherlimits']
@@ -54,8 +54,8 @@ if __name__ == '__main__':
     pi = pigpio.pi();
     try:
         rospy.init_node('actuator_driver_servos', anonymous=True)
-        rospy.Subscriber('/rudder_control', Int16, rudderservoPWMcontrol)
-        rospy.Subscriber('/sail_servo', UInt16, sailservoPWMcontrol)
+        rospy.Subscriber('rudder_control', Int16, rudderservoPWMcontrol)
+        rospy.Subscriber('sail_servo', UInt16, sailservoPWMcontrol)
         rospy.spin()
     except rospy.ROSInterruptException:
         pass

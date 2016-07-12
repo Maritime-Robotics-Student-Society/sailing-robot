@@ -16,9 +16,9 @@ from sensor_msgs.msg import NavSatFix
 
 
 def goal_heading_publisher(tasks_runner):
-    pub = rospy.Publisher("/goal_heading", Float32, queue_size=10)
-    pub_state = rospy.Publisher("/sailing_state", String, queue_size=10)
-    rate = rospy.Rate(rospy.get_param("/config/rate"))
+    pub = rospy.Publisher("goal_heading", Float32, queue_size=10)
+    pub_state = rospy.Publisher("sailing_state", String, queue_size=10)
+    rate = rospy.Rate(rospy.get_param("config/rate"))
 
     tasks_runner.start_next_task()
     while not rospy.is_shutdown():
@@ -31,9 +31,9 @@ def goal_heading_publisher(tasks_runner):
 if __name__ == '__main__':
     try:
         rospy.init_node("publish_goal_heading", anonymous=True)
-        #tasks = rospy.get_param("/tasks")
-        tasks = tasks_from_wps(rospy.get_param("/wp"))
-        nav_options = rospy.get_param("/navigation")
+        #tasks = rospy.get_param("tasks")
+        tasks = tasks_from_wps(rospy.get_param("wp"))
+        nav_options = rospy.get_param("navigation")
         nav = Navigation()#**nav_options)
         tasks_runner = RosTasksRunner(tasks, nav)
         tasks_runner.nav.subscribe_topics()

@@ -11,8 +11,8 @@ from sailing_robot.tack_control import Tacking
 
 if __name__ == '__main__':
     try:
-        sail_pub = rospy.Publisher('/tack_sail', Float32, queue_size=10)
-        rudder_pub = rospy.Publisher('/tack_rudder', Float32, queue_size=10)
+        sail_pub = rospy.Publisher('tack_sail', Float32, queue_size=10)
+        rudder_pub = rospy.Publisher('tack_rudder', Float32, queue_size=10)
         tacking = Tacking()
         def recv(msg):
             sail, rudder = tacking.calculate_sail_and_rudder(msg.data)
@@ -20,7 +20,7 @@ if __name__ == '__main__':
             rudder_pub.publish(rudder)
 
         rospy.init_node("publish_tack_data", anonymous=True)
-        rospy.Subscriber('/sailing_state', String, recv)
+        rospy.Subscriber('sailing_state', String, recv)
         rospy.spin()  # Wait for shutdown
     except rospy.ROSInterruptException:
         pass

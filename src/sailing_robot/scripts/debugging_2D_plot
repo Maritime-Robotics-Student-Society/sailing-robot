@@ -23,17 +23,17 @@ class Debugging_2D_plot():
 
         rospy.init_node("debugging_2D_plot", anonymous=True)
 
-        rospy.Subscriber('/sailing_state', String, self.update_sailing_state)
+        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
         self.sailing_state = 'normal'
 
-        #rospy.Subscriber('/current_wp', NavSatFix, self.update_current_wp)
+        #rospy.Subscriber('current_wp', NavSatFix, self.update_current_wp)
         self.nav = Navigation()
-        rospy.Subscriber('/position', NavSatFix, self.update_position)
+        rospy.Subscriber('position', NavSatFix, self.update_position)
         self.gps_fix_lock = True
 
         self.markerArray = MarkerArray()
 
-        self.rate = rospy.Rate(rospy.get_param("/config/rate"))
+        self.rate = rospy.Rate(rospy.get_param("config/rate"))
 
         self.count = 0
         self.MARKERS_MAX = 500
@@ -48,8 +48,8 @@ class Debugging_2D_plot():
 
 
     def generate_wp_Array(self):
-        wp_list = rospy.get_param('/wp/list')
-        wp_table = rospy.get_param('/wp/table')
+        wp_list = rospy.get_param('wp/list')
+        wp_table = rospy.get_param('wp/table')
 
         wp_list = list(set(wp_list)) # only print each waypoint once
 
