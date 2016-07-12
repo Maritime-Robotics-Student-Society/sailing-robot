@@ -7,6 +7,7 @@ import rospy
 from std_msgs.msg import Float64, Float32
 from sailing_robot.msg import velocity
 import time, math
+import numpy as np
 
 
 class Wind_simu():
@@ -31,6 +32,10 @@ class Wind_simu():
         self.rate = rospy.Rate(rospy.get_param("/config/rate"))
         self.wind_direction_north = rospy.get_param("/simulation/wind/direction")
 
+        #Noise
+        self.wind_direction_noise_range = rospy.get_param('/simulation/wind/noise_direction_range')
+        self.wind_speed_noise_range = rospy.get_param('/simulation/wind/noise_speed_range')
+
         rospy.loginfo("Wind direction simulated")
         self.wind_publisher()
 
@@ -45,14 +50,26 @@ class Wind_simu():
     def wind_publisher(self):
 
         while not rospy.is_shutdown():
-            wind_direction_boat = (self.wind_direction_north - self.heading) % 360
-            wind_vector_boat = (self.wind_speed* math.cos(math.radians(wind_direction_boat )),
-                                - self.wind_speed* math.sin(math.radians(wind_direction_boat)),)
+
+            if self.wind_direction_noise_range:
+                noise_direction = np.random.normal(scale= self.wind_direction_noise_range)
+            else:
+                noise_direction = 0
+
+            if self.wind_speed_noise_range:
+                noise_speed = np.random.normal(scale= self.wind_speed_noise_range)
+            else:
+                noise_speed = 0
+
+
+            wind_direction_boat = (self.wind_direction_north + noise_direction - self.heading) % 360
+            wind_vector_boat = ((self.wind_speed + noise_speed)* math.cos(math.radians(wind_direction_boat )),
+                                - (self.wind_speed + noise_speed)* math.sin(math.radians(wind_direction_boat)),)
 
             wind_apparent = (self.velocity[0] + wind_vector_boat[0],
                              self.velocity[1] + wind_vector_boat[1],) 
 
-            
+
             wind_speed_apparent = math.sqrt(wind_apparent[0]**2 + wind_apparent[1]**2)
             wind_direction_apparent = ( math.degrees(- math.atan2(wind_apparent[1], wind_apparent[0]))) % 360
 
