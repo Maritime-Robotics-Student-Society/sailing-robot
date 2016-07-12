@@ -16,25 +16,46 @@
 
     <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>
 
-    <!--
-    Nodes
-    -->
-    <node name = "tasks" pkg="sailing_robot" type = "tasks" />
-    <node name = "tack" pkg="sailing_robot" type = "tack" />
-    <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" />
-    <node name = "actuator_demand_sail" pkg="sailing_robot" type = "actuator_demand_sail" />
-    <node name = "simulation_position" pkg='sailing_robot' type="simulation_position"/>
-    <node name = "simulation_velocity" pkg='sailing_robot' type="simulation_velocity"/>
-    <node name = "simulation_wind_apparent" pkg="sailing_robot" type="simulation_wind_apparent" />
-    <node name = "simulation_heading" pkg="sailing_robot" type="simulation_heading" />
+    <group ns = "pirate">
+        <!--
+        Nodes
+        -->
+        <node name = "tasks" pkg="sailing_robot" type = "tasks" />
+        <node name = "tack" pkg="sailing_robot" type = "tack" />
+        <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" />
+        <node name = "actuator_demand_sail" pkg="sailing_robot" type = "actuator_demand_sail" />
+        <node name = "simulation_position" pkg='sailing_robot' type="simulation_position"/>
+        <node name = "simulation_velocity" pkg='sailing_robot' type="simulation_velocity"/>
+        <node name = "simulation_wind_apparent" pkg="sailing_robot" type="simulation_wind_apparent" />
+        <node name = "simulation_heading" pkg="sailing_robot" type="simulation_heading" />
 
-    <node name = "sensor_processed_wind_direction" pkg="sailing_robot" type="sensor_processed_wind_direction" />
+        <node name = "sensor_processed_wind_direction" pkg="sailing_robot" type="sensor_processed_wind_direction" />
+        <node name="debugging_2D_plot" pkg='sailing_robot' type="debugging_2D_plot"/>
+        <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 map my_frame 100" />
 
-    <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/>
+    </group>
 
-    <node name="debugging_2D_plot" pkg='sailing_robot' type="debugging_2D_plot"/>
-    <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 map my_frame 100" />
+    <group ns = "greenBoat">
+        <!--
+        Nodes
+        -->
+        <node name = "tasks" pkg="sailing_robot" type = "tasks" />
+        <node name = "tack" pkg="sailing_robot" type = "tack" />
+        <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" />
+        <node name = "actuator_demand_sail" pkg="sailing_robot" type = "actuator_demand_sail" />
+        <node name = "simulation_position" pkg='sailing_robot' type="simulation_position"/>
+        <node name = "simulation_velocity" pkg='sailing_robot' type="simulation_velocity"/>
+        <node name = "simulation_wind_apparent" pkg="sailing_robot" type="simulation_wind_apparent" />
+        <node name = "simulation_heading" pkg="sailing_robot" type="simulation_heading" />
 
-    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
+        <node name = "sensor_processed_wind_direction" pkg="sailing_robot" type="sensor_processed_wind_direction" />
+        <node name="debugging_2D_plot" pkg='sailing_robot' type="debugging_2D_plot"/>
+        <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 map my_frame 100" />
+
+    </group>
+
+
+
+
  </launch>
 
