@@ -25,8 +25,7 @@
     <node name = "actuator_demand_sail" pkg="sailing_robot" type = "actuator_demand_sail" />
     <node name = "simulation_position" pkg='sailing_robot' type="simulation_position"/>
     <node name = "simulation_velocity" pkg='sailing_robot' type="simulation_velocity"/>
-    <node name = "simulation_wind_direction" pkg="sailing_robot" type="simulation_wind_direction" />
-    <node name = "simulation_wind_speed" pkg="sailing_robot" type="simulation_wind_speed" />
+    <node name = "simulation_wind_apparent" pkg="sailing_robot" type="simulation_wind_apparent" />
     <node name = "simulation_heading" pkg="sailing_robot" type="simulation_heading" />
 
     <node name = "sensor_processed_wind_direction" pkg="sailing_robot" type="sensor_processed_wind_direction" />
