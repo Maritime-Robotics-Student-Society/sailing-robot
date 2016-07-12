@@ -35,10 +35,14 @@ class Debugging_2D_plot():
 
         self.rate = rospy.Rate(rospy.get_param("config/rate"))
 
-
-        self.colour_red = rospy.get_param("simulation/boatColour/red")
-        self.colour_green = rospy.get_param("simulation/boatColour/green")
-        self.colour_blue = rospy.get_param("simulation/boatColour/blue")
+        if rospy.has_param('simulation/boatColour/red'):
+            self.colour_red = rospy.get_param("simulation/boatColour/red")
+            self.colour_green = rospy.get_param("simulation/boatColour/green")
+            self.colour_blue = rospy.get_param("simulation/boatColour/blue")
+        else:
+            self.colour_red = 256
+            self.colour_green = 256
+            self.colour_blue = 0
 
         self.count = 0
         self.MARKERS_MAX = 500
