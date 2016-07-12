@@ -7,9 +7,9 @@
         <!--
         Parameters
         -->
-        <param name = "simulation/boatColour/red" value = "200"/>
+        <param name = "simulation/boatColour/red" value = "10"/>
         <param name = "simulation/boatColour/green" value = "0"/>
-        <param name = "simulation/boatColour/blue" value = "256"/>
+        <param name = "simulation/boatColour/blue" value = "156"/>
 
         <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
 
