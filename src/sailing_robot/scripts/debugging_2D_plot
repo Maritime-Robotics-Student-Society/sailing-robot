@@ -123,9 +123,9 @@ class Debugging_2D_plot():
                 marker.color.b = 0.0
             else:
                 marker.color.a =  1.0
-                marker.color.r = self.colour_red /256
-                marker.color.g = self.colour_green /256
-                marker.color.b = self.colour_blue /256
+                marker.color.r = self.colour_red /256.0
+                marker.color.g = self.colour_green /256.0
+                marker.color.b = self.colour_blue /256.0
 
             marker.pose.orientation.w = 1.0
             marker.pose.position.x = self.position[0] - self.init_position[0]
