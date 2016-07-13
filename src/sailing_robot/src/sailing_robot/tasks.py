@@ -1,3 +1,9 @@
+"""Machinery to step through tasks.
+
+This can be tested without ROS; tasks_ros.py contains a subclass which
+integrates with ROS to publish logging and debugging topics.
+"""
+
 from __future__ import print_function
 
 from LatLon import LatLon
@@ -45,6 +51,8 @@ class TasksRunner(object):
         print(msg % values)
     
     def _make_task(self, taskdict):
+        """Turn a task dict from params (or from tasks_from_wps) into a task object
+        """
         kind = taskdict['kind']
         if kind == 'to_waypoint':
             wp = LatLon(taskdict['lat'], taskdict['lon'])
@@ -70,6 +78,10 @@ class TasksRunner(object):
         self.active_task.start()
         
     def calculate_state_and_goal(self):
+        """Use the active task to calculate what to do now.
+        
+        Before using the active task, checks if it should go to the next task.
+        """
         if self.active_task.check_end_condition():
             self.start_next_task()
         return self.active_task.calculate_state_and_goal()

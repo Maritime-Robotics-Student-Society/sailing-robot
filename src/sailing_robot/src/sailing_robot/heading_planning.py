@@ -6,6 +6,11 @@ from shapely.geometry import Point
 from .taskbase import TaskBase
 
 class TackVoting(object):
+    """Handles a rolling vote of which tack we want to be on.
+    
+    :param int nsamples: N samples for voting. Sample frequency is determined by ROS rate.
+    :param int threshold: Number of votes to change tack. Should be > (nsamples/2)
+    """
     def __init__(self, nsamples, threshold):
         self.nsamples = nsamples
         self.threshold = threshold
@@ -15,17 +20,20 @@ class TackVoting(object):
         self.votes_sum = nsamples // 2
 
     def vote(self, value):
-        # 0: Want starboard tack
-        # 1: Want port tack
+        """Push one vote.
+        
+        0 votes for starboard tack, 1 for port.
+        """
         if len(self.votes) >= self.nsamples:
             self.votes_sum -= self.votes.popleft()
         self.votes.append(value)
         self.votes_sum += value
 
-
     def tack_now(self, current_tack):
-        # 0: Currently on starboard tack
-        # 1: Currently on port tack
+        """Get the current result - True to tack now.
+        
+        :param int current_tack: 0 if on starboard tack now, 1 if on port tack
+        """
         if current_tack:
             # Port: tack to starboard?
             return self.votes_sum < (self.nsamples - self.threshold)
@@ -34,8 +42,10 @@ class TackVoting(object):
             return self.votes_sum > self.threshold
 
     def reset(self, current_tack):
-        # 0: Reached starboard tack
-        # 1: Reached port tack
+        """Set all votes one way.
+        
+        :param int current_tack: 0 on startboard tack, 1 on port tack.
+        """
         if current_tack:
             self.votes.extend([1] * self.nsamples)
             self.votes_sum = self.nsamples
@@ -49,18 +59,16 @@ class HeadingPlan(TaskBase):
             target_radius=2,
             tack_decision_samples=100, tack_decision_threshold=0.75,
             ):
-        """Heading planning machinery.
+        """Sail towards a waypoint.
 
-        beating_angle is the closest angle we can sail to the wind -
-        the total dead zone is twice this angle. Measured in degrees.
-
-        tack_line_offset is half the width of the tacking corridor we use when
-        sailing towards a marker upwind, measured in km.
+        *nav* is a sailing_robot.navigation.Navigation instance.
         
-        utm_zone is the zone number of the UTM system to use. Southampton is in
-        zone 30, Portugal in zone 29. http://www.dmap.co.uk/utmworld.htm
-        Distance calculations will be less accurate the further from the
-        specified zone you are.
+        *waypoint* is a LatLon object telling us where to go.
+        
+        *target_radius* is how close we need to get to the waypoint, in metres.
+        
+        *tack_decision_samples* and *tack_decision_threshold* control tack
+        voting.
         """
         self.nav = nav
         self.waypoint = waypoint
@@ -79,6 +87,7 @@ class HeadingPlan(TaskBase):
         pass
 
     def check_end_condition(self):
+        """Are we there yet?"""
         return self.nav.position_xy.within(self.target_area)
 
     debug_topics = [
@@ -88,6 +97,8 @@ class HeadingPlan(TaskBase):
     ]
 
     def distance_heading_to_waypoint(self):
+        """Calculate where we are relative to the waypoint, for debugging.
+        """
         dx = self.waypoint_xy.x - self.nav.position_xy.x
         dy = self.waypoint_xy.y - self.nav.position_xy.y
         d = (dx**2 + dy**2) ** 0.5

@@ -1,3 +1,9 @@
+"""Base class for task classes.
+
+This has almost no implementation; the debugging methods are injected by
+tasks_ros. This allows us to test task classes outside ROS.
+"""
+
 class TaskBase(object):
     debug_topics = []
     

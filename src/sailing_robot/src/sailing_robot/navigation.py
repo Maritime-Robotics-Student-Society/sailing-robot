@@ -1,15 +1,19 @@
+"""Common navigation machinery used by different modules"""
+
 import math
 from LatLon import LatLon
 from pyproj import Proj
 from shapely.geometry import Point
 
 class Navigation(object):
-    """Common navigation machinery used by different modules"""
+    """Common navigation machinery used by different modules.
+    
+    Stores boat position (both lat/long and x/y based on UTM projection), and
+    heading, along with apparent wind angle.
+    """
     def __init__(self, 
                 beating_angle=45, utm_zone=30):
         """
-        position_ll :  Position as a LatLon object
-        heading : Compass heading
         beating_angle : Closest absolute angle relative to the wind that we can
             sail
         utm_zone : Zone number of the UTM system to use. Southampton is in
@@ -88,9 +92,15 @@ class Navigation(object):
 ################
 
 def angleSum(a,b):
+    """Add two angles in degrees, returning a value mod 360
+    """
     return (a+b)%360
 
 def angleAbsDistance(a,b):
+    """Magnitude of the difference between two angles.
+    
+    Result should always be between 0 and 180.
+    """
     distanceA = abs((a - b) % 360)
     distanceB = abs((b - a) % 360)
     return min(distanceA, distanceB)

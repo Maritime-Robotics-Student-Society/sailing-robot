@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-#
-# Node receives current waypoint from path planner
-# calculates goal heading for reaching the waypoint as fast as possible
+"""Node steps through a series of tasks to perform.
+
+Tasks (or waypoints) are loaded from parameters, and then each one is used to
+calculate sailing_state and goal_heading until its check_end_condition()
+returns True.
+"""
 
 import rospy
 from std_msgs.msg import Float32

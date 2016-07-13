@@ -15,6 +15,7 @@ class RosTasksRunner(TasksRunner):
 
     @staticmethod
     def log(level, msg, *values):
+        """Log output through ROS."""
         if level == 'fatal':
             rospy.logfatal(msg, *values)
         elif level == 'error':
@@ -27,6 +28,12 @@ class RosTasksRunner(TasksRunner):
             rospy.logdebug(msg, *values)
 
     def register_debug_topics(self, topics):
+        """Sets up publishers for a task's debugging topics.
+        
+        *topics* should be a list of pairs, (topic_name, data_type), e.g.:
+        
+            [('next_wp', 'sensor_msgs.msg:NavSatFix')]
+        """
         for (topic, datatype_s) in topics:
             if (topic in self.debug_topics) \
                     and (self.debug_topics[topic][0] == datatype_s):
@@ -44,6 +51,11 @@ class RosTasksRunner(TasksRunner):
             self.debug_topics[topic] = (datatype_s, pub)
 
     def debug_pub(self, topic, value):
+        """Publish a value for a debugging topic.
+        
+        *topic* should be the name of a topic previously set up by
+        register_debug_topics()
+        """
         try:
             datatype, pub = self.debug_topics[topic]
         except KeyError:
