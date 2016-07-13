@@ -20,6 +20,7 @@ class Debugging_2D_plot():
         
         self.publisher = rospy.Publisher('debugging_2D_plot', MarkerArray, queue_size=10)
         self.publisher_waypoint = rospy.Publisher('debugging_2D_plot_wp', MarkerArray, queue_size=10)
+        self.publisher_origin = rospy.Publisher('debugging_2D_plot_origin', NavSatFix, queue_size=10)
 
         rospy.init_node("debugging_2D_plot", anonymous=True)
 
@@ -50,6 +51,7 @@ class Debugging_2D_plot():
         while self.gps_fix_lock and not rospy.is_shutdown():
             self.rate.sleep()
         self.init_position = self.position
+        self.init_position_gps = self.position_gps 
 
 
         self.generate_wp_Array()
@@ -100,6 +102,7 @@ class Debugging_2D_plot():
 
     def update_position(self, msg):
         self.position = self.nav.latlon_to_utm( msg.latitude, msg.longitude)
+        self.position_gps = msg
         self.gps_fix_lock = False
 
     def marker_publish(self):
@@ -154,6 +157,7 @@ class Debugging_2D_plot():
 
             self.publisher.publish(self.markerArray)
             self.publisher_waypoint.publish(self.wp_Array)
+            self.publisher_origin.publish(self.init_position_gps)
 
             self.count += 1
 

@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /AerialMapDisplay1
       Splitter Ratio: 0.5
     Tree Height: 473
   - Class: rviz/Selection
@@ -64,13 +65,13 @@ Visualization Manager:
       Blocks: 3
       Class: rviz_plugins/AerialMapDisplay
       Draw Behind: false
-      Dynamically reload: true
+      Dynamically reload: false
       Enabled: true
       Frame Convention: XYZ -> ENU
       Name: AerialMapDisplay
       Object URI: http://a.tile.thunderforest.com/landscape/{z}/{x}/{y}.png
       Robot frame: my_frame
-      Topic: /position
+      Topic: /debugging_2D_plot_origin
       Value: true
       Zoom: 19
   Enabled: true
@@ -97,7 +98,7 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 4.97242
+      Scale: 6.6343
       Target Frame: my_frame
       Value: TopDownOrtho (rviz)
       X: 0
