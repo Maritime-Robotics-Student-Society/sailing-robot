@@ -11,7 +11,7 @@ class TackVoting(object):
         self.nsamples = nsamples
         self.threshold = threshold
         self.votes = deque(maxlen=nsamples)
-        self.votes_sum = sum(self.votes)
+        self.votes_sum = 50
 
     def vote(self, value):
         # 0: Want starboard tack
@@ -19,7 +19,8 @@ class TackVoting(object):
         if len(self.votes) >= self.nsamples:
             self.votes_sum -= self.votes.popleft()
         self.votes.append(value)
-        self.votes_sum += value
+        self.votes_sum = sum(self.votes)
+
 
     def tack_now(self, current_tack):
         # 0: Currently on starboard tack
