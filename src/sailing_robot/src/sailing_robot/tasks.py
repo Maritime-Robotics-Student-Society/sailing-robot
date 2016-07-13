@@ -69,7 +69,13 @@ class TasksRunner(object):
         return task
     
     def start_next_task(self):
+        """Step to the next task, making it the active task.
+        """
         self.task_ix += 1
+        if self.task_ix >= len(self.tasks):
+            self.log('warning', "Run all tasks, returning to start")
+            self.task_ix = 0
+
         self.active_task = self.tasks[self.task_ix]
         endcond = '' # TODO
         self.log('info', "Running task {}: {} with end condition {}".format(
