@@ -13,12 +13,12 @@ from std_msgs.msg import Int32, String
 
 class Blink_on_sailing_state():
     def __init__(self):
-        self.led_blink = rospy.Publisher('/led_blink', Int32, queue_size=10)
+        self.led_blink = rospy.Publisher('led_blink', Int32, queue_size=10)
 
         rospy.init_node("debugging_blink_on_sailing_state", anonymous=True)
-        rospy.Subscriber('/sailing_state', String, self.update_sailing_state)
+        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
         self.sailing_state = "normal"
-        self.rate = rospy.Rate(rospy.get_param("/config/rate"))
+        self.rate = rospy.Rate(rospy.get_param("config/rate"))
         self.blink_publisher()
 
 

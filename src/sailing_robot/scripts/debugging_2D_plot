@@ -20,20 +20,29 @@ class Debugging_2D_plot():
         
         self.publisher = rospy.Publisher('debugging_2D_plot', MarkerArray, queue_size=10)
         self.publisher_waypoint = rospy.Publisher('debugging_2D_plot_wp', MarkerArray, queue_size=10)
+        self.publisher_origin = rospy.Publisher('debugging_2D_plot_origin', NavSatFix, queue_size=10)
 
         rospy.init_node("debugging_2D_plot", anonymous=True)
 
-        rospy.Subscriber('/sailing_state', String, self.update_sailing_state)
+        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
         self.sailing_state = 'normal'
 
-        #rospy.Subscriber('/current_wp', NavSatFix, self.update_current_wp)
         self.nav = Navigation()
-        rospy.Subscriber('/position', NavSatFix, self.update_position)
+        rospy.Subscriber('position', NavSatFix, self.update_position)
         self.gps_fix_lock = True
 
         self.markerArray = MarkerArray()
 
-        self.rate = rospy.Rate(rospy.get_param("/config/rate"))
+        self.rate = rospy.Rate(rospy.get_param("config/rate"))
+
+        if rospy.has_param('simulation/boatColour/red'):
+            self.colour_red = rospy.get_param("simulation/boatColour/red")
+            self.colour_green = rospy.get_param("simulation/boatColour/green")
+            self.colour_blue = rospy.get_param("simulation/boatColour/blue")
+        else:
+            self.colour_red = 256
+            self.colour_green = 256
+            self.colour_blue = 0
 
         self.count = 0
         self.MARKERS_MAX = 500
@@ -41,15 +50,19 @@ class Debugging_2D_plot():
         while self.gps_fix_lock and not rospy.is_shutdown():
             self.rate.sleep()
         self.init_position = self.position
+        self.init_position_gps = self.position_gps 
 
 
-        self.generate_wp_Array()
+        if rospy.has_param('wp/list'):
+            self.generate_wp_Array()
+        else:
+            rospy.logwarn("No waypoint list found in parameters")
         self.marker_publish()
 
 
     def generate_wp_Array(self):
-        wp_list = rospy.get_param('/wp/list')
-        wp_table = rospy.get_param('/wp/table')
+        wp_list = rospy.get_param('wp/list')
+        wp_table = rospy.get_param('wp/table')
 
         wp_list = list(set(wp_list)) # only print each waypoint once
 
@@ -91,6 +104,7 @@ class Debugging_2D_plot():
 
     def update_position(self, msg):
         self.position = self.nav.latlon_to_utm( msg.latitude, msg.longitude)
+        self.position_gps = msg
         self.gps_fix_lock = False
 
     def marker_publish(self):
@@ -117,10 +131,10 @@ class Debugging_2D_plot():
                 marker.color.g = 1.0
                 marker.color.b = 0.0
             else:
-                marker.color.a = 1.0
-                marker.color.r = 1.0
-                marker.color.g = 1.0
-                marker.color.b = 0.0
+                marker.color.a =  1.0
+                marker.color.r = self.colour_red /256.0
+                marker.color.g = self.colour_green /256.0
+                marker.color.b = self.colour_blue /256.0
 
             marker.pose.orientation.w = 1.0
             marker.pose.position.x = self.position[0] - self.init_position[0]
@@ -144,7 +158,9 @@ class Debugging_2D_plot():
 
 
             self.publisher.publish(self.markerArray)
-            self.publisher_waypoint.publish(self.wp_Array)
+            if rospy.has_param('wp/list'):
+                self.publisher_waypoint.publish(self.wp_Array)
+            self.publisher_origin.publish(self.init_position_gps)
 
             self.count += 1
 

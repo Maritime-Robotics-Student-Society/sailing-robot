@@ -1,0 +1,88 @@
+#!/usr/bin/python
+#
+# Simulator for the apparent wind node
+
+
+import rospy
+from std_msgs.msg import Float64, Float32
+from sailing_robot.msg import velocity
+import time, math
+import numpy as np
+
+
+class Wind_simu():
+    def __init__(self):
+        """ 
+            Simulate the apparent wind direction and speed based on the heading of the boat, its velocity 
+            and the direction/speed given in the parameter file
+        """
+        self.wind_direction_pub = rospy.Publisher('wind_direction_apparent', Float64, queue_size=10)
+        self.wind_speed_pub = rospy.Publisher('wind_speed_apparent', Float64, queue_size=10)
+
+        rospy.init_node("simulation_wind_apparent", anonymous=True)
+
+        rospy.Subscriber('heading', Float32, self.update_heading)
+        self.heading = rospy.get_param("simulation/heading_init")
+
+        self.wind_speed = rospy.get_param("simulation/wind/speed")
+
+        rospy.Subscriber('velocity', velocity, self.update_velocity)
+        self.velocity = [0,0,0]
+
+        self.rate = rospy.Rate(rospy.get_param("config/rate"))
+        self.wind_direction_north = rospy.get_param("simulation/wind/direction")
+
+        #Noise
+        self.wind_direction_noise_range = rospy.get_param('simulation/wind/noise_direction_range')
+        self.wind_speed_noise_range = rospy.get_param('simulation/wind/noise_speed_range')
+
+        rospy.loginfo("Wind direction simulated")
+        self.wind_publisher()
+
+
+    def update_heading(self, msg):
+        self.heading = msg.data
+
+    def update_velocity(self, msg):
+        self.velocity = (msg.velx, msg.vely, msg.velz)
+
+
+    def wind_publisher(self):
+
+        while not rospy.is_shutdown():
+
+            if self.wind_direction_noise_range:
+                noise_direction = np.random.normal(scale= self.wind_direction_noise_range)
+            else:
+                noise_direction = 0
+
+            if self.wind_speed_noise_range:
+                noise_speed = np.random.normal(scale= self.wind_speed_noise_range)
+            else:
+                noise_speed = 0
+
+
+            wind_direction_boat = (self.wind_direction_north + noise_direction - self.heading) % 360
+            wind_vector_boat = ((self.wind_speed + noise_speed)* math.cos(math.radians(wind_direction_boat )),
+                                - (self.wind_speed + noise_speed)* math.sin(math.radians(wind_direction_boat)),)
+
+            wind_apparent = (self.velocity[0] + wind_vector_boat[0],
+                             self.velocity[1] + wind_vector_boat[1],) 
+
+
+            wind_speed_apparent = math.sqrt(wind_apparent[0]**2 + wind_apparent[1]**2)
+            wind_direction_apparent = ( math.degrees(- math.atan2(wind_apparent[1], wind_apparent[0]))) % 360
+
+
+            self.wind_speed_pub.publish(wind_speed_apparent)
+            self.wind_direction_pub.publish(wind_direction_apparent)
+
+            self.rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        Wind_simu()
+    except rospy.ROSInterruptException:
+        pass
+

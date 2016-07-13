@@ -7,10 +7,10 @@ from sailing_robot.sail_data import Sail_data
 import sailing_robot.pid_control as _PID
 
 sail = Sail_data()
-saildata = rospy.get_param('/sail')
+saildata = rospy.get_param('sail')
 
 def node_publisher():
-    pub = rospy.Publisher('/sail_servo', UInt16, queue_size=10)
+    pub = rospy.Publisher('sail_servo', UInt16, queue_size=10)
     rospy.init_node('actuator_demand_sail', anonymous=True)
     rate = rospy.Rate(10)
 
@@ -31,7 +31,7 @@ def node_publisher():
 
 if __name__ == '__main__':
     try:
-        rospy.Subscriber('/wind_direction_apparent', Float64, sail.update_apparent_wind_angle)
+        rospy.Subscriber('wind_direction_apparent', Float64, sail.update_apparent_wind_angle)
         node_publisher()
     except rospy.ROSInterruptException:
         pass

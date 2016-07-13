@@ -7,11 +7,11 @@
 import rospy
 from std_msgs.msg import Float64
 
-windDirection = rospy.get_param("/dummy/wind_direction_apparent")
+windDirection = rospy.get_param("dummy/wind_direction_apparent")
 
 def wind_direction_apparent_publisher():
 
-    rate = rospy.Rate(rospy.get_param("/config/rate"))
+    rate = rospy.Rate(rospy.get_param("config/rate"))
 
     while not rospy.is_shutdown():
         wind_pub.publish(windDirection)
@@ -20,7 +20,7 @@ def wind_direction_apparent_publisher():
 
 if __name__ == '__main__':
     try:
-        wind_pub = rospy.Publisher('/wind_direction_apparent', Float64, queue_size=10)
+        wind_pub = rospy.Publisher('wind_direction_apparent', Float64, queue_size=10)
         rospy.init_node("publish_dummy_wind_data", anonymous=True)
         wind_direction_apparent_publisher()
     except rospy.ROSInterruptException:

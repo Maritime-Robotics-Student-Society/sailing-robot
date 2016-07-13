@@ -11,7 +11,9 @@ class TackVoting(object):
         self.nsamples = nsamples
         self.threshold = threshold
         self.votes = deque(maxlen=nsamples)
-        self.votes_sum = 50
+        # Start off indecisive, with equal votes either way
+        self.votes.extend([1, 0] * (nsamples // 2))
+        self.votes_sum = nsamples // 2
 
     def vote(self, value):
         # 0: Want starboard tack
@@ -20,6 +22,7 @@ class TackVoting(object):
             self.votes_sum -= self.votes.popleft()
         self.votes.append(value)
         self.votes_sum += value
+
 
     def tack_now(self, current_tack):
         # 0: Currently on starboard tack
@@ -80,9 +83,9 @@ class HeadingPlan(TaskBase):
         return self.nav.position_xy.within(self.target_area)
 
     debug_topics = [
-        ('/heading_to_waypoint', 'Float32'),
-        ('/distance_to_waypoint', 'Float32'),
-        ('/goal_wind_angle', 'Float32'),
+        ('heading_to_waypoint', 'Float32'),
+        ('distance_to_waypoint', 'Float32'),
+        ('goal_wind_angle', 'Float32'),
     ]
 
     def distance_heading_to_waypoint(self):
@@ -96,8 +99,8 @@ class HeadingPlan(TaskBase):
         """Work out what we want the boat to do
         """
         dwp, hwp = self.distance_heading_to_waypoint()
-        self.debug_pub('/distance_to_waypoint', dwp)
-        self.debug_pub('/heading_to_waypoint', hwp)
+        self.debug_pub('distance_to_waypoint', dwp)
+        self.debug_pub('heading_to_waypoint', hwp)
 
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':
@@ -144,6 +147,6 @@ class HeadingPlan(TaskBase):
             # On the starboard tack
             goal_wind_angle = min(goal_wind_angle, -self.nav.beating_angle)
 
-        self.debug_pub('/goal_wind_angle', goal_wind_angle)
+        self.debug_pub('goal_wind_angle', goal_wind_angle)
 
         return 'normal', self.nav.wind_angle_to_heading(goal_wind_angle)

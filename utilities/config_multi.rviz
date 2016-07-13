@@ -5,7 +5,6 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /AerialMapDisplay1
       Splitter Ratio: 0.5
     Tree Height: 473
   - Class: rviz/Selection
@@ -47,7 +46,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /debugging_2D_plot
+      Marker Topic: /greenBoat/debugging_2D_plot_wp
       Name: MarkerArray
       Namespaces:
         "": true
@@ -55,7 +54,23 @@ Visualization Manager:
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /debugging_2D_plot_wp
+      Marker Topic: /greenBoat/debugging_2D_plot
+      Name: MarkerArray
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /pirate/debugging_2D_plot
+      Name: MarkerArray
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /pirate/debugging_2D_plot_wp
       Name: MarkerArray
       Namespaces:
         "": true
@@ -71,7 +86,7 @@ Visualization Manager:
       Name: AerialMapDisplay
       Object URI: http://a.tile.thunderforest.com/landscape/{z}/{x}/{y}.png
       Robot frame: my_frame
-      Topic: /debugging_2D_plot_origin
+      Topic: /pirate/debugging_2D_plot_origin
       Value: true
       Zoom: 19
   Enabled: true
@@ -98,7 +113,7 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 6.6343
+      Scale: 4.97242
       Target Frame: my_frame
       Value: TopDownOrtho (rviz)
       X: 0

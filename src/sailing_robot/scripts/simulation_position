@@ -17,22 +17,22 @@ class Position_simu():
     def __init__(self):
         """ Publish position based on velocity and heading
         """
-        self.position_pub = rospy.Publisher('/position', NavSatFix, queue_size=10)
+        self.position_pub = rospy.Publisher('position', NavSatFix, queue_size=10)
 
         rospy.init_node("simulation_position", anonymous=True)
 
-        rospy.Subscriber('/heading', Float32, self.update_heading)
-        self.heading = rospy.get_param("/simulation/heading_init")
+        rospy.Subscriber('heading', Float32, self.update_heading)
+        self.heading = rospy.get_param("simulation/heading_init")
 
-        rospy.Subscriber('/velocity', velocity, self.update_velocity)
+        rospy.Subscriber('velocity', velocity, self.update_velocity)
         self.velocity = [0,0,0]
 
-        self.freq = rospy.get_param("/config/rate")
+        self.freq = rospy.get_param("config/rate")
         self.rate = rospy.Rate(self.freq)
 
         # Read init position form the /wp parameters
-        wp_list = rospy.get_param('/wp/list')
-        wp_table = rospy.get_param('/wp/table')
+        wp_list = rospy.get_param('wp/list')
+        wp_table = rospy.get_param('wp/table')
         init_position = wp_table[wp_list[0]]
 
         self.nav = Navigation()

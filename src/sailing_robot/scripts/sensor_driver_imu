@@ -20,8 +20,8 @@ import time, math
 
 def heading_publisher():
 
-    rate = rospy.Rate(rospy.get_param("/config/rate"))
-    calib = rospy.get_param('/calibration/compass')
+    rate = rospy.Rate(rospy.get_param("config/rate"))
+    calib = rospy.get_param('calibration/compass')
 
     XOFFSET = calib['XOFFSET']
     YOFFSET = calib['YOFFSET']
@@ -170,7 +170,7 @@ def heading_publisher():
 
 if __name__ == '__main__':
     try:
-        heading_pub = rospy.Publisher('/heading', Float32, queue_size=10)
+        heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
         rospy.init_node("publish_heading_data", anonymous=True)
         heading_publisher()
     except rospy.ROSInterruptException:

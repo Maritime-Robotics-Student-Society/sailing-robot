@@ -72,15 +72,18 @@ class HeadingPlanTests(unittest.TestCase):
     def test_tack_to_port(self):
         self.hp.nav.wind_direction = 90
         self.hp.nav.heading = 280  # We're reaching the wrong way!
-        self.hp.tack_voting.votes_sum = 75  # On tack threshold
+        self.hp.tack_voting.reset(0)
+        for _ in range(75):  # On tack threshold
+            self.hp.tack_voting.vote(1)
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_port_tack')
 
     def test_tack_to_stbd(self):
         self.hp.nav.wind_direction = 270
         self.hp.nav.heading = 280  # We're reaching the wrong way!
-        self.hp.tack_voting.votes_sum = 25  # On tack threshold
-        self.hp.tack_voting.votes.extend([1] * 100)
+        self.hp.tack_voting.reset(1)
+        for _ in range(75):  # On tack threshold
+            self.hp.tack_voting.vote(0)
         state, goal = self.hp.calculate_state_and_goal()
         self.assertEqual(state, 'tack_to_stbd_tack')
 
@@ -146,3 +149,13 @@ class TackVotingTests(unittest.TestCase):
         assert not self.tv.tack_now(1)
         self.tv.vote(0)
         assert self.tv.tack_now(1)
+
+    def test_initial_state(self):
+        self.assertEqual(self.tv.votes_sum, 50)
+        for _ in range(2):
+            self.tv.vote(0)
+        # One 1 should have been pushed out the other end
+        self.assertEqual(self.tv.votes_sum, 49)
+        for _ in range(48):
+            self.tv.vote(0)
+        self.assertEqual(self.tv.votes_sum, 25)
