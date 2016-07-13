@@ -27,7 +27,6 @@ class Debugging_2D_plot():
         rospy.Subscriber('sailing_state', String, self.update_sailing_state)
         self.sailing_state = 'normal'
 
-        #rospy.Subscriber('current_wp', NavSatFix, self.update_current_wp)
         self.nav = Navigation()
         rospy.Subscriber('position', NavSatFix, self.update_position)
         self.gps_fix_lock = True
@@ -54,7 +53,10 @@ class Debugging_2D_plot():
         self.init_position_gps = self.position_gps 
 
 
-        self.generate_wp_Array()
+        if rospy.has_param('wp/list'):
+            self.generate_wp_Array()
+        else:
+            rospy.logwarn("No waypoint list found in parameters")
         self.marker_publish()
 
 
@@ -156,7 +158,8 @@ class Debugging_2D_plot():
 
 
             self.publisher.publish(self.markerArray)
-            self.publisher_waypoint.publish(self.wp_Array)
+            if rospy.has_param('wp/list'):
+                self.publisher_waypoint.publish(self.wp_Array)
             self.publisher_origin.publish(self.init_position_gps)
 
             self.count += 1
