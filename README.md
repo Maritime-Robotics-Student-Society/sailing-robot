@@ -53,3 +53,14 @@ To run the tests:
 To launch the nodes
 
     roslaunch sailing_robot test-all-systems.launch
+
+To run simulator, you need install dependencies
+    
+    sudo apt-get install python-scipy 
+    sudo pip install --user LatLon shapely scipy
+    
+then 
+
+    roslaunch simulator.launch
+    
+
