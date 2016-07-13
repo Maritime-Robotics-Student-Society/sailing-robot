@@ -11,7 +11,6 @@ import sailing_robot
 from sailing_robot.tasks import tasks_from_wps
 from sailing_robot.tasks_ros import RosTasksRunner
 from sailing_robot.navigation import Navigation
-from sailing_robot.heading_planning import HeadingPlan
 from sensor_msgs.msg import NavSatFix
 
 

@@ -3,7 +3,6 @@ import LatLon as ll
 import math
 from shapely.geometry import Point
 
-from .navigation import Navigation, angleSum, angleAbsDistance
 from .taskbase import TaskBase
 
 class TackVoting(object):
