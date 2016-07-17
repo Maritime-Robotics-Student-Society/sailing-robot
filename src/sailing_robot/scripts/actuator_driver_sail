@@ -1,0 +1,63 @@
+#!/usr/bin/env python
+"""
+Node looks up correct sail setting from table
+Subscribes: wind direction apparent
+Sets sail actuator to correct PWM value
+"""
+import rospy
+from std_msgs.msg import Float64, Float32
+#import pigpio
+
+SAILGPIO = 24
+
+# get dictionary for the boat specific sail PWM settings
+sailTable = rospy.get_param('sailsettings/table')
+minPWM = rospy.get_param('sailsettings/minPWM')
+maxPWM = rospy.get_param('sailsettings/maxPWM')
+windSpeed = rospy.get_param('sailsettings/windSpeed')
+
+
+def sail_servo_update(msg):
+    windDirection = msg.data
+    sheet_normalized = interpolateSailSetting(windDirection)
+
+    debug_pub.publish(sheet_normalized)
+
+    # calculate actual PWM value from limits
+    sheetPWM = (sheet_normalized * (maxPWM-minPWM)) + minPWM
+    piPWM.set_servo_pulsewidth(SAILGPIO, sheetPWM)
+
+def interpolateSailSetting(windDirection):
+    # CAUTION this is currently assuming a fixed wind speed
+    # TODO at the moment the next smaller wind angle is used, this needs better interpolation
+    directionLowerLim = 0
+    directionUpperLim = 180
+    for direction in sailTable:
+        # deal with the restriction that yaml dicts can only have strings as names
+        angle = int(direction)
+        # find angle upper and lower table entries
+        if angle < windDirection:
+            if directionLowerLim < angle:
+                directionLowerLim = angle
+        elif angle > windDirection:
+            if directionUpperLim > angle:
+                directionUpperLim = angle
+    sailLowerLim = sailTable[str(directionLowerLim)]
+    sailUpperLim = sailTable[str(directionUpperLim)]
+    # linear interpolation
+    delta = (windDirection - directionLowerLim) / (directionUpperLim - directionLowerLim)
+    sheet_normalized = sailLowerLim + delta * (sailUpperLim - sailLowerLim)
+    return sheet_normalized
+
+
+
+if __name__ == '__main__':
+    piPWM = pigpio.pi();
+    piPWM.set_mode(SAILGPIO, pigpio.OUTPUT) # GPIO 24/RPi PIN 18 as sail servo pin
+    try:
+        debug_pub = rospy.Publisher('debug_sailsheet_normalized', Float32, queue_size=10)
+        rospy.init_node('actuator_driver_sail', anonymous=True)
+        rospy.Subscriber('wind_direction_apparent', Float64, sail_servo_update)
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass
