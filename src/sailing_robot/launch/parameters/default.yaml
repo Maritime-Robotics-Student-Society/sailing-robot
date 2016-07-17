@@ -111,7 +111,7 @@ sail/winchDiameter: 50
 #
 # To avoid noise of the wind sensor, we average it over a time
 # in [seconds]
-wind/sensor_average_time: 2.0
+wind/sensor_average_time: 0.5
 
 # The route planning should consider the longer term trend of the wind direction
 # so a longer average is calculated
