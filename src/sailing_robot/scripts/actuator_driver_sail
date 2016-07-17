@@ -45,7 +45,10 @@ def interpolateSailSetting(windDirection):
     sailLowerLim = sailTable[str(directionLowerLim)]
     sailUpperLim = sailTable[str(directionUpperLim)]
     # linear interpolation
-    delta = (windDirection - directionLowerLim) / (directionUpperLim - directionLowerLim)
+    if directionUpperLim == directionLowerLim:
+        delta = 0
+    else:
+        delta = (windDirection - directionLowerLim) / (directionUpperLim - directionLowerLim)
     sheet_normalized = sailLowerLim + delta * (sailUpperLim - sailLowerLim)
     return sheet_normalized
 
