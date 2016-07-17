@@ -31,7 +31,7 @@
     <node name = "debugging_blink_on_sailing_state" pkg="sailing_robot" type="debugging_blink_on_sailing_state" />
 
     <!-- Rosbag records messages for later investigation -->
-    <!-- <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-record"/> -->
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-record"/>
     <!-- Also record GPS data as required by the competition -->
     <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/>
 
