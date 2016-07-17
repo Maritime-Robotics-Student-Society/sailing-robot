@@ -10,7 +10,7 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
 
     <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
-    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_laser.yaml" ns="/calibration" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_laser.yaml" command="load"/>
     <!-- Sail servo PWM settings -->
     <param name="sailsettings/minPWM"          value="965" />
     <param name="sailsettings/maxPWM"          value="1640" />  
