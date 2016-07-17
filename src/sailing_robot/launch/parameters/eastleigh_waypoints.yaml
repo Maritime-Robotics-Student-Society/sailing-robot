@@ -1,7 +1,7 @@
 
 # for simplified entry of path, simply add list of waypoint names
 # starts with list entry 0, continues until end is reached
-wp/list: ["11", "9", "10", "11"]
+wp/list: ["11", "8", "7", "12"]
 
 
 # distance within waypoint is accepted, in [m]
@@ -26,5 +26,3 @@ wp/table: {"1" : [50.957567, -1.367289],
             "P1": [50.957021,   -1.366734], 
             "P2": [50.956466,   -1.366816], 
             }
-
-
