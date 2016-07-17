@@ -37,4 +37,8 @@
 
     <!-- Serve an HTML dashboard so we can see what's going on -->
     <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
+
+    <!-- Extra debugging -->
+    <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 map my_frame 100" />
+    <node name="debugging_2D_plot" pkg='sailing_robot' type="debugging_2D_plot"/>
  </launch>
