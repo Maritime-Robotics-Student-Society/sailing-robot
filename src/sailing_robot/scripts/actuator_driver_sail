@@ -6,7 +6,7 @@ Sets sail actuator to correct PWM value
 """
 import rospy
 from std_msgs.msg import Float64, Float32
-#import pigpio
+import pigpio
 
 SAILGPIO = 24
 
