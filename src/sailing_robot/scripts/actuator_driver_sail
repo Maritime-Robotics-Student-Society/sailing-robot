@@ -19,6 +19,8 @@ windSpeed = rospy.get_param('sailsettings/windSpeed')
 
 def sail_servo_update(msg):
     windDirection = msg.data
+    if windDirection > 180:
+        windDirection = 360 - windDirection
     sheet_normalized = interpolateSailSetting(windDirection)
 
     debug_pub.publish(sheet_normalized)
