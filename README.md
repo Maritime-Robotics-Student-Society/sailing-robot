@@ -61,6 +61,8 @@ To run simulator, you need install dependencies
     
 then 
 
-    roslaunch simulator.launch
+    roslaunch sailing_robot simulator.launch &
+    sleep 10
+    rviz
     
 
