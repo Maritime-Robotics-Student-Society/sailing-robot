@@ -1,0 +1,19 @@
+utilities script to check for gps fix
+Run something to keep reading GPS, to maintain the fix once we've got it
+
+Check before leaving that we have the latitude
+
+More double sided tape
+test laylines with simulator
+keep voting in
+see how close we can get to the Wind
+wind speed dependent: closes angle to wind; sail sheet table
+
+Dump params on launch to match rosbags
+
+Make sure batteries are charged beforehand!
+
+Notes of what happened:
+
+Wind direction averaging time decreased from 2s to .5s, c. 7.30pm
+Course changed from 11, 9, 10 to 11, 8, 7, 12, c. 8pm
