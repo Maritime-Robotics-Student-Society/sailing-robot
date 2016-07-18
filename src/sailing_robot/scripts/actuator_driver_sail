@@ -7,54 +7,29 @@ Sets sail actuator to correct PWM value
 import rospy
 from std_msgs.msg import Float64, Float32
 import pigpio
+from sailing_robot.sail_table import SailTable
 
 SAILGPIO = 24
 
 # get dictionary for the boat specific sail PWM settings
-sailTable = rospy.get_param('sailsettings/table')
+sail_table_dict = rospy.get_param('sailsettings/table')
 minPWM = rospy.get_param('sailsettings/minPWM')
 maxPWM = rospy.get_param('sailsettings/maxPWM')
 windSpeed = rospy.get_param('sailsettings/windSpeed')
 
+sail_table = SailTable(sail_table_dict)
 
 def sail_servo_update(msg):
     windDirection = msg.data
     if windDirection > 180:
         windDirection = 360 - windDirection
-    sheet_normalized = interpolateSailSetting(windDirection)
 
+    sheet_normalized = sail_table.interpolate_sail_setting(windDirection)
     debug_pub.publish(sheet_normalized)
 
     # calculate actual PWM value from limits
     sheetPWM = (sheet_normalized * (maxPWM-minPWM)) + minPWM
     piPWM.set_servo_pulsewidth(SAILGPIO, sheetPWM)
-
-def interpolateSailSetting(windDirection):
-    # CAUTION this is currently assuming a fixed wind speed
-    # TODO at the moment the next smaller wind angle is used, this needs better interpolation
-    directionLowerLim = 0
-    directionUpperLim = 180
-    for direction in sailTable:
-        # deal with the restriction that yaml dicts can only have strings as names
-        angle = int(direction)
-        # find angle upper and lower table entries
-        if angle < windDirection:
-            if directionLowerLim < angle:
-                directionLowerLim = angle
-        elif angle > windDirection:
-            if directionUpperLim > angle:
-                directionUpperLim = angle
-    sailLowerLim = sailTable[str(directionLowerLim)]
-    sailUpperLim = sailTable[str(directionUpperLim)]
-    # linear interpolation
-    if directionUpperLim == directionLowerLim:
-        delta = 0
-    else:
-        delta = (windDirection - directionLowerLim) / (directionUpperLim - directionLowerLim)
-    sheet_normalized = sailLowerLim + delta * (sailUpperLim - sailLowerLim)
-    return sheet_normalized
-
-
 
 if __name__ == '__main__':
     piPWM = pigpio.pi();
