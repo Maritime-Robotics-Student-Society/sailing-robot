@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+"""Dump all parameters, to match up with our rosbag files.
+"""
+from datetime import datetime
+import json
+import os.path
+import rospy
+
+FILENAME_BASE = "~/sailing-robot/params-dump_"
+
+filename = FILENAME_BASE + datetime.now().strftime('%Y-%m-%d-T%H-%M-%S') + '.json'
+filename = os.path.expanduser(filename)
+
+params = rospy.get_param('/')
+
+with open(filename, 'w') as f:
+    json.dump(params, f, indent=2)
