@@ -82,7 +82,15 @@ class TasksRunner(object):
                     self.task_ix, self.active_task.task_kind, '/'.join(endcond)
         ))
         self.active_task.start()
-        
+
+    def insert_task(self, taskdict):
+        task = self._make_task(taskdict)
+        # Decrease task_ix so we go back to the current task when this is done.
+        self.task_ix -= 1
+        self.active_task = task
+        task.start()
+        self.log('info', "Running intermediate task: {}".format(task.task_kind))
+
     def calculate_state_and_goal(self):
         """Use the active task to calculate what to do now.
         

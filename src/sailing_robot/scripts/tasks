@@ -29,6 +29,12 @@ def goal_heading_publisher(tasks_runner):
         pub_state.publish(state)
         rate.sleep()
 
+def insert_waypoint(msg):
+    tasks_runner.insert_task({
+        'kind': 'to_waypoint',
+        'lat': msg.latitude,
+        'lon': msg.longitude
+    })
 
 if __name__ == '__main__':
     try:
@@ -39,6 +45,7 @@ if __name__ == '__main__':
         nav = Navigation()#**nav_options)
         tasks_runner = RosTasksRunner(tasks, nav)
         tasks_runner.nav.subscribe_topics()
+        rospy.Subscriber('temporary_wp', NavSatFix, insert_waypoint)
         goal_heading_publisher(tasks_runner)
     except rospy.ROSInterruptException:
         pass
