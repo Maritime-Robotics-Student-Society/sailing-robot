@@ -68,6 +68,8 @@ class TasksRunner(object):
         task.task_kind = kind
         return task
     
+    on_temporary_task = False
+
     def start_next_task(self):
         """Step to the next task, making it the active task.
         """
@@ -77,6 +79,7 @@ class TasksRunner(object):
             self.task_ix = 0
 
         self.active_task = self.tasks[self.task_ix]
+        self.on_temporary_task = False
         endcond = '' # TODO
         self.log('info', "Running task {}: {} with end condition {}".format(
                     self.task_ix, self.active_task.task_kind, '/'.join(endcond)
@@ -84,11 +87,17 @@ class TasksRunner(object):
         self.active_task.start()
 
     def insert_task(self, taskdict):
-        task = self._make_task(taskdict)
+        """Do a temporary task.
+
+        After completing the temporary task, control will be return to the
+        regular task that was active before the temporary task was started.
+        """
         # Decrease task_ix so we go back to the current task when this is done.
-        self.task_ix -= 1
-        self.active_task = task
-        task.start()
+        if not self.on_temporary_task:
+            self.task_ix -= 1
+        self.on_temporary_task = True
+        self.active_task = self._make_task(taskdict)
+        self.active_task.start()
         self.log('info', "Running intermediate task: {}".format(task.task_kind))
 
     def calculate_state_and_goal(self):
