@@ -11,7 +11,7 @@ import time
 import types
 
 from .navigation import Navigation
-from .heading_planning import HeadingPlan
+from .heading_planning_laylines import HeadingPlan
 from .station_keeping import StationKeeping
 
 def tasks_from_wps(wp_params):
