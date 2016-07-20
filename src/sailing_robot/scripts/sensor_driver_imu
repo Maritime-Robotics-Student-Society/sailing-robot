@@ -147,6 +147,9 @@ def heading_publisher():
         accz = twos_comp_combine(b.read_byte_data(LSM, LSM_ACC_Z_MSB), b.read_byte_data(LSM, LSM_ACC_Z_LSB))
         AccZ = accz #*0.061
         
+        pitch = math.atan2(AccY,math.sqrt(math.pow(AccX,2) + math.pow(AccZ,2)))
+        roll = math.atan2(-AccX,AccZ)
+        
         gyrox = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_X_MSB), b.read_byte_data(LGD, LGD_GYRO_X_LSB))
         gyroy = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_Y_MSB), b.read_byte_data(LGD, LGD_GYRO_Y_LSB))
         gyroz = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_Z_MSB), b.read_byte_data(LGD, LGD_GYRO_Z_LSB))
