@@ -25,8 +25,10 @@ def heading_publisher():
 
     XOFFSET = calib['XOFFSET']
     YOFFSET = calib['YOFFSET']
+    ZOFFSET = calib['ZOFFSET']
     XSCALE = calib['XSCALE']
     YSCALE = calib['YSCALE']
+    ZSCALE = calib['ZSCALE']
 
 
     def twos_comp_combine(msb, lsb):
@@ -154,6 +156,7 @@ def heading_publisher():
         # calibration
 	MagX = (MagX - XOFFSET) * XSCALE
         MagY = (MagY - YOFFSET) * YSCALE
+        MagZ = (MagZ - ZOFFSET) * ZSCALE
 	
         # handle division by zero
         if abs(MagY) <= 0.001:
