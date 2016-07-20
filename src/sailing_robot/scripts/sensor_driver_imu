@@ -150,6 +150,9 @@ def heading_publisher():
         pitch = math.atan2(AccY,math.sqrt(math.pow(AccX,2) + math.pow(AccZ,2)))
         roll = math.atan2(-AccX,AccZ)
         
+        pitch_pub.publish(pitch)
+        roll_pub.publish(roll)
+        
         gyrox = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_X_MSB), b.read_byte_data(LGD, LGD_GYRO_X_LSB))
         gyroy = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_Y_MSB), b.read_byte_data(LGD, LGD_GYRO_Y_LSB))
         gyroz = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_Z_MSB), b.read_byte_data(LGD, LGD_GYRO_Z_LSB))
@@ -177,6 +180,9 @@ def heading_publisher():
 if __name__ == '__main__':
     try:
         heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
+        pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
+        roll_pub = rospy.Publisher('roll', Float32, queue_size=10)
+        
         rospy.init_node("publish_heading_data", anonymous=True)
         heading_publisher()
     except rospy.ROSInterruptException:
