@@ -2,7 +2,7 @@ import unittest
 
 from sailing_robot.tasks import TasksRunner
 from sailing_robot.navigation import Navigation
-from sailing_robot.heading_planning import HeadingPlan
+from sailing_robot.heading_planning_laylines import HeadingPlan
 from sailing_robot.station_keeping import StationKeeping
 
 tasks_def_1 = [
