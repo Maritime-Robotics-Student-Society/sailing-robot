@@ -25,9 +25,10 @@ def heading_publisher():
 
     XOFFSET = calib['XOFFSET']
     YOFFSET = calib['YOFFSET']
+    ZOFFSET = calib['ZOFFSET']
     XSCALE = calib['XSCALE']
     YSCALE = calib['YSCALE']
-
+    ZSCALE = calib['ZSCALE']
 
     def twos_comp_combine(msb, lsb):
         twos_comp = 256*msb + lsb
@@ -145,6 +146,9 @@ def heading_publisher():
         accz = twos_comp_combine(b.read_byte_data(LSM, LSM_ACC_Z_MSB), b.read_byte_data(LSM, LSM_ACC_Z_LSB))
         AccZ = accz #*0.061
         
+        pitch = math.atan2(AccY,math.sqrt(math.pow(AccX,2) + math.pow(AccZ,2)))
+        roll = math.atan2(-AccX,AccZ)
+        
         gyrox = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_X_MSB), b.read_byte_data(LGD, LGD_GYRO_X_LSB))
         gyroy = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_Y_MSB), b.read_byte_data(LGD, LGD_GYRO_Y_LSB))
         gyroz = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_Z_MSB), b.read_byte_data(LGD, LGD_GYRO_Z_LSB))
@@ -154,6 +158,7 @@ def heading_publisher():
         # calibration
 	MagX = (MagX - XOFFSET) * XSCALE
         MagY = (MagY - YOFFSET) * YSCALE
+        MagZ = (MagZ - ZOFFSET) * ZSCALE
 	
         # handle division by zero
         if abs(MagY) <= 0.001:
@@ -163,14 +168,19 @@ def heading_publisher():
      	        heading = -90
         else:
             heading = math.atan2(MagX, MagY)*(180/math.pi)
+	
 	heading = (heading - 90) % 360
         data = (AccX,AccY,AccZ,MagX,MagY,MagZ,heading)
         heading_pub.publish(heading)
-
+        pitch_pub.publish(pitch)
+        pitch_pub.publish(roll)
 
 if __name__ == '__main__':
     try:
         heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
+        pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
+        roll_pub = rospy.Publisher('roll', Float32, queue_size=10)
+        
         rospy.init_node("publish_heading_data", anonymous=True)
         heading_publisher()
     except rospy.ROSInterruptException:
