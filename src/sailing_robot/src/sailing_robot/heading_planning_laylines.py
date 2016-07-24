@@ -5,6 +5,7 @@ from shapely.geometry import Point, Polygon
 
 from .navigation import angleSum
 from .taskbase import TaskBase
+from .heading_planning import TackVoting
 
 # For calculations, lay lines don't extend to infinity.
 # This is in m; 10km should be plenty for our purposes.
@@ -33,7 +34,7 @@ class HeadingPlan(TaskBase):
         self.waypoint_xy = Point(x, y)
         self.target_area = self.waypoint_xy.buffer(target_radius)
         self.sailing_state = 'normal'  # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
-        
+        self.tack_voting = TackVoting(50, 35)
     
     def start(self):
         pass
@@ -79,6 +80,7 @@ class HeadingPlan(TaskBase):
             else:
                 # Tack completed
                 self.log('info', 'Finished tack (%s)', self.sailing_state)
+                self.tack_voting.reset(boat_wind_angle > 0)
                 self.sailing_state = 'normal'
 
         on_port_tack = boat_wind_angle > 0
@@ -87,21 +89,14 @@ class HeadingPlan(TaskBase):
         
         if wp_wind_angle * boat_wind_angle > 0:
             # These two have the same sign, so we're on the better tack already
-            if on_port_tack:
-                goal_wind_angle = max(wp_wind_angle, self.nav.beating_angle)
-            else:
-                goal_wind_angle = min(wp_wind_angle, -self.nav.beating_angle)
-            state = 'normal'
-
+            self.tack_voting.vote(on_port_tack)
         elif self.nav.position_xy.within(self.lay_triangle()):
             # We're between the laylines; stick to our current tack for now
-            if on_port_tack:
-                goal_wind_angle = self.nav.beating_angle
-            else:
-                goal_wind_angle = -self.nav.beating_angle
-            state = 'normal'
-        
+            self.tack_voting.vote(on_port_tack)
         else:
+            self.tack_voting.vote(not on_port_tack)
+        
+        if self.tack_voting.tack_now(on_port_tack):
             # Ready about!
             if on_port_tack:
                 state = 'tack_to_stbd_tack'
@@ -110,6 +105,12 @@ class HeadingPlan(TaskBase):
                 state = 'tack_to_port_tack'
                 goal_wind_angle = self.nav.beating_angle
             self.sailing_state = state
+        else:
+            if on_port_tack:
+                goal_wind_angle = max(wp_wind_angle, self.nav.beating_angle)
+            else:
+                goal_wind_angle = min(wp_wind_angle, -self.nav.beating_angle)
+            state = 'normal'
             
         self.debug_pub('goal_wind_angle', goal_wind_angle)
         return state, self.nav.wind_angle_to_heading(goal_wind_angle)
