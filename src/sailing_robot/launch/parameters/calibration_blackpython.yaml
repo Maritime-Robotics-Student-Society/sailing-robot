@@ -2,9 +2,9 @@ compass: {XOFFSET: -1140, XSCALE: 2809, YOFFSET: 34, YSCALE: 2998}
 wind_dir: {ANGLEOFFSET: 0, XOFFSET: -472, XSCALE: 54710, YOFFSET: -472, YSCALE: 51222}
 
 rudder/PWMoffset: 85
-rudder/servolowerlimits: 1140
-rudder/servohigherlimits: 1900
+rudder/servolowerlimits: 1000
+rudder/servohigherlimits: 2000
 
 sail/PWMoffset: 0
-sail/servolowerlimits: 1100
-sail/servohigherlimits: 1900
+sail/servolowerlimits: 1125
+sail/servohigherlimits: 1540
