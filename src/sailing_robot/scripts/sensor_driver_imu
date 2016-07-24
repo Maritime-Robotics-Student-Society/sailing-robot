@@ -171,17 +171,26 @@ def heading_publisher():
 	
 	heading = (heading - 90) % 360
 	
-	heading_1 = math.atan2(MagX, MagY)*(180/math.pi)
+	heading_1 = math.atan2(MagY, MagX)*(180/math.pi)
 	if heading_1 < 0:
-		heading_1 = heading_1 +360
+		heading_1 = heading_1 + 360
 	else:
 		heading_1 = heading_1
 		
-			
+	MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
+	MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) + (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
+	
+	heading_comp = math.atan2(MagY_comp, MagX_comp)*(180/math.pi)
+	if heading_comp < 0:
+		heading_comp = heading_comp + 360
+	else:
+		heading_comp = heading_comp
+	
 	
         data = (AccX,AccY,AccZ,MagX,MagY,MagZ,heading)
         heading_pub.publish(heading)
         heading1_pub.publish(heading_1)
+        headingcomp_pub.publish(heading_comp)
         pitch_pub.publish(pitch)
         pitch_pub.publish(roll)
 
@@ -189,6 +198,7 @@ if __name__ == '__main__':
     try:
         heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
         heading1_pub = rospy.Publisher('heading_1', Float32, queue_size=10)
+        headingcomp_pub = rospy.Publisher('heading_comp', Float32, queue_size=10)
         pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
         roll_pub = rospy.Publisher('roll', Float32, queue_size=10)
         
