@@ -4,7 +4,7 @@
 #rostopic list 2>&1 /dev/null || echo "roscore needs to be running"; exit 1
 
 
-defaultname='laser'
+defaultname='blackpython'
 
 echo "Name of the calibration file [" $defaultname "]"
 read name
