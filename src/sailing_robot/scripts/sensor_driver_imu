@@ -156,43 +156,43 @@ def heading_publisher():
         dataraw = (magx, magy, magz, accx, accy, accz, gyrox, gyroy, gyroz)
         
         # calibration
-	MagX = (MagX - XOFFSET) * XSCALE
+        MagX = (MagX - XOFFSET) * XSCALE
         MagY = (MagY - YOFFSET) * YSCALE
         MagZ = (MagZ - ZOFFSET) * ZSCALE
-	
+    
         # handle division by zero
         if abs(MagY) <= 0.001:
-	    if MagY*MagX > 0:
-		heading = 90
-	    else:
-     	        heading = -90
+            if MagY*MagX > 0:
+                heading = 90
+            else:
+                heading = -90
         else:
             heading = math.atan2(MagX, MagY)*(180/math.pi)
-	
-	heading = (heading - 90) % 360
-	
-	heading_1 = math.atan2(MagY, MagX)*(180/math.pi)
-	if heading_1 < 0:
-		heading_1 = heading_1 + 360
-	else:
-		heading_1 = heading_1
-		
-	MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
-	MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) + (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
-	
-	heading_comp = math.atan2(MagY_comp, MagX_comp)*(180/math.pi)
-	if heading_comp < 0:
-		heading_comp = heading_comp + 360
-	else:
-		heading_comp = heading_comp
-	
-	
-        data = (AccX,AccY,AccZ,MagX,MagY,MagZ,heading)
-        heading_pub.publish(heading)
-        heading1_pub.publish(heading_1)
-        headingcomp_pub.publish(heading_comp)
-        pitch_pub.publish(pitch)
-        roll_pub.publish(roll)
+    
+    heading = (heading - 90) % 360
+    
+    heading_1 = math.atan2(MagY, MagX)*(180/math.pi)
+    if heading_1 < 0:
+        heading_1 = heading_1 + 360
+    else:
+        heading_1 = heading_1
+        
+    MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
+    MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) + (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
+    
+    heading_comp = math.atan2(MagY_comp, MagX_comp)*(180/math.pi)
+    if heading_comp < 0:
+        heading_comp = heading_comp + 360
+    else:
+        heading_comp = heading_comp
+    
+    
+    data = (AccX,AccY,AccZ,MagX,MagY,MagZ,heading)
+    heading_pub.publish(heading)
+    heading1_pub.publish(heading_1)
+    headingcomp_pub.publish(heading_comp)
+    pitch_pub.publish(pitch)
+    pitch_pub.publish(roll)
 
 if __name__ == '__main__':
     try:
