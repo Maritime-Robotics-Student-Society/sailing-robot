@@ -13,8 +13,8 @@ SAILGPIO = 24
 
 # get dictionary for the boat specific sail PWM settings
 sail_table_dict = rospy.get_param('sailsettings/table')
-minPWM = rospy.get_param('sailsettings/minPWM')
-maxPWM = rospy.get_param('sailsettings/maxPWM')
+minPWM = rospy.get_param('sail/servolowerlimits')
+maxPWM = rospy.get_param('sail/servohigherlimits')
 windSpeed = rospy.get_param('sailsettings/windSpeed')
 
 sail_table = SailTable(sail_table_dict)
