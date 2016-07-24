@@ -192,7 +192,7 @@ def heading_publisher():
         heading1_pub.publish(heading_1)
         headingcomp_pub.publish(heading_comp)
         pitch_pub.publish(pitch)
-        pitch_pub.publish(roll)
+        roll_pub.publish(roll)
 
 if __name__ == '__main__':
     try:
