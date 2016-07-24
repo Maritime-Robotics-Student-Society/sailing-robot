@@ -9,6 +9,7 @@ from .taskbase import TaskBase
 # For calculations, lay lines don't extend to infinity.
 # This is in m; 10km should be plenty for our purposes.
 LAYLINE_EXTENT = 10000
+LAYLINE_LEAD = 5
 
 class HeadingPlan(TaskBase):
     def __init__(self, nav,
@@ -120,8 +121,12 @@ class HeadingPlan(TaskBase):
         This returns a shapely Polygon with the two lines extended to
         LAYLINE_EXTENT (10km).
         """
-        downwind = angleSum(self.nav.absolute_wind_direction(), 180)
-        x0, y0 = self.waypoint_xy.x, self.waypoint_xy.y
+        upwind = self.nav.absolute_wind_direction()
+        downwind = angleSum(upwind, 180)
+        xw, yw = self.waypoint_xy.x, self.waypoint_xy.y
+        lu = math.radians(upwind)
+        x0 = xw + (LAYLINE_LEAD * math.sin(lu))
+        y0 = xw + (LAYLINE_LEAD * math.cos(lu))
         l1 = math.radians(angleSum(downwind, -self.nav.beating_angle))
         x1 = x0 + (LAYLINE_EXTENT * math.sin(l1))
         y1 = y0 + (LAYLINE_EXTENT * math.cos(l1))
