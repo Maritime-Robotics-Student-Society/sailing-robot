@@ -19,11 +19,10 @@ def setup():
 
 def rudderservoPWMcontrol(data):
     """This function takes in the /rudder_control (90 to -90) value and directly write PWM signal to the rudder servo. Netural point was determined by the start and end points. rudderservoPWMoffset is used for software level trim. """
-    degrees = data.data;
-    pwm = rudderservo_range*(1.0*degrees)/90 + rudderservo_netural_point +\
-         rudderservo_PWM_offset;
-    pi.set_servo_pulsewidth(13, pwm);
-
+    degrees = data.data
+    pwm = rudderservo_range*(-1.0*degrees)/90 + rudderservo_netural_point +\
+         rudderservo_PWM_offset
+    pi.set_servo_pulsewidth(13, pwm)
 
 if __name__ == '__main__':
     pi = pigpio.pi();
