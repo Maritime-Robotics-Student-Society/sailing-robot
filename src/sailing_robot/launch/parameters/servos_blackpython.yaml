@@ -1,0 +1,7 @@
+rudder/PWMoffset: 85
+rudder/servolowerlimits: 1000
+rudder/servohigherlimits: 2000
+
+sail/PWMoffset: 0
+sail/servolowerlimits: 1125
+sail/servohigherlimits: 1540

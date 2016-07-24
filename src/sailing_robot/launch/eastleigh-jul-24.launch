@@ -11,6 +11,7 @@
 
     <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
     <rosparam file="$(find sailing_robot)/launch/parameters/boldrewood_waypoints.yaml" command="load"/>
 
