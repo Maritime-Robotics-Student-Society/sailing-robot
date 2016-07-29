@@ -1,0 +1,82 @@
+<launch>
+    <!--
+    General test file to launch all existing nodes to talk to real hardware
+    -->
+
+    <group ns = "pirate">
+        <!--
+        Parameters
+        -->
+        <param name = "simulation/boatColour/red" value = "10"/>
+        <param name = "simulation/boatColour/green" value = "0"/>
+        <param name = "simulation/boatColour/blue" value = "156"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/simulation_waypoints.yaml" command="load"/>
+        <!--rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/-->
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>
+
+
+        <!--
+        Nodes
+        -->
+        <node name = "tasks" pkg="sailing_robot" type = "tasks" />
+        <node name = "tack" pkg="sailing_robot" type = "tack" />
+        <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" />
+        <node name = "actuator_demand_sail" pkg="sailing_robot" type = "actuator_demand_sail" />
+        <node name = "simulation_position" pkg='sailing_robot' type="simulation_position"/>
+        <node name = "simulation_velocity" pkg='sailing_robot' type="simulation_velocity"/>
+        <node name = "simulation_wind_apparent" pkg="sailing_robot" type="simulation_wind_apparent" />
+        <node name = "simulation_heading" pkg="sailing_robot" type="simulation_heading" />
+
+        <node name = "sensor_processed_wind_direction" pkg="sailing_robot" type="sensor_processed_wind_direction" />
+        <node name="debugging_2D_plot" pkg='sailing_robot' type="debugging_2D_plot"/>
+        <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 map my_frame 100" />
+
+    </group>
+
+    <group ns = "greenBoat">
+        <!--
+        Parameters
+        -->
+        <param name = "simulation/boatColour/red" value = "0"/>
+        <param name = "simulation/boatColour/green" value = "256"/>
+        <param name = "simulation/boatColour/blue" value = "100"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/simulation_waypoints.yaml" command="load"/>
+        <!--rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/-->
+
+        <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>
+
+
+        <!--
+        Nodes
+        -->
+        <node name = "tasks" pkg="sailing_robot" type = "tasks" />
+        <node name = "tack" pkg="sailing_robot" type = "tack" />
+        <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" />
+        <node name = "actuator_demand_sail" pkg="sailing_robot" type = "actuator_demand_sail" />
+        <node name = "simulation_position" pkg='sailing_robot' type="simulation_position"/>
+        <node name = "simulation_velocity" pkg='sailing_robot' type="simulation_velocity"/>
+        <node name = "simulation_wind_apparent" pkg="sailing_robot" type="simulation_wind_apparent" />
+        <node name = "simulation_heading" pkg="sailing_robot" type="simulation_heading" />
+
+        <node name = "sensor_processed_wind_direction" pkg="sailing_robot" type="sensor_processed_wind_direction" />
+        <node name="debugging_2D_plot" pkg='sailing_robot' type="debugging_2D_plot"/>
+        <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 map my_frame 100" />
+
+    </group>
+
+
+
+
+ </launch>
+

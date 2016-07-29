@@ -1,10 +1,17 @@
+"""Machinery to step through tasks.
+
+This can be tested without ROS; tasks_ros.py contains a subclass which
+integrates with ROS to publish logging and debugging topics.
+"""
+
 from __future__ import print_function
 
 from LatLon import LatLon
 import time
+import types
 
 from .navigation import Navigation
-from .heading_planning import HeadingPlan
+from .heading_planning_laylines import HeadingPlan
 from .station_keeping import StationKeeping
 
 def tasks_from_wps(wp_params):
@@ -31,17 +38,21 @@ class TimedEnd(object):
     
     def check(self):
         return (time.time() > self.ends_at)
-    
 
 class TasksRunner(object):
-    def __init__(self, tasks, nav, log=print):
+    def __init__(self, tasks, nav):
         self.task_ix = -1
         self.active_task = None
-        self.log = log
         self.nav = nav
         self.tasks = [self._make_task(d) for d in tasks]
+
+    @staticmethod
+    def log(level, msg, *values):
+        print(msg % values)
     
     def _make_task(self, taskdict):
+        """Turn a task dict from params (or from tasks_from_wps) into a task object
+        """
         kind = taskdict['kind']
         if kind == 'to_waypoint':
             wp = LatLon(taskdict['lat'], taskdict['lon'])
@@ -57,16 +68,43 @@ class TasksRunner(object):
         task.task_kind = kind
         return task
     
+    on_temporary_task = False
+
     def start_next_task(self):
+        """Step to the next task, making it the active task.
+        """
         self.task_ix += 1
+        if self.task_ix >= len(self.tasks):
+            self.log('warning', "Run all tasks, returning to start")
+            self.task_ix = 0
+
         self.active_task = self.tasks[self.task_ix]
+        self.on_temporary_task = False
         endcond = '' # TODO
-        self.log("Running task {}: {} with end condition {}".format(
+        self.log('info', "Running task {}: {} with end condition {}".format(
                     self.task_ix, self.active_task.task_kind, '/'.join(endcond)
         ))
         self.active_task.start()
-        
+
+    def insert_task(self, taskdict):
+        """Do a temporary task.
+
+        After completing the temporary task, control will be return to the
+        regular task that was active before the temporary task was started.
+        """
+        # Decrease task_ix so we go back to the current task when this is done.
+        if not self.on_temporary_task:
+            self.task_ix -= 1
+        self.on_temporary_task = True
+        self.active_task = self._make_task(taskdict)
+        self.active_task.start()
+        self.log('info', "Running intermediate task: {}".format(task.task_kind))
+
     def calculate_state_and_goal(self):
+        """Use the active task to calculate what to do now.
+        
+        Before using the active task, checks if it should go to the next task.
+        """
         if self.active_task.check_end_condition():
             self.start_next_task()
         return self.active_task.calculate_state_and_goal()

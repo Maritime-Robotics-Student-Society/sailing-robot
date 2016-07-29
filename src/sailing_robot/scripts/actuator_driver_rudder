@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+import time
+import pigpio
+import rospy
+from std_msgs.msg import UInt16, Int16
+import numpy as np
+
+rudderdata = rospy.get_param('rudder')
+rudderservo_PWM_offset = rudderdata['PWMoffset']
+rudderservo_lower_limits = rudderdata['servolowerlimits']
+rudderservo_higher_limits = rudderdata['servohigherlimits']
+rudderservo_netural_point = (rudderservo_lower_limits +
+                             rudderservo_higher_limits) / 2
+rudderservo_range = (rudderservo_higher_limits - rudderservo_lower_limits)
+
+def setup():
+    pi = pigpio.pi()
+    pi.set_mode(13, pigpio.OUTPUT) # GPIO 13/RPi PIN 33 as rudder servo pin
+
+def rudderservoPWMcontrol(data):
+    """This function takes in the /rudder_control (90 to -90) value and directly write PWM signal to the rudder servo. Netural point was determined by the start and end points. rudderservoPWMoffset is used for software level trim. """
+    degrees = data.data;
+    pwm = rudderservo_range*(1.0*degrees)/90 + rudderservo_netural_point +\
+         rudderservo_PWM_offset;
+    pi.set_servo_pulsewidth(13, pwm);
+
+
+if __name__ == '__main__':
+    pi = pigpio.pi();
+    try:
+        rospy.init_node('actuator_driver_servos', anonymous=True)
+        rospy.Subscriber('rudder_control', Int16, rudderservoPWMcontrol)
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass

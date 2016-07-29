@@ -1,0 +1,80 @@
+#!/usr/bin/python
+#
+# Simulator for the heading
+
+
+import rospy
+from std_msgs.msg import Float32, Int16
+from sailing_robot.msg import velocity
+import time, math
+
+
+class Heading_simu():
+    def __init__(self):
+        """
+            Compute the heading thanks to the rudder angle and the boat velocity
+            The boat moves on a circle defined by the keel and the rudder
+        """
+
+        self.heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
+
+        rospy.init_node("simulation_heading", anonymous=True)
+
+        rospy.Subscriber('rudder_control', Int16, self.update_rudder)
+        self.rudder = 0
+        rospy.Subscriber('velocity', velocity, self.update_velocity)
+        self.velocity = [0,0,0]
+
+        self.heading = rospy.get_param("simulation/heading_init")
+
+        self.diff_heading_coefficient = rospy.get_param("simulation/heading/coefficient")
+        self.freq = rospy.get_param("config/rate")
+        self.rate = rospy.Rate(self.freq)
+
+
+        rospy.loginfo("Heading simulated")
+        self.heading_publisher()
+
+
+    def update_rudder(self, msg):
+        self.rudder = msg.data
+
+    def update_velocity(self, msg):
+        self.velocity = (msg.velx, msg.vely, msg.velz)
+
+    def diff_heading(self):
+        if self.rudder == 0:
+            return 0
+
+
+        Ay = -0.25    # -1/4 of the size of the boat [m]
+        r = 0.05      # radius of the rudder [m]
+        By = Ay*2
+        Cx = - r*math.sin(math.radians(self.rudder))
+        Cy = By - r*math.cos(math.radians(self.rudder))
+
+        d = self.velocity[0]/self.freq
+
+        y = d
+        x = (-(-Cx**2-Cy**2+Ay*Cy+math.sqrt(Cx**4+Cy**4-2*Ay*Cy**3+Ay**2*Cy**2+2*Cx**2*Cy**2-4*Cx**2*d**2-2*Ay*Cx**2*Cy+4*Ay*Cx**2*d))/(2*Cx))
+        #x=(-(-Cx**2-Cy**2+Ay*Cy-(math.sqrt(Cx**4+Cy**4-2*Ay*Cy**3+Ay**2*Cy**2+2*Cx**2*Cy**2-4*Cx**2*d**2-2*Ay*Cx**2*Cy+4*Ay*Cx**2*d)))/(2*Cx))
+
+        return -math.degrees(math.atan2(y,x)) + 90
+
+
+    def heading_publisher(self):
+
+        while not rospy.is_shutdown():
+           
+            self.heading = (self.diff_heading_coefficient * self.diff_heading() + self.heading) % 360
+
+            self.heading_pub.publish(self.heading)
+            self.rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        Heading_simu()
+    except rospy.ROSInterruptException:
+        pass
+

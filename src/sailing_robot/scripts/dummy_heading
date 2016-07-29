@@ -1,0 +1,27 @@
+#!/usr/bin/python
+#
+# Node publishes apparent wind direction
+# DUMMY NODE, at the moment it just keeps publishing a constant wind direction
+# as specified in the parameters file
+
+import rospy
+from std_msgs.msg import Float32
+
+currentHeading = rospy.get_param("dummy/heading")
+
+def heading_publisher():
+
+    rate = rospy.Rate(rospy.get_param("config/rate"))
+
+    while not rospy.is_shutdown():
+        heading_pub.publish(currentHeading)
+        rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
+        rospy.init_node("publish_dummy_heading_data", anonymous=True)
+        heading_publisher()
+    except rospy.ROSInterruptException:
+        pass

@@ -1,0 +1,81 @@
+#!/usr/bin/python
+#
+# Simulator for the boat position based on velocity and heading
+
+
+import rospy
+from std_msgs.msg import Float64, Float32
+import time, math
+from sensor_msgs.msg import NavSatFix
+from sailing_robot.msg import velocity
+from LatLon import LatLon
+
+from sailing_robot.navigation import Navigation
+
+
+class Position_simu():
+    def __init__(self):
+        """ Publish position based on velocity and heading
+        """
+        self.position_pub = rospy.Publisher('position', NavSatFix, queue_size=10)
+
+        rospy.init_node("simulation_position", anonymous=True)
+
+        rospy.Subscriber('heading', Float32, self.update_heading)
+        self.heading = rospy.get_param("simulation/heading_init")
+
+        rospy.Subscriber('velocity', velocity, self.update_velocity)
+        self.velocity = [0,0,0]
+
+        self.freq = rospy.get_param("config/rate")
+        self.rate = rospy.Rate(self.freq)
+
+        # Read init position form the /wp parameters
+        wp_list = rospy.get_param('wp/list')
+        wp_table = rospy.get_param('wp/table')
+        init_position = wp_table[wp_list[0]]
+
+        self.nav = Navigation()
+        self.utm_position = self.nav.latlon_to_utm(init_position[0], init_position[1])
+
+        rospy.loginfo("Position simulated")
+
+        self.position_publisher()
+
+
+    def update_heading(self, msg):
+        self.heading = msg.data
+
+    def update_velocity(self, msg):
+        self.velocity = (msg.velx, msg.vely, msg.velz)
+
+    def position_publisher(self):
+
+        while not rospy.is_shutdown():
+            
+            dx = (self.velocity[0] * math.sin(math.radians(self.heading)) - \
+                self.velocity[1] * math.cos(math.radians(self.heading))) / self.freq
+
+            dy = (self.velocity[0] * math.cos(math.radians(self.heading)) + \
+                self.velocity[1] * math.sin(math.radians(self.heading))) / self.freq
+            
+
+            msg = NavSatFix()
+            self.utm_position = (self.utm_position[0] + dx, self.utm_position[1] + dy)
+
+            position = self.nav.utm_to_latlon(self.utm_position[0], self.utm_position[1])
+            msg.latitude = position.lat.decimal_degree
+            msg.longitude = position.lon.decimal_degree
+            
+
+            self.position_pub.publish(msg)
+
+            self.rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        Position_simu()
+    except rospy.ROSInterruptException:
+        pass
+

@@ -1,0 +1,18 @@
+<launch>
+    <!--
+    General test file to launch all existing nodes to talk to real hardware
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
+
+    <node name="debugging_2D_plot" pkg='sailing_robot' type="debugging_2D_plot"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/>
+    <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0.0 0.0 0.0 0.0 0.0 0.0 map my_frame 100" />
+
+</launch>

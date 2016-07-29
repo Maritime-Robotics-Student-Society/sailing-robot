@@ -1,0 +1,127 @@
+#!/usr/bin/python
+#
+# Simulator for the boat velocity
+
+
+
+import rospy
+from std_msgs.msg import Float64, Float32
+from sailing_robot.msg import velocity
+import scipy.interpolate
+import time, math
+
+
+
+
+
+
+class Velocity_simu():
+    """ Node to simulate boat velocity based on polar and the wind direction and speed
+        A minimum velocity is set in the parameter file to be able to tack correctly
+    """
+    def __init__(self):
+        self.velocity_pub = rospy.Publisher('velocity', velocity, queue_size=10)
+
+        rospy.init_node("simulation_velocity", anonymous=True)
+
+        rospy.Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
+        self.wind_direction = 0
+        rospy.Subscriber('wind_speed_apparent', Float64, self.update_wind_speed)
+        self.wind_speed = 0
+
+        self.velocity_coefficient = rospy.get_param("simulation/velocity/coefficient")
+        self.velocity_minimum = rospy.get_param("simulation/velocity/minimum")
+
+        self.rate = rospy.Rate(rospy.get_param("config/rate"))
+
+        self.velocity = velocity()
+
+        rospy.loginfo("Velocity simulated")
+        self.polardef()
+        self.velocity_publisher()
+
+    def update_wind_direction(self, msg):
+        self.wind_direction = msg.data
+
+    def update_wind_speed(self, msg):
+        self.wind_speed = msg.data
+
+
+    def polardef(self):
+        """ Polar data from: https://1.bp.blogspot.com/-i_cyGtVorDs/T8rCqga1ZkI/AAAAAAAAARo/Lrmy5AooMbw/s1600/Laser+Polars.JPG
+        """
+
+        ang_pol = [ 0,
+                   13.3727803547,
+                   25.9524035025,
+                   27.0751750586,
+                   30.4378864816,
+                   35.6660200539,
+                   42.0349112634,
+                   49.7665534516,
+                   58.2972310405,
+                   64.8124671853,
+                   71.964538913,
+                   79.8079847501,
+                   89.7055041223,
+                   98.2026979197,
+                   112.8408218317,
+                   122.0785817886,
+                   131.0447776393,
+                   139.5439071043,
+                   151.1246799202,
+                   162.550911114,
+                   175.4021514163,
+                   180,]
+
+        speed_pol = [0.0620155039,
+                     0.0769833174,
+                     0.1566796511,
+                     0.2423907054,
+                     0.3651209659,
+                     0.4761790727,
+                     0.5978118655,
+                     0.7203837181,
+                     0.8119202931,
+                     0.8693697206,
+                     0.9346114548,
+                     0.9762073829,
+                     1.0001019704,
+                     0.9925925807,
+                     0.9593461558,
+                     0.9271178874,
+                     0.8870117091,
+                     0.8327395402,
+                     0.7718802369,
+                     0.733971012,
+                     0.6907957239,
+                     0.688696381,]
+        
+        self.polar = scipy.interpolate.interp1d(ang_pol, speed_pol)
+
+
+    def velocity_publisher(self):
+
+        while not rospy.is_shutdown():
+            # wind direction between 0 and 180 degree
+            wind_direction_180 =  180 - abs(self.wind_direction - 180) 
+
+            velx = self.polar( wind_direction_180 ) * self.wind_speed * self.velocity_coefficient
+            if velx < self.velocity_minimum:
+                velx = self.velocity_minimum
+            
+
+            self.velocity.velx = velx
+            self.velocity.vely = 0
+            self.velocity.velz = 0
+            self.velocity_pub.publish(self.velocity)
+
+            self.rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        Velocity_simu()
+    except rospy.ROSInterruptException:
+        pass
+

@@ -1,0 +1,29 @@
+
+# Wind conditions:
+# wind speed in m/s (1m/s = 1.9kts)
+simulation/wind/speed: 5
+
+# wind direction relative to north
+simulation/wind/direction: 0
+
+# A gaussian noise is generated on both wind speed and wind direction, use a value of 0 to remove the noise generation.
+# These parameters are the 'width' of the gaussian distribution
+simulation/wind/noise_direction_range: 0        # [degree]
+simulation/wind/noise_speed_range: 0          # [m/s]
+
+
+# Boat velocity
+# velocity of the boat at 90° from the wind in with 1 m/s wind speed 
+# for example in a 10kts wind, if the boat goes at 3kts, the coefficient is 0.3
+simulation/velocity/coefficient: 0.3
+
+# Minimum velocity of the boat (in m/s)
+simulation/velocity/minimum: 0.5
+
+
+simulation/heading_init: +90.0
+
+
+# Heading coefficient
+# just a multiplocator coefficient for the heading control in case of need
+simulation/heading/coefficient: 1.0

@@ -150,6 +150,7 @@ function rosout_handling(target_id) {
       var n_discard = trim_at_n_msgs - recent_msgs.length;
       recent_msgs = recent_msgs.slice(n_discard, n_discard + keep_n_msgs);
     }
+    rerender();
   }
   return append_msg;
 }

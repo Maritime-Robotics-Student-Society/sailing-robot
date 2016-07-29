@@ -29,7 +29,7 @@ ros::NodeHandle  nh;
 
 #define PIN 6
 #define NUMPIXELS 30
-#define DELAY 2000
+#define DELAY 20
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, PIN);
 int gps_satellites = 0;
@@ -45,8 +45,8 @@ void set_up_to_pixel(int number, int red, int green, int blue){
 }
 
 
-void set_all_msg_colour(int allColours){
-  int red = allColours/90000;
+void set_all_msg_colour(long allColours){
+  int red = (int)((float)allColours/90000);
   int green = (allColours - red*90000)/300;
   int blue = allColours - red*90000 - green*300;
   set_up_to_pixel(NUMPIXELS, red, green, blue);

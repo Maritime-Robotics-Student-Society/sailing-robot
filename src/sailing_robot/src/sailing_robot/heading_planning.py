@@ -2,32 +2,73 @@ from collections import deque
 import LatLon as ll
 import math
 from shapely.geometry import Point
-from std_msgs.msg import Float32
-import rospy
 
+from .taskbase import TaskBase
 
-from .navigation import Navigation, angleSum, angleAbsDistance
+class TackVoting(object):
+    """Handles a rolling vote of which tack we want to be on.
+    
+    :param int nsamples: N samples for voting. Sample frequency is determined by ROS rate.
+    :param int threshold: Number of votes to change tack. Should be > (nsamples/2)
+    """
+    def __init__(self, nsamples, threshold):
+        self.nsamples = nsamples
+        self.threshold = threshold
+        self.votes = deque(maxlen=nsamples)
+        # Start off indecisive, with equal votes either way
+        self.votes.extend([1, 0] * (nsamples // 2))
+        self.votes_sum = nsamples // 2
 
-goal_wind_angle_pub = rospy.Publisher("/goal_wind_angle", Float32, queue_size=10)
+    def vote(self, value):
+        """Push one vote.
+        
+        0 votes for starboard tack, 1 for port.
+        """
+        if len(self.votes) >= self.nsamples:
+            self.votes_sum -= self.votes.popleft()
+        self.votes.append(value)
+        self.votes_sum += value
 
-class HeadingPlan:
+    def tack_now(self, current_tack):
+        """Get the current result - True to tack now.
+        
+        :param int current_tack: 0 if on starboard tack now, 1 if on port tack
+        """
+        if current_tack:
+            # Port: tack to starboard?
+            return self.votes_sum < (self.nsamples - self.threshold)
+        else:
+            # Starboard: tack to port?
+            return self.votes_sum > self.threshold
+
+    def reset(self, current_tack):
+        """Set all votes one way.
+        
+        :param int current_tack: 0 on startboard tack, 1 on port tack.
+        """
+        if current_tack:
+            self.votes.extend([1] * self.nsamples)
+            self.votes_sum = self.nsamples
+        else:
+            self.votes.clear()
+            self.votes_sum = 0
+
+class HeadingPlan(TaskBase):
     def __init__(self, nav, tack_line_offset=0.01,
             waypoint=ll.LatLon(50.742810, 1.014469), # somewhere in the solent
             target_radius=2,
             tack_decision_samples=100, tack_decision_threshold=0.75,
             ):
-        """Heading planning machinery.
+        """Sail towards a waypoint.
 
-        beating_angle is the closest angle we can sail to the wind -
-        the total dead zone is twice this angle. Measured in degrees.
-
-        tack_line_offset is half the width of the tacking corridor we use when
-        sailing towards a marker upwind, measured in km.
+        *nav* is a sailing_robot.navigation.Navigation instance.
         
-        utm_zone is the zone number of the UTM system to use. Southampton is in
-        zone 30, Portugal in zone 29. http://www.dmap.co.uk/utmworld.htm
-        Distance calculations will be less accurate the further from the
-        specified zone you are.
+        *waypoint* is a LatLon object telling us where to go.
+        
+        *target_radius* is how close we need to get to the waypoint, in metres.
+        
+        *tack_decision_samples* and *tack_decision_threshold* control tack
+        voting.
         """
         self.nav = nav
         self.waypoint = waypoint
@@ -39,18 +80,25 @@ class HeadingPlan:
         self.side_heading = 0
         self.alternate_heading = 0
         self.sailing_state = 'normal'  # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
-        self.tack_decision_samples = tack_decision_samples
-        self.tack_decision_min = int(tack_decision_threshold * tack_decision_samples)
-        self.tack_wanted = deque(maxlen=tack_decision_samples)
-        self.tack_wanted_sum = 0
+        self.tack_voting = TackVoting(tack_decision_samples,
+                         int(tack_decision_threshold * tack_decision_samples))
     
     def start(self):
         pass
 
     def check_end_condition(self):
+        """Are we there yet?"""
         return self.nav.position_xy.within(self.target_area)
 
+    debug_topics = [
+        ('heading_to_waypoint', 'Float32'),
+        ('distance_to_waypoint', 'Float32'),
+        ('goal_wind_angle', 'Float32'),
+    ]
+
     def distance_heading_to_waypoint(self):
+        """Calculate where we are relative to the waypoint, for debugging.
+        """
         dx = self.waypoint_xy.x - self.nav.position_xy.x
         dy = self.waypoint_xy.y - self.nav.position_xy.y
         d = (dx**2 + dy**2) ** 0.5
@@ -60,6 +108,10 @@ class HeadingPlan:
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
         """
+        dwp, hwp = self.distance_heading_to_waypoint()
+        self.debug_pub('distance_to_waypoint', dwp)
+        self.debug_pub('heading_to_waypoint', hwp)
+
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':
             # A tack is in progress
@@ -73,44 +125,38 @@ class HeadingPlan:
                 return self.sailing_state, self.nav.wind_angle_to_heading(beating_angle)
             else:
                 # Tack completed
+                self.log('info', 'Finished tack (%s)', self.sailing_state)
+                self.tack_voting.reset(boat_wind_angle > 0)
                 self.sailing_state = 'normal'
-                self.tack_wanted.clear()
-                self.tack_wanted_sum = 0
+
+        on_port_tack = boat_wind_angle > 0
 
         wp_heading = self.nav.position_ll.heading_initial(self.waypoint)
         wp_wind_angle = self.nav.heading_to_wind_angle(wp_heading)
-        want_tack_now = 0
-        if (wp_wind_angle * boat_wind_angle) < 0:
-            # These two have different signs, so we want the other tack
-            want_tack_now = 1
+        # Tack voting: 0 for starboard tack, 1 for port tack
+        current_tack_vote = int(wp_wind_angle > 0)
+        self.tack_voting.vote(current_tack_vote)
 
-        self.tack_wanted_sum += want_tack_now
-        if self.tack_wanted_sum > self.tack_decision_min:
-            # We have reached the threshold to trigger a tack
-            if boat_wind_angle > 0:
-                # On the port tack
-                beating_angle = -self.nav.beating_angle
+        tack_now = self.tack_voting.tack_now(on_port_tack)
+
+        if tack_now:
+            if on_port_tack:
                 tack_to = 'tack_to_stbd_tack'
+                beating_angle = -self.nav.beating_angle
             else:
-                beating_angle = self.nav.beating_angle
                 tack_to = 'tack_to_port_tack'
+                beating_angle = self.nav.beating_angle
             self.sailing_state = tack_to
             return tack_to, self.nav.wind_angle_to_heading(beating_angle)
 
-        # Update the rolling poll of whether we want to tack.
-        if len(self.tack_wanted) >= self.tack_decision_samples:
-            self.tack_wanted_sum -= self.tack_wanted.popleft()
-        self.tack_wanted.append(want_tack_now)
-
         # Continue on our current tack
         goal_wind_angle = wp_wind_angle
-        if boat_wind_angle > 0:
-            # On the port tack
+        if on_port_tack:
             goal_wind_angle = max(goal_wind_angle, self.nav.beating_angle)
         else:
             # On the starboard tack
             goal_wind_angle = min(goal_wind_angle, -self.nav.beating_angle)
 
-        goal_wind_angle_pub.publish(goal_wind_angle)
+        self.debug_pub('goal_wind_angle', goal_wind_angle)
 
         return 'normal', self.nav.wind_angle_to_heading(goal_wind_angle)

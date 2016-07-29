@@ -1,15 +1,19 @@
+"""Common navigation machinery used by different modules"""
+
 import math
 from LatLon import LatLon
 from pyproj import Proj
 from shapely.geometry import Point
 
 class Navigation(object):
-    """Common navigation machinery used by different modules"""
+    """Common navigation machinery used by different modules.
+    
+    Stores boat position (both lat/long and x/y based on UTM projection), and
+    heading, along with apparent wind angle.
+    """
     def __init__(self, 
                 beating_angle=45, utm_zone=30):
         """
-        position_ll :  Position as a LatLon object
-        heading : Compass heading
         beating_angle : Closest absolute angle relative to the wind that we can
             sail
         utm_zone : Zone number of the UTM system to use. Southampton is in
@@ -36,8 +40,8 @@ class Navigation(object):
     
     def utm_to_latlon(self, x, y):
         """Returns a LatLon object"""
-        lon, lat = self.projection.inverse(x, y, inverse=True)
-        return ll.LatLon(lat, lon)
+        lon, lat = self.projection(x, y, inverse=True)
+        return LatLon(lat, lon)
 
     def update_heading(self, msg):
         self.heading = msg.data
@@ -79,18 +83,24 @@ class Navigation(object):
         from rospy import Subscriber
         from std_msgs.msg import Float32, Float64
         from sensor_msgs.msg import NavSatFix
-        Subscriber('/heading', Float32, self.update_heading)
-        Subscriber('/wind_direction_apparent', Float64, self.update_wind_direction)
-        Subscriber('/position', NavSatFix, self.update_position)
+        Subscriber('heading', Float32, self.update_heading)
+        Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
+        Subscriber('position', NavSatFix, self.update_position)
 
 ################
 # General utility functions
 ################
 
 def angleSum(a,b):
+    """Add two angles in degrees, returning a value mod 360
+    """
     return (a+b)%360
 
 def angleAbsDistance(a,b):
+    """Magnitude of the difference between two angles.
+    
+    Result should always be between 0 and 180.
+    """
     distanceA = abs((a - b) % 360)
     distanceB = abs((b - a) % 360)
     return min(distanceA, distanceB)

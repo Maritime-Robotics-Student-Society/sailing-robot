@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+# Log GPS data in the CSV format required by the rules
+
+import csv
+from datetime import datetime
+import os.path
+import rospy
+from sensor_msgs.msg import NavSatFix
+
+RECORDS_DIR = os.path.expanduser('~/sailing-robot')
+
+def record():
+    filename = 'gps-trace-' + datetime.now().strftime("%Y-%m-%dT%H.%M.%S")+'.csv'
+    with open(os.path.join(RECORDS_DIR, filename), 'w') as f:
+        csvw = csv.writer(f)
+        def write(msg):
+            ts = datetime.now().strftime("%H%M%S%d")
+            csvw.writerow([ts, msg.latitude, msg.longitude])
+
+        rospy.Subscriber('position', NavSatFix, write)
+        rospy.spin()
+
+if __name__ == '__main__':
+    try:
+        rospy.init_node("debugging_gps_log", anonymous=True)
+        record()
+    except rospy.ROSInterruptException:
+        pass

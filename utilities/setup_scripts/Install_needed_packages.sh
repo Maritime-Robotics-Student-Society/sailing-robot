@@ -19,6 +19,9 @@ sudo apt-get --assume-yes install vim
 # Install bc
 sudo apt-get --assume-yes install bc
 
+# Install sharply for navigation node
+yes | sudo pip install shapely
+
 # Needed for dashboard
 yes | sudo pip install tornado
 

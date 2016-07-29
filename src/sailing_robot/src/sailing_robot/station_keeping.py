@@ -2,7 +2,9 @@
 import LatLon as ll
 from shapely.geometry import Polygon
 
-class StationKeeping:
+from .taskbase import TaskBase
+
+class StationKeeping(TaskBase):
     def __init__(self, nav, markers, buffer_width=10):
         """Machinery to stay within a marked area.
 

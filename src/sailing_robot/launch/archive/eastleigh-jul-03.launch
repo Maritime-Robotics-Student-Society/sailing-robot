@@ -1,0 +1,41 @@
+<launch>
+    <!--
+    General test file to launch all existing nodes to talk to real hardware
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/>
+
+    <!--
+    Nodes
+    -->
+    <!-- These are currently dummies, need to be replaced with real nodes -->
+    <!-- <node name="publish_heading" pkg='sailing_robot' type="publish_heading"/> -->
+    <node name="gps" pkg='sailing_robot' type="gps"/>
+    <!--<node name = "go_through_wp_list" pkg="sailing_robot" type = "run_through_wp_list" /> -->
+    <!--<node name = "heading_control" pkg="sailing_robot" type = "heading_control" />-->
+    <node name = "tasks" pkg="sailing_robot" type = "tasks" />
+    <node name = "tack" pkg="sailing_robot" type = "tack" />
+    <node name = "pid_rudder" pkg="sailing_robot" type = "pid_rudder" />
+    <node name = "pid_sail" pkg="sailing_robot" type = "pid_sail" />
+    <node name = "heading" pkg="sailing_robot" type="imu-calibrated" />
+    <node name = "servo_control" pkg="sailing_robot" type="servo_control" />
+    <node name = "wind_direction" pkg="sailing_robot" type="wind_direction_calibrated" />
+    <node name = "debugging_blink_on_sailing_state" pkg="sailing_robot" type="debugging_blink_on_sailing_state" />
+
+    <!-- Rosbag records messages for later investigation -->
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-record"/>
+    <!-- Also record GPS data as required by the competition -->
+    <node name="gps_log" pkg='sailing_robot' type="gps_log"/>
+
+    <!-- Serve an HTML dashboard so we can see what's going on -->
+    <node name = "dashboard" pkg="sailing_robot" type = "dashboard" />
+
+ </launch>

@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+import rospy
+from std_msgs.msg import Float32, Int16, String
+
+from sailing_robot.pid_data import PID_Data
+import sailing_robot.pid_control as _PID
+from sailing_robot.navigation import angle_subtract
+
+data = PID_Data()
+
+rudder = rospy.get_param('rudder')
+
+controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'],rudder['maxAngle'], -rudder['maxAngle'])
+
+
+def node_publisher():
+    """
+    Publish rudder servo angle data (Int16) to Arduino node.
+    Higher level tack angle was used when in TACK manoeuvre.
+    PID controller was used in other conditions.
+    :rtype: object
+    """
+    pub = rospy.Publisher('rudder_control', Int16, queue_size=10)  # Use UInt 16 here to minimize the memory use
+    rospy.init_node('actuator_demand_rudder', anonymous=True)
+    rate = rospy.Rate(10)
+
+    while not rospy.is_shutdown():
+        rospy.loginfo("Sailing state: %r", data.sailing_state)
+        if data.sailing_state == 'normal':
+            rawangle = -controller.update_PID(angle_subtract(
+                                               data.heading, data.goal_heading))
+            angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
+            rospy.loginfo("Angle: %r", angle)
+        else:
+            rawangle = data.tack_rudder
+            angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
+
+        pub.publish(int(angle))
+
+        rate.sleep()
+
+print(data.goal_heading)
+
+if __name__ == '__main__':
+    try:
+        rospy.Subscriber('goal_heading', Float32, data.update_goal_heading)
+        rospy.Subscriber('heading', Float32, data.update_heading)
+        rospy.Subscriber('sailing_state', String, data.update_sailing_state)
+        rospy.Subscriber('tack_rudder', Float32, data.update_tack_rudder)
+        node_publisher()
+    except rospy.ROSInterruptException:
+        pass
