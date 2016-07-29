@@ -30,7 +30,8 @@ def setup():
     pi.set_mode(13, pigpio.OUTPUT) # GPIO 13/RPi PIN 33 as rudder servo pin
     
 def sailservoPWMcontrol(data):
-    """  Sail Servo PWM control take in the maximum sail angle from topic /sail_servo. Maximum angle then convert into the sheet length in meters. This value will then used to calculate the rotation anlge (should between 0 to 1260)Final stage of servo control is transfer rotation angle into PWM output a    nd use pigpio service to control the servo.  """
+    """  Sail Servo PWM control take in the maximum sail angle from topic /sail_servo. Maximum angle then convert into the sheet length in meters. This value will then used to calculate the rotation anlge (should between 0 to 1260)Final stage of servo control is transfer rotation angle into PWM output a    nd use pigpio service to control the servo.  """ 
+    sail_angle = data.data
     sheetlength2D = np.sqrt(pullypivotdistance**2 + boomsheetdistance**2 -\
     2*pullypivotdistance*boomsheetdistance*np.cos(1.0*sail_angle/180*np.pi))
     sheetlength = np.sqrt(sheetlength2D**2 + boomheight**2)
