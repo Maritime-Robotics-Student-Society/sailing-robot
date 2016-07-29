@@ -10,6 +10,7 @@ publish_led() {
   rostopic pub -1 /led_blink std_msgs/Int32 --  $intcolor &> /dev/null &
 }
 
+  publish_led 255 0 0 # green
 
 rostopic list &> /dev/null
 
