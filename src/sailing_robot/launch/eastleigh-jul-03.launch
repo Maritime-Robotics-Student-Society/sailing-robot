@@ -38,8 +38,4 @@
     <!-- Serve an HTML dashboard so we can see what's going on -->
     <node name = "dashboard" pkg="sailing_robot" type = "dashboard" />
 
-    <!--
-    Launch Bridge to Arduino for LED blinking
-    -->
-  </node>
  </launch>
