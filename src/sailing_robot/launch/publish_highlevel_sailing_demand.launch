@@ -15,6 +15,7 @@
   <node name="dummy_position" pkg='sailing_robot' type="dummy_position"/>
   <node name="debugging_dashboard" pkg='sailing_robot' type="debugging_dashboard"/>
   <node name="debugging_dump_params" pkg='sailing_robot' type="debugging_dump_params"/>
+  <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/>
 
 
     <!--

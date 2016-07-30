@@ -6,18 +6,23 @@ from datetime import datetime
 import os.path
 import rospy
 from sensor_msgs.msg import NavSatFix
+from sailing_robot.msg import gpswtime
 
 RECORDS_DIR = os.path.expanduser('~/sailing-robot')
 
 def record():
     filename = 'gps-trace-' + datetime.now().strftime("%Y-%m-%dT%H.%M.%S")+'.csv'
+    day_of_month = datetime.now().day
     with open(os.path.join(RECORDS_DIR, filename), 'w') as f:
         csvw = csv.writer(f)
         def write(msg):
-            ts = datetime.now().strftime("%H%M%S%d")
-            csvw.writerow([ts, msg.latitude, msg.longitude])
+            ts = '%02d%02d%02d%02d' % (msg.time_h, msg.time_m, msg.time_s,
+                                        day_of_month)
+            lat = int(msg.fix.latitude * 1e7)
+            lon = int(msg.fix.longitude * 1e7)
+            csvw.writerow([ts, lat, lon])
 
-        rospy.Subscriber('position', NavSatFix, write)
+        rospy.Subscriber('gps_fix', gpswtime, write)
         rospy.spin()
 
 if __name__ == '__main__':
