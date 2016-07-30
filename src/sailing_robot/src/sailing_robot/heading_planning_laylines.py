@@ -10,12 +10,11 @@ from .heading_planning import TackVoting
 # For calculations, lay lines don't extend to infinity.
 # This is in m; 10km should be plenty for our purposes.
 LAYLINE_EXTENT = 10000
-LAYLINE_LEAD = 5
 
 class HeadingPlan(TaskBase):
     def __init__(self, nav,
             waypoint=ll.LatLon(50.742810, 1.014469), # somewhere in the solent
-            target_radius=2,
+            target_radius=2, tack_voting_radius=15,
             ):
         """Sail towards a waypoint.
 
@@ -25,8 +24,8 @@ class HeadingPlan(TaskBase):
         
         *target_radius* is how close we need to get to the waypoint, in metres.
         
-        *tack_decision_samples* and *tack_decision_threshold* control tack
-        voting.
+        *tack_voting_radius* is the distance within which we use tack voting, to
+        avoid too frequent tacks close to the waypoint.
         """
         self.nav = nav
         self.waypoint = waypoint
@@ -35,6 +34,7 @@ class HeadingPlan(TaskBase):
         self.target_area = self.waypoint_xy.buffer(target_radius)
         self.sailing_state = 'normal'  # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
         self.tack_voting = TackVoting(50, 35)
+        self.tack_voting_radius = tack_voting_radius
     
     def start(self):
         pass
@@ -87,6 +87,7 @@ class HeadingPlan(TaskBase):
 
         wp_wind_angle = self.nav.heading_to_wind_angle(hwp)
         
+        tack_now = False
         if wp_wind_angle * boat_wind_angle > 0:
             # These two have the same sign, so we're on the better tack already
             self.tack_voting.vote(on_port_tack)
@@ -94,9 +95,15 @@ class HeadingPlan(TaskBase):
             # We're between the laylines; stick to our current tack for now
             self.tack_voting.vote(on_port_tack)
         else:
+            tack_now = True
             self.tack_voting.vote(not on_port_tack)
         
-        if self.tack_voting.tack_now(on_port_tack):
+        if dwp < self.tack_voting_radius:
+            # Close to the waypoint, use tack voting so we're not constantly
+            # tacking.
+            tack_now = self.tack_voting.tack_now(on_port_tack)
+
+        if tack_now:
             # Ready about!
             if on_port_tack:
                 state = 'tack_to_stbd_tack'
@@ -106,6 +113,7 @@ class HeadingPlan(TaskBase):
                 goal_wind_angle = self.nav.beating_angle
             self.sailing_state = state
         else:
+            # Stay on our current tack
             if on_port_tack:
                 goal_wind_angle = max(wp_wind_angle, self.nav.beating_angle)
             else:
@@ -115,19 +123,14 @@ class HeadingPlan(TaskBase):
         self.debug_pub('goal_wind_angle', goal_wind_angle)
         return state, self.nav.wind_angle_to_heading(goal_wind_angle)
 
-
     def lay_triangle(self):
         """Calculate the lay lines for the current waypoint.
         
         This returns a shapely Polygon with the two lines extended to
         LAYLINE_EXTENT (10km).
         """
-        upwind = self.nav.absolute_wind_direction()
-        downwind = angleSum(upwind, 180)
-        xw, yw = self.waypoint_xy.x, self.waypoint_xy.y
-        lu = math.radians(upwind)
-        x0 = xw + (LAYLINE_LEAD * math.sin(lu))
-        y0 = xw + (LAYLINE_LEAD * math.cos(lu))
+        downwind = angleSum(self.nav.absolute_wind_direction(), 180)
+        x0, y0 = self.waypoint_xy.x, self.waypoint_xy.y
         l1 = math.radians(angleSum(downwind, -self.nav.beating_angle))
         x1 = x0 + (LAYLINE_EXTENT * math.sin(l1))
         y1 = y0 + (LAYLINE_EXTENT * math.cos(l1))
