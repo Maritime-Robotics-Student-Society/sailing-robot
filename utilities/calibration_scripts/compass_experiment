@@ -90,14 +90,14 @@ LGD_GYRO_Z_MSB = 0x2D
 
 
 if b.read_byte_data(LSM, LSM_WHOAMI_ADDRESS) == LSM_WHOAMI_CONTENTS:
-    print 'LSM303D detected successfully on I2C bus '+str(busNum)+'.'
+    print('LSM303D detected successfully on I2C bus '+str(busNum)+'.')
 else:
-    print 'No LSM303D detected on bus on I2C bus '+str(busNum)+'.'
+    print('No LSM303D detected on bus on I2C bus '+str(busNum)+'.')
 
 if b.read_byte_data(LGD, LGD_WHOAMI_ADDRESS) == LGD_WHOAMI_CONTENTS:
-    print 'L3GD20H detected successfully on I2C bus '+str(busNum)+'.'
+    print('L3GD20H detected successfully on I2C bus '+str(busNum)+'.')
 else:
-    print 'No L3GD20H detected on bus on I2C bus '+str(busNum)+'.'
+    print('No L3GD20H detected on bus on I2C bus '+str(busNum)+'.')
 
 #Set up the chips for reading  ----------------------
 
