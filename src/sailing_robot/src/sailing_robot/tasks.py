@@ -16,7 +16,9 @@ from .station_keeping import StationKeeping
 
 def tasks_from_wps(wp_params):
     target_radius = wp_params['acceptRadius']
+    tack_voting_radius = wp_params['tackVotingRadius']
     coordinates = wp_params['table']
+
     res = []
     for wpid in wp_params['list']:
         lat, lon = coordinates[wpid]
@@ -24,7 +26,8 @@ def tasks_from_wps(wp_params):
             'kind': 'to_waypoint',
             'lat': lat,
             'lon': lon,
-            'target_radius': target_radius
+            'target_radius': target_radius,
+            'tack_voting_radius': tack_voting_radius
         })
     return res
 
@@ -56,7 +59,7 @@ class TasksRunner(object):
         kind = taskdict['kind']
         if kind == 'to_waypoint':
             wp = LatLon(taskdict['lat'], taskdict['lon'])
-            kw = {'target_radius': taskdict.get('target_radius', 2.0)}
+            kw = {'target_radius': taskdict.get('target_radius', 2.0), 'tack_voting_radius': taskdict.get('tack_voting_radius', 15.)}
             task = HeadingPlan(waypoint=wp, nav=self.nav, **kw)
         elif kind == 'keep_station':
             markers = [tuple(p) for p in taskdict['markers']]
