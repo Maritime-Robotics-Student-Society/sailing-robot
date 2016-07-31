@@ -10,6 +10,7 @@
 #2. Comment out the line "blacklist ic2-bcm2708" (with a #) in the file /etc/modprobe.d/raspi-blacklist.conf
 #3. Install I2C utility (including smbus) with the command "apt-get install python-smbus i2c-tools"
 #4. Connect the I2C device to the SDA and SCL pins of the Raspberry Pi and detect it using the command "i2cdetect -y 1".  It should show up as 1D (typically) or 1E (if the jumper is set).
+from __future__ import print_function
 
 import time, math
 import rospy
@@ -108,76 +109,83 @@ b.write_byte_data(LSM, LSM_CTRL_7, 0x00) #get magnetometer out of low power mode
 
 b.write_byte_data(LGD, LGD_CTRL_1, 0x0F) #turn on gyro and set to normal mode
 
+def read_mag_field():
+    magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB),
+                             b.read_byte_data(LSM, LSM_MAG_X_LSB))
+    magy = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Y_MSB),
+                             b.read_byte_data(LSM, LSM_MAG_Y_LSB))
+    magz = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Z_MSB),
+                             b.read_byte_data(LSM, LSM_MAG_Z_LSB))
+    return magx, magy, magz
 
+def read_acc():
+    accx = twos_comp_combine(b.read_byte_data(LSM, LSM_ACC_X_MSB),
+                             b.read_byte_data(LSM, LSM_ACC_X_LSB))
+    accy = twos_comp_combine(b.read_byte_data(LSM, LSM_ACC_Y_MSB),
+                             b.read_byte_data(LSM, LSM_ACC_Y_LSB))
+    accz = twos_comp_combine(b.read_byte_data(LSM, LSM_ACC_Z_MSB),
+                             b.read_byte_data(LSM, LSM_ACC_Z_LSB))
+    return accx, accy, accz
+
+def pitch_and_roll():
+    AccX, AccY, AccZ = read_acc()
+    pitch = math.atan2(AccY,math.sqrt(math.pow(AccX,2) + math.pow(AccZ,2)))
+    roll = math.atan2(-AccX,AccZ)
+    return math.degress(pitch), math.degrees(roll)
 
 data_X = []
 data_Y = []
 data_Z = []
 
+# for i in range(300):
+#     try:
+#         #Read data from the chips ----------------------
+#         time.sleep(0.1)
+#         
+#         magx, magy, magz = read_mag_field()
+# 
+#         data_X.append(magx)
+#         data_Y.append(magy)
+# 
+#         minx = min(data_X)
+#         miny = min(data_Y)
+#         maxx = max(data_X)
+#         maxy = max(data_Y)
+#         
+#         print
+#         print('min x', minx)
+#         print('max x', maxx)
+#         print('min y', miny)
+#         print('max y', maxy)
+#         
+#     except KeyboardInterrupt:
+#         print("Interrupted")
+#         break
+# 
+# minx = min(data_X)
+# miny = min(data_Y)
+# 
+# maxx = max(data_X)
+# maxy = max(data_Y)
+# 
+# offset_X = (maxx + minx)/2
+# offset_Y = (maxy + miny)/2
+# 
+# range_X = maxx - minx
+# range_Y = maxy - miny
+
+print('Now point the boat north and prepare to tilt it.')
+raw_input('Press enter when ready')
+
+pitches = []
+rolls = []
+
 for i in range(300):
-    try:
-        #Read data from the chips ----------------------
-        time.sleep(0.1)
-        magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
-
-        magy = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Y_MSB), b.read_byte_data(LSM, LSM_MAG_Y_LSB))
-
-        magz = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Z_MSB), b.read_byte_data(LSM, LSM_MAG_Z_LSB))
-
-        data_X.append(magx)
-        data_Y.append(magy)
-        data_Z.append(magz)
-
-        minx = min(data_X)
-        miny = min(data_Y)
-        minz = min(data_Z)
-        maxx = max(data_X)
-        maxy = max(data_Y)
-        maxz = max(data_Z)
-        
-        print
-        print(minx)
-        print(maxx)
-        print(miny)
-        print(maxy)
-        print(minz)
-        print(maxz)
-        
-    except KeyboardInterrupt:
-        print("Interrupted")
-        break
-
-
-
-minx = min(data_X)
-miny = min(data_Y)
-minz = min(data_Z)
-
-maxx = max(data_X)
-maxy = max(data_Y)
-maxz = max(data_Z)
-
-offset_X = (maxx + minx)/2
-offset_Y = (maxy + miny)/2
-offset_Z = (maxz + minz)/2
-
-range_X = maxx - minx
-range_Y = maxy - miny
-range_Z = maxz - minz
-
-rospy.set_param('/calibration/compass', {'XOFFSET': offset_X,
-                                          'YOFFSET': offset_Y,
-                                          'ZOFFSET': offset_Z,
-                                          'XSCALE': range_X,
-                                          'YSCALE': range_Y,
-                                          'ZSCALE': range_Z,
-                                          })
-
-
-
-print("XOFFSET = " + str(offset_X))
-print("YOFFSET = " + str(offset_Y))
-print("ZOFFSET = " + str(offset_Z))
-print("XSCALE = " + str(range_X))
-print("YSCALE = " + str(range_Y))
-print("ZSCALE = " + str(range_Z))
+    pitch, roll = pitch_and_roll()
+    
+    pitches.append(pitch)
+    rolls.append(roll)
+    
+    print('     / min / current / max')
+    print('pitch : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(pitches), pitch, max(pitches)))
+    print('roll  : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(rolls), roll, max(rolls)))')
