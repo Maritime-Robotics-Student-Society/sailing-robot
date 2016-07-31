@@ -131,7 +131,7 @@ def pitch_and_roll():
     AccX, AccY, AccZ = read_acc()
     pitch = math.atan2(AccY,math.sqrt(math.pow(AccX,2) + math.pow(AccZ,2)))
     roll = math.atan2(-AccX,AccZ)
-    return math.degress(pitch), math.degrees(roll)
+    return math.degrees(pitch), math.degrees(roll)
 
 data_X = []
 data_Y = []
