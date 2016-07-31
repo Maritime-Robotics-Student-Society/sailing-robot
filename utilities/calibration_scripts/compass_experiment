@@ -181,6 +181,7 @@ pitches = []
 rolls = []
 
 for i in range(300):
+    time.sleep(0.1)
     pitch, roll = pitch_and_roll()
     
     pitches.append(pitch)
