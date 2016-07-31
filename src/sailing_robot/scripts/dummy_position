@@ -4,12 +4,11 @@
 # DUMMY NODE: keeps publishing a constant wind direction as specified in the
 # parameters file. See 'gps' for our real gps node.
 
+from datetime import datetime
 import rospy
-import serial
-import pynmea2
 
-from std_msgs.msg import Float32
 from sensor_msgs.msg import NavSatFix
+from sailing_robot.msg import gpswtime
 
 currentLatitude = rospy.get_param("dummy/latitude")
 currentLongitude = rospy.get_param("dummy/longitude")
@@ -17,32 +16,30 @@ currentLongitude = rospy.get_param("dummy/longitude")
 position = NavSatFix()
 
 def position_publisher():
-
     rate = rospy.Rate(rospy.get_param("config/rate"))
-    
-    # if str.find('GGA') > 0:
-    #     msg = pynmea2.parse(str)
-    # 
-    #     currentLatitude = msg.lat
-    #     currentLongitude = msg.lon
-    #     #print "Timestamp: %s -- Lat: %s %s -- Lon: %s %s -- Altitude: %s %s" % (msg.timestamp,msg.l$
-    #     #print msg
 
     position.latitude = currentLatitude
     position.longitude = currentLongitude
 
     while not rospy.is_shutdown():
         position_pub.publish(position)
+        
+        now = datetime.utcnow()
+        wtime = gpswtime()
+        wtime.fix = position
+        wtime.time_h = now.hour
+        wtime.time_m = now.minute
+        wtime.time_s = now.second
+        gps_pub.publish(wtime)
         rate.sleep()
 
 
 if __name__ == '__main__':
     try:
         position_pub = rospy.Publisher('position', NavSatFix, queue_size=10)
+        gps_pub = rospy.Publisher('gps_fix', gpswtime, queue_size=10)
         rospy.init_node("publish_dummy_position_data", anonymous=True)
-        
-        # serialPort = serial.Serial("/dev/ttyAMA0", 9600, timeout=0.5)
-        # str = serialPort.readline()
+
         position_publisher()
     except rospy.ROSInterruptException:
         pass

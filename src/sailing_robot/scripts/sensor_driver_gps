@@ -8,6 +8,7 @@ import traceback
 import rospy
 from std_msgs.msg import Int16
 from sensor_msgs.msg import NavSatFix
+from sailing_robot.msg import gpswtime
 
 serial_port = serial.Serial("/dev/ttyAMA0", 9600, timeout=0.5)
 
@@ -54,10 +55,18 @@ def pos_publisher():
             msg.longitude = decimal_degrees(sentence.lon, sentence.lon_dir)
             pos_pub.publish(msg)
             nsats_pub.publish(int(sentence.num_sats))
+            
+            wtime = gpswtime()
+            wtime.fix = msg
+            wtime.time_h = sentence.timestamp.hour
+            wtime.time_m = sentence.timestamp.minute
+            wtime.time_s = sentence.timestamp.second
+            gps_pub.publish(wtime)
 
 if __name__ == '__main__':
     try:
         pos_pub = rospy.Publisher('position', NavSatFix, queue_size=10)
+        gps_pub = rospy.Publisher('gps_fix', gpswtime, queue_size=10)
         nsats_pub = rospy.Publisher('gps_satellites', Int16, queue_size=10)
         rospy.init_node("sensor_driver_gps", anonymous=True)
         pos_publisher()
