@@ -188,4 +188,4 @@ for i in range(300):
     
     print('     / min / current / max')
     print('pitch : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(pitches), pitch, max(pitches)))
-    print('roll  : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(rolls), roll, max(rolls)))')
+    print('roll  : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(rolls), roll, max(rolls)))
