@@ -160,12 +160,19 @@ def heading_publisher():
         MagY = (MagY - YOFFSET) * YSCALE
         MagZ = (MagZ - ZOFFSET) * ZSCALE
         
+        magx_pub.publish(MagX)
+        magy_pub.publish(MagY)
+        magz_pub.publish(MagZ)
+        
         heading = math.degrees(math.atan2(-MagY, MagX))
         heading = heading % 360
             
         MagX_comp = (MagX*math.cos(pitch)) + (-MagZ*math.sin(pitch))
         MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) +\
                     (-MagY*math.cos(roll)) - (-MagZ*math.sin(roll)*math.cos(pitch))
+        
+        magx_comp_pub.publish(MagX_comp)
+        magy_comp_pub.publish(MagY_comp)
         
         heading_comp = math.degrees(math.atan2(MagY_comp, MagX_comp))
         heading_comp = heading_comp % 360
@@ -179,6 +186,11 @@ def heading_publisher():
 
 if __name__ == '__main__':
     try:
+        magx_pub = rospy.Publisher('mag_x', Float32, queue_size=10)
+        magy_pub = rospy.Publisher('mag_y', Float32, queue_size=10)
+        magz_pub = rospy.Publisher('mag_z', Float32, queue_size=10)
+        magx_comp_pub = rospy.Publisher('mag_x_comp', Float32, queue_size=10)
+        magy_comp_pub = rospy.Publisher('mag_y_comp', Float32, queue_size=10)
         heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
         headingcomp_pub = rospy.Publisher('heading_comp', Float32, queue_size=10)
         pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
