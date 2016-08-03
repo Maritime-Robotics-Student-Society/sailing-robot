@@ -164,9 +164,10 @@ def heading_publisher():
         heading = heading % 360
             
         MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
-        MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) + (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
+        MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) +\
+                    (-MagY*math.cos(roll)) - (-MagZ*math.sin(roll)*math.cos(pitch))
         
-        heading_comp = math.degrees(math.atan2(-MagY_comp, MagX_comp))
+        heading_comp = math.degrees(math.atan2(MagY_comp, MagX_comp))
         heading_comp = heading_comp % 360
         
         
