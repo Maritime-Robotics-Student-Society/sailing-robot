@@ -20,7 +20,6 @@ STATIC_PATH = os.path.expanduser('~/sailing-robot/dashboard/static')
 
 simple_topics = [
     ('/heading', Float32),
-    ('/heading_1', Float32),
     ('/heading_comp', Float32),
     ('/pitch', Float32),
     ('/roll', Float32),
