@@ -163,7 +163,7 @@ def heading_publisher():
         heading = math.degrees(math.atan2(-MagY, MagX))
         heading = heading % 360
             
-        MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
+        MagX_comp = (MagX*math.cos(pitch)) + (-MagZ*math.sin(pitch))
         MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) +\
                     (-MagY*math.cos(roll)) - (-MagZ*math.sin(roll)*math.cos(pitch))
         
