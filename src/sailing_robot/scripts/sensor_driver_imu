@@ -146,8 +146,8 @@ def heading_publisher():
         accz = twos_comp_combine(b.read_byte_data(LSM, LSM_ACC_Z_MSB), b.read_byte_data(LSM, LSM_ACC_Z_LSB))
         AccZ = accz #*0.061
         
-        pitch = math.atan2(AccY,math.sqrt(math.pow(AccX,2) + math.pow(AccZ,2)))
-        roll = math.atan2(-AccX,AccZ)
+        pitch = math.atan2(AccX, math.sqrt(AccX**2 + AccZ**2))
+        roll = math.atan2(-AccY, -AccZ)
         
         gyrox = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_X_MSB), b.read_byte_data(LGD, LGD_GYRO_X_LSB))
         gyroy = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_Y_MSB), b.read_byte_data(LGD, LGD_GYRO_Y_LSB))
@@ -191,8 +191,8 @@ def heading_publisher():
         heading_pub.publish(heading)
         heading1_pub.publish(heading_1)
         headingcomp_pub.publish(heading_comp)
-        pitch_pub.publish(pitch)
-        roll_pub.publish(roll)
+        pitch_pub.publish(math.degrees(pitch))
+        roll_pub.publish(math.degrees(roll))
 
 if __name__ == '__main__':
     try:
