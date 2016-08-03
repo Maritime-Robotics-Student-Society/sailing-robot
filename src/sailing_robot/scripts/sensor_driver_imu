@@ -159,19 +159,12 @@ def heading_publisher():
         MagX = (MagX - XOFFSET) * XSCALE
         MagY = (MagY - YOFFSET) * YSCALE
         MagZ = (MagZ - ZOFFSET) * ZSCALE
-    
-        # handle division by zero
-        if abs(MagY) <= 0.001:
-            if MagY*MagX > 0:
-                heading = 90
-            else:
-                heading = -90
-        else:
-            heading = math.atan2(MagX, MagY)*(180/math.pi)
+
+        heading = math.degrees(math.atan2(MagX, MagY))
     
         heading = (heading - 90) % 360
         
-        heading_1 = math.atan2(MagY, MagX)*(180/math.pi)
+        heading_1 = math.degrees(math.atan2(MagY, MagX))
         if heading_1 < 0:
             heading_1 = heading_1 + 360
         else:
@@ -180,7 +173,7 @@ def heading_publisher():
         MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
         MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) + (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
         
-        heading_comp = math.atan2(MagY_comp, MagX_comp)*(180/math.pi)
+        heading_comp = math.degrees(math.atan2(MagY_comp, MagX_comp))
         if heading_comp < 0:
             heading_comp = heading_comp + 360
         else:
