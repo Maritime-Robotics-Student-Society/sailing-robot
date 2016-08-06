@@ -180,22 +180,26 @@ rolls = []
 readings = []
 
 for i in range(300):
-    time.sleep(0.1)
-    pitch, roll = pitch_and_roll()
-    mag_xyz = read_mag_field()
+    try:
+        time.sleep(0.1)
+        pitch, roll = pitch_and_roll()
+        mag_xyz = read_mag_field()
 
-    readings.append({
-        'pitch': pitch,
-        'roll': roll,
-        'mag_xyz': mag_xyz,
-    })
-    
-    pitches.append(pitch)
-    rolls.append(roll)
-    
-    print('     / min / current / max')
-    print('pitch : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(pitches), pitch, max(pitches)))
-    print('roll  : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(rolls), roll, max(rolls)))
+        readings.append({
+            'pitch': pitch,
+            'roll': roll,
+            'mag_xyz': mag_xyz,
+        })
+        
+        pitches.append(pitch)
+        rolls.append(roll)
+        
+        print('     / min / current / max')
+        print('pitch : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(pitches), pitch, max(pitches)))
+        print('roll  : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(rolls), roll, max(rolls)))
+    except KeyboardInterrupt:
+        print('Interrupted')
+        break
 
 import json
 
