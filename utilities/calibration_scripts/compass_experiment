@@ -203,5 +203,13 @@ for i in range(300):
 
 import json
 
+store = {
+    'offset_X': offset_X,
+    'offset_Y': offset_Y,
+    'range_X':  range_X,
+    'range_Y': range_Y,
+    'roll_readings': readings,
+}
+
 with open('roll_calibration.json', 'w') as f:
-    json.dump(readings, f, indent=2)
+    json.dump(store, f, indent=2)
