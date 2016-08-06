@@ -28,5 +28,13 @@ yes | sudo pip install tornado
 # Set time zone to england (it is the same for portugal)
 sudo timedatectl set-timezone Europe/London
 
+# How to install pigpio on raspberry pi
+#rm pigpio.zip
+#sudo rm -rf PIGPIO
+#wget abyz.co.uk/rpi/pigpio/pigpio.zip
+#unzip pigpio.zip
+#cd PIGPIO
+#make -j4
+#sudo make install
 
 cd ~
