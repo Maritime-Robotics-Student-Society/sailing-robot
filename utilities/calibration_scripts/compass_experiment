@@ -203,5 +203,5 @@ for i in range(300):
 
 import json
 
-with open('roll_calibration.json') as f:
+with open('roll_calibration.json', 'w') as f:
     json.dump(readings, f, indent=2)
