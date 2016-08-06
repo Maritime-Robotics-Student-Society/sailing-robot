@@ -156,9 +156,9 @@ def heading_publisher():
         dataraw = (magx, magy, magz, accx, accy, accz, gyrox, gyroy, gyroz)
         
         # calibration
-        MagX = (MagX - XOFFSET) * XSCALE
-        MagY = (MagY - YOFFSET) * YSCALE
-        MagZ = (MagZ - ZOFFSET) * ZSCALE
+        MagX = (MagX - XOFFSET) / XSCALE
+        MagY = (MagY - YOFFSET) / YSCALE
+        MagZ = (MagZ - ZOFFSET) / ZSCALE
         
         magx_pub.publish(MagX)
         magy_pub.publish(MagY)
