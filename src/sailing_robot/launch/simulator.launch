@@ -7,14 +7,18 @@
     Parameters
     -->
 
+
     <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/boldrewood_waypoints.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailingClub_waypoints.yaml" command="load"/>
+    <!--rosparam file="$(find sailing_robot)/launch/parameters/boldrewood_waypoints.yaml" command="load"/-->
     <!--rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/-->
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/simulator_go_away.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>
 
     <!--
     Nodes
