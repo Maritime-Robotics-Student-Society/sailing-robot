@@ -20,6 +20,16 @@ simulation/velocity/coefficient: 0.4
 # Minimum velocity of the boat (in m/s)
 simulation/velocity/minimum: 0.5
 
+# Time after a tack the boat velocity is reduced [s]
+simulation/velocity/tacking_punishment_time: 3 # [s]
+        
+# the velocity will be multiplied by the following coefficient after each tack
+simulation/velocity/tacking_punishment_coefficient: 0.2
+
+# simulate a constant water stream
+simulation/velocity/water_stream_speed: 0.1     # [m/s]
+simulation/velocity/water_stream_direction: 0   # [degree]
+
 
 simulation/heading_init: 270.0
 

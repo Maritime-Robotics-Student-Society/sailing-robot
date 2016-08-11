@@ -5,7 +5,7 @@
 
 
 import rospy
-from std_msgs.msg import Float64, Float32
+from std_msgs.msg import Float64, Float32, String
 from sailing_robot.msg import velocity
 import scipy.interpolate
 import time, math
@@ -29,10 +29,18 @@ class Velocity_simu():
         rospy.Subscriber('wind_speed_apparent', Float64, self.update_wind_speed)
         self.wind_speed = 0
 
+        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
+        self.sailing_state = 'normal'
+
+        self.punishment = 1
+        self.tacking_punishment_time = rospy.get_param("simulation/velocity/tacking_punishment_time")
+        self.tacking_punishment_coef = rospy.get_param("simulation/velocity/tacking_punishment_coefficient")
+
         self.velocity_coefficient = rospy.get_param("simulation/velocity/coefficient")
         self.velocity_minimum = rospy.get_param("simulation/velocity/minimum")
 
-        self.rate = rospy.Rate(rospy.get_param("config/rate"))
+        self.freq = rospy.get_param("config/rate")
+        self.rate = rospy.Rate(self.freq)
 
         self.velocity = velocity()
 
@@ -45,6 +53,22 @@ class Velocity_simu():
 
     def update_wind_speed(self, msg):
         self.wind_speed = msg.data
+
+    def update_sailing_state(self, msg):
+        prev_sailing_state = self.sailing_state
+        self.sailing_state = msg.data
+        if self.sailing_state == 'normal':
+            if prev_sailing_state != self.sailing_state:
+                self.start_punishment()
+            else:
+                self.decr_punishment()
+        
+    def start_punishment(self):
+        self.punishment = self.tacking_punishment_coef
+
+    def decr_punishment(self):
+        if self.punishment < 1:
+            self.punishment = self.punishment + (1-self.tacking_punishment_coef)/(self.tacking_punishment_time * self.freq)
 
 
     def polardef(self):
@@ -106,12 +130,13 @@ class Velocity_simu():
             # wind direction between 0 and 180 degree
             wind_direction_180 =  180 - abs(self.wind_direction - 180) 
 
+
             velx = self.polar( wind_direction_180 ) * self.wind_speed * self.velocity_coefficient
             if velx < self.velocity_minimum:
                 velx = self.velocity_minimum
             
 
-            self.velocity.velx = velx
+            self.velocity.velx = velx * self.punishment
             self.velocity.vely = 0
             self.velocity.velz = 0
             self.velocity_pub.publish(self.velocity)
