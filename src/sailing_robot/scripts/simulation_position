@@ -30,6 +30,10 @@ class Position_simu():
         self.freq = rospy.get_param("config/rate")
         self.rate = rospy.Rate(self.freq)
 
+        # Water stream
+        self.water_stream_dir = rospy.get_param("simulation/velocity/water_stream_direction")
+        self.water_stream_speed = rospy.get_param("simulation/velocity/water_stream_speed")
+
         # Read init position form the /wp parameters
         wp_list = rospy.get_param('wp/list')
         wp_table = rospy.get_param('wp/table')
@@ -53,11 +57,15 @@ class Position_simu():
 
         while not rospy.is_shutdown():
             
+            water_stream_x = -self.water_stream_speed * math.sin(math.radians(self.water_stream_dir))
+            water_stream_y = -self.water_stream_speed * math.cos(math.radians(self.water_stream_dir))
+
+
             dx = (self.velocity[0] * math.sin(math.radians(self.heading)) - \
-                self.velocity[1] * math.cos(math.radians(self.heading))) / self.freq
+                self.velocity[1] * math.cos(math.radians(self.heading)) + water_stream_x) / self.freq
 
             dy = (self.velocity[0] * math.cos(math.radians(self.heading)) + \
-                self.velocity[1] * math.sin(math.radians(self.heading))) / self.freq
+                self.velocity[1] * math.sin(math.radians(self.heading)) + water_stream_y) / self.freq
             
 
             msg = NavSatFix()

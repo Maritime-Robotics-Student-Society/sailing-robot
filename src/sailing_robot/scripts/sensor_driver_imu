@@ -146,8 +146,8 @@ def heading_publisher():
         accz = twos_comp_combine(b.read_byte_data(LSM, LSM_ACC_Z_MSB), b.read_byte_data(LSM, LSM_ACC_Z_LSB))
         AccZ = accz #*0.061
         
-        pitch = math.atan2(AccY,math.sqrt(math.pow(AccX,2) + math.pow(AccZ,2)))
-        roll = math.atan2(-AccX,AccZ)
+        pitch = math.atan2(AccX, math.sqrt(AccX**2 + AccZ**2))
+        roll = math.atan2(-AccY, -AccZ)
         
         gyrox = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_X_MSB), b.read_byte_data(LGD, LGD_GYRO_X_LSB))
         gyroy = twos_comp_combine(b.read_byte_data(LGD, LGD_GYRO_Y_MSB), b.read_byte_data(LGD, LGD_GYRO_Y_LSB))
@@ -156,48 +156,42 @@ def heading_publisher():
         dataraw = (magx, magy, magz, accx, accy, accz, gyrox, gyroy, gyroz)
         
         # calibration
-        MagX = (MagX - XOFFSET) * XSCALE
-        MagY = (MagY - YOFFSET) * YSCALE
-        MagZ = (MagZ - ZOFFSET) * ZSCALE
-    
-        # handle division by zero
-        if abs(MagY) <= 0.001:
-            if MagY*MagX > 0:
-                heading = 90
-            else:
-                heading = -90
-        else:
-            heading = math.atan2(MagX, MagY)*(180/math.pi)
-    
-        heading = (heading - 90) % 360
+        MagX = (MagX - XOFFSET) / XSCALE
+        MagY = (MagY - YOFFSET) / YSCALE
+        MagZ = (MagZ - ZOFFSET) / ZSCALE
         
-        heading_1 = math.atan2(MagY, MagX)*(180/math.pi)
-        if heading_1 < 0:
-            heading_1 = heading_1 + 360
-        else:
-            heading_1 = heading_1
+        magx_pub.publish(MagX)
+        magy_pub.publish(MagY)
+        magz_pub.publish(MagZ)
+        
+        heading = math.degrees(math.atan2(-MagY, MagX))
+        heading = heading % 360
             
         MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
-        MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) + (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
+        MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) +\
+                    (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
         
-        heading_comp = math.atan2(MagY_comp, MagX_comp)*(180/math.pi)
-        if heading_comp < 0:
-            heading_comp = heading_comp + 360
-        else:
-            heading_comp = heading_comp
+        magx_comp_pub.publish(MagX_comp)
+        magy_comp_pub.publish(MagY_comp)
+        
+        heading_comp = math.degrees(math.atan2(-MagY_comp, MagX_comp))
+        heading_comp = heading_comp % 360
         
         
         data = (AccX,AccY,AccZ,MagX,MagY,MagZ,heading)
         heading_pub.publish(heading)
-        heading1_pub.publish(heading_1)
         headingcomp_pub.publish(heading_comp)
-        pitch_pub.publish(pitch)
-        roll_pub.publish(roll)
+        pitch_pub.publish(math.degrees(pitch))
+        roll_pub.publish(math.degrees(roll))
 
 if __name__ == '__main__':
     try:
+        magx_pub = rospy.Publisher('mag_x', Float32, queue_size=10)
+        magy_pub = rospy.Publisher('mag_y', Float32, queue_size=10)
+        magz_pub = rospy.Publisher('mag_z', Float32, queue_size=10)
+        magx_comp_pub = rospy.Publisher('mag_x_comp', Float32, queue_size=10)
+        magy_comp_pub = rospy.Publisher('mag_y_comp', Float32, queue_size=10)
         heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
-        heading1_pub = rospy.Publisher('heading_1', Float32, queue_size=10)
         headingcomp_pub = rospy.Publisher('heading_comp', Float32, queue_size=10)
         pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
         roll_pub = rospy.Publisher('roll', Float32, queue_size=10)
