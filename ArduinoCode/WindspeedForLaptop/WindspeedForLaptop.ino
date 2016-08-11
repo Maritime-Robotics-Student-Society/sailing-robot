@@ -46,6 +46,7 @@ void loop()
 {
   // Publish previously measured wind speed
   Serial.println(wind_speed);
+  Serial.println("in m/s");
 
   thread=100;
   
