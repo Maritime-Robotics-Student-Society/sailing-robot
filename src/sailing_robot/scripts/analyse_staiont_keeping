@@ -1,0 +1,34 @@
+#!/usr/bin/python
+
+"""
+Analyse the result of a station keeping attempt
+This script is for use independent of ROS!
+
+READY FOR MIT LICENCE
+"""
+
+import csv
+from sailing_robot.navigation import Navigation
+from LatLon import LatLon
+
+# CSV values
+# hhmmssdd
+# Lat *10^^7
+# Lon *10^^7
+
+CENTER = LatLon(50.8897983, -1.3840460)
+FILE = "../../../logs/gps-trace-2016-08-06T15.06.03.csv"
+
+
+####### ONGOING WORK
+
+# Read file
+# iterate through points:
+# Find first point in 20 m radius
+## calculate radius
+## get time of that point
+# get all points from the next 5 minutes
+# sum up x and y positions to get Pc
+# calculate distance for all points
+# remove 5% of points with largest distance to Pc
+# find next largest distance, this is the radius
