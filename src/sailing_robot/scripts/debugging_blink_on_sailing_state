@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# READY FOR MIT
 """
 Blink LEDs to indicate sailing state
 \n
