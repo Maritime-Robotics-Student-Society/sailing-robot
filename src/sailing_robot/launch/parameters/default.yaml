@@ -106,3 +106,22 @@ wind/sensor_average_time: 0.5
 # so a longer average is calculated
 # in [seconds]
 wind/trend_average_time: 40.0
+
+
+
+
+#
+# Camera detection 
+#
+# Threshold at wich the detection will be triggered (=% of the image that contain the colors)
+# (here 4%)
+camera_detection/threshold: 0.04
+
+# Rate at wich picture are taken 
+camera_detection/rate: 2  # [Hz]
+
+# Lower color:
+camera_detection/Lower_color: [2, 11, 100] # /!\ BGR colorspace
+# Upper color:
+camera_detection/Upper_color: [90, 91, 255] # /!\ BGR colorspace
+
