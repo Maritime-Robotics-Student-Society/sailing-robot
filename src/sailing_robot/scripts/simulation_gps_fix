@@ -1,0 +1,59 @@
+#!/usr/bin/python
+# READY FOR MIT
+# Simulator for gps_fix
+
+
+import rospy
+from sensor_msgs.msg import NavSatFix
+from sailing_robot.msg import gpswtime
+import time, math
+from datetime import datetime
+
+
+
+class Gps_fix_simu():
+    def __init__(self):
+        """
+            Publish gps_fix topic for the logger
+        """
+
+        self.gps_fix_pub = rospy.Publisher('gps_fix', gpswtime, queue_size=10)
+
+        rospy.init_node("simulation_gps_fix", anonymous=True)
+
+        self.rate = rospy.Rate(1)
+
+        rospy.Subscriber('position', NavSatFix, self.update_position)
+        self.gps_fix_lock = True
+
+        while self.gps_fix_lock and not rospy.is_shutdown():
+            self.rate.sleep()
+
+        rospy.loginfo("gps fix simulated")
+        self.gps_fix_publisher()
+
+
+    def update_position(self, msg):
+        self.position = msg
+        self.gps_fix_lock = False
+
+    def gps_fix_publisher(self):
+
+        while not rospy.is_shutdown():
+           
+            msg = gpswtime()
+            msg.fix = self.position
+            msg.time_h = datetime.now().hour
+            msg.time_m = datetime.now().minute
+            msg.time_s = datetime.now().second
+
+            self.gps_fix_pub.publish(msg)
+            self.rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        Gps_fix_simu()
+    except rospy.ROSInterruptException:
+        pass
+
