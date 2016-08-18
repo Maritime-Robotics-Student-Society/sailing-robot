@@ -1,11 +1,9 @@
 #!/usr/bin/python
 # READY FOR MIT
 
-from std_msgs.msg import Float64, Float32, String
+from std_msgs.msg import String
 
-from sailing_robot.navigation import Navigation
 import rospy
-import math
 import time
 
 import numpy as np
@@ -42,8 +40,9 @@ class Camera_detection():
             if bool:
                 image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
                 mask = cv2.inRange(image, self.Lower, self.Upper)
-
-                percent_detect = 1.0*cv2.countNonZero(mask)  / image_size # percentage of the image that contains the expected colors
+                
+                # percentage of the image that contains the expected colors
+                percent_detect = 1.0*cv2.countNonZero(mask)  / image_size 
                 
                 if percent_detect >= self.threshold:
                     msg = 'detected'
