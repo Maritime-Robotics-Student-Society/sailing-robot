@@ -19,7 +19,7 @@ echo '----------------------------------------------------------'
 echo 'Calibration of the Compass, be ready to dance!'
 echo '----------------------------------------------------------'
 
-python2 calibration_scripts/compass_experiment
+python2 calibration_scripts/compasscalib_roll
 
 
 echo '----------------------------------------------------------'
