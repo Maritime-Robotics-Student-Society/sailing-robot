@@ -10,6 +10,8 @@
 #4. Connect the I2C device to the SDA and SCL pins of the Raspberry Pi and detect it using the command "i2cdetect -y 1".  It should show up as 1D (typically) or 1E (if the jumper is set).
 from __future__ import print_function
 
+import numpy as np
+from scipy.optimize import leastsq
 import time, math
 import rospy
 
@@ -133,7 +135,9 @@ def pitch_and_roll():
 
 data_X = []
 data_Y = []
-data_Z = []
+
+print('Hold the boat level and gently turn it around several times')
+raw_input('Press enter to start')
 
 for i in range(300):
     try:
@@ -172,27 +176,27 @@ offset_Y = (maxy + miny)/2
 range_X = maxx - minx
 range_Y = maxy - miny
 
-print('Now hold the boat at a stead heading and roll it side to side.')
+print('Now hold the boat at a steady heading and roll it side to side.')
 raw_input('Press enter when ready')
 
 pitches = []
 rolls = []
-readings = []
+mag_x = []
+mag_y = []
+mag_z = []
+
 
 for i in range(300):
     try:
         time.sleep(0.1)
         pitch, roll = pitch_and_roll()
         mag_xyz = read_mag_field()
-
-        readings.append({
-            'pitch': pitch,
-            'roll': roll,
-            'mag_xyz': mag_xyz,
-        })
         
         pitches.append(pitch)
         rolls.append(roll)
+        mag_x.append(mag_xyz[0])
+        mag_y.append(mag_xyz[1])
+        mag_z.append(mag_xyz[2])
         
         print('     / min / current / max')
         print('pitch : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(pitches), pitch, max(pitches)))
@@ -201,15 +205,41 @@ for i in range(300):
         print('Interrupted')
         break
 
-import json
+adjusted_x = (np.array(mag_x) - offset_X) / range_X
+adjusted_y = (np.array(mag_y) - offset_Y) / range_Y
+raw_z = np.array(mag_z)
 
-store = {
-    'offset_X': offset_X,
-    'offset_Y': offset_Y,
-    'range_X':  range_X,
-    'range_Y': range_Y,
-    'roll_readings': readings,
-}
+roll_d = np.array(rolls)
+roll_r = np.radians(roll_d)
+pitch_r = np.radians(pitches)
 
-with open('roll_calibration.json', 'w') as f:
-    json.dump(store, f, indent=2)
+# Take our correct y field as the points where we're within 3 degrees of level.
+y_flat = adjusted_y[(-3 < roll_d) & (roll_d < +3)].mean()
+
+def mag_y_comp_residuals(p):
+    MagY_comp = (adjusted_x * np.sin(roll_r) * np.sin(pitch_r)) +\
+     (adjusted_y * np.cos(roll_r)) - (((raw_z - p[0]) / p[1])* np.sin(roll_r) * np.cos(pitch_r)) 
+    return MagY_comp - y_flat
+
+res, ier = leastsq(mag_y_comp_residuals, (1, 1))
+# According to the docs, an integer code between 1 and 4 (inclusive) indicates
+# success.
+assert 1 <= ier <= 4
+
+offset_Z, range_Z = res
+
+rospy.set_param('/calibration/compass', {'XOFFSET': offset_X,
+                                          'YOFFSET': offset_Y,
+                                          'ZOFFSET': offset_Z,
+                                          'XSCALE': range_X,
+                                          'YSCALE': range_Y,
+                                          'ZSCALE': range_Z,
+                                          })
+
+
+print("XOFFSET = " + str(offset_X))
+print("YOFFSET = " + str(offset_Y))
+print("ZOFFSET = " + str(offset_Z))
+print("XSCALE = " + str(range_X))
+print("YSCALE = " + str(range_Y))
+print("ZSCALE = " + str(range_Z))
