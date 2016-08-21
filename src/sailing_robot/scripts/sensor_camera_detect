@@ -1,0 +1,62 @@
+#!/usr/bin/python
+# READY FOR MIT
+
+from std_msgs.msg import String
+
+import rospy
+import time
+
+import numpy as np
+import cv2
+
+
+class Camera_detection():
+    """
+        Node that publish event when the obstacle is detected
+    """
+    def __init__(self):
+        
+        self.publisher = rospy.Publisher('camera_detection', String, queue_size=10)
+
+        rospy.init_node("sensor_camera_detect", anonymous=True)
+
+        self.rate = rospy.Rate(rospy.get_param("camera_detection/rate"))
+        self.Lower = np.array( rospy.get_param('camera_detection/Lower_color'))
+        self.Upper = np.array( rospy.get_param('camera_detection/Upper_color'))
+        self.threshold = rospy.get_param('camera_detection/threshold')
+
+        self.publish()
+
+    def publish(self):
+
+        camera = cv2.VideoCapture(0) 
+        (bool, image) = camera.read()
+        image_size = image.shape[0]*image.shape[1]
+        self.rate.sleep()
+
+        while not rospy.is_shutdown():
+
+            (bool, image) = camera.read()
+            if bool:
+                image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+                mask = cv2.inRange(image, self.Lower, self.Upper)
+                
+                # percentage of the image that contains the expected colors
+                percent_detect = 1.0*cv2.countNonZero(mask)  / image_size 
+                
+                if percent_detect >= self.threshold:
+                    msg = 'detected'
+                else:
+                    msg = 'nothing'
+                
+                self.publisher.publish(msg)
+
+            self.rate.sleep() 
+
+
+if __name__ == '__main__':
+    try:
+        Camera_detection()
+    except rospy.ROSInterruptException:
+        pass
+

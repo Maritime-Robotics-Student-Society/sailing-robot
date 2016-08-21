@@ -17,12 +17,9 @@ fi
 
 echo '----------------------------------------------------------'
 echo 'Calibration of the Compass, be ready to dance!'
-echo 'hit enter when ready'
 echo '----------------------------------------------------------'
 
-read
-
-python2 calibration_scripts/compasscalib
+python2 calibration_scripts/compasscalib_roll
 
 
 echo '----------------------------------------------------------'

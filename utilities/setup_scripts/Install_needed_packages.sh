@@ -1,8 +1,8 @@
 #!/bin/sh 
 cd ~
 
-# Install Geos headers (for shapely)
-sudo apt-get --assume-yes install libgeos-dev
+# Install Geos headers (for shapely), and scipy (for compass calibration)
+sudo apt-get --assume-yes install libgeos-dev python-scipy
 
 # Install Latlon, shapely (navigation) and pynmea2 (reading GPS)
 yes | sudo pip install Latlon shapely pynmea2

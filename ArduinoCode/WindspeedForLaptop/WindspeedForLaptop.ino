@@ -25,7 +25,7 @@ void arduino_anemometer()
 {
  // measure wind speed
  int deltat = millis() - prevtime;
- if (deltat > 0){
+ if (deltat > 2){
    wind_speed = 666.66/deltat;
  }
  prevtime = millis();
@@ -45,8 +45,11 @@ void setup()
 void loop()
 {
   // Publish previously measured wind speed
-  Serial.println(wind_speed);
-  Serial.println("in m/s");
+  Serial.print("Wind speed: ")
+  Serial.print(wind_speed);
+  Serial.print("m/s  --- ");
+  Serial.print(wind_speed*2);
+  Serial.println(" kts");
 
   thread=100;
   

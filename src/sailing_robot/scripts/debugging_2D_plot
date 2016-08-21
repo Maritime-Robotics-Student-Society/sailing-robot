@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# READY FOR MIT
 
 from visualization_msgs.msg import Marker
 from visualization_msgs.msg import MarkerArray
