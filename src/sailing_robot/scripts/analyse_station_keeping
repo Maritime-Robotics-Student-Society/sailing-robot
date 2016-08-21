@@ -1,0 +1,102 @@
+#!/usr/bin/python
+
+"""
+Analyse the result of a station keeping attempt
+This script is for use independent of ROS!
+
+READY FOR MIT LICENCE
+"""
+
+import csv
+from sailing_robot.navigation import Navigation
+from LatLon import LatLon
+from shapely.geometry import Point
+import bisect
+
+# CSV values
+# hhmmssdd
+# Lat *10^^7
+# Lon *10^^7
+
+def convertToSec(timeString):
+    # hh mm ss dd
+    hours = int(timeString[0:2])
+    minutes = int(timeString[2:4])
+    seconds = int(timeString[4:6])
+    time = hours * 60 * 60 + minutes * 60 + seconds
+    return time
+
+# Constants that need adapting
+CENTER = LatLon(50.8897983, -1.3840460)
+FILE = "../../../logs/gps-trace-2016-08-06T15.06.03.csv"
+
+# Competition rules
+RADIUS = 20 # 20 m
+TIMESPAN = 5 * 60   # 5 minutes
+
+time = []
+position = []
+####### ONGOING WORK
+
+# Read file
+with open(FILE) as logfile:
+    data = csv.reader(logfile, delimiter=',')
+    for row in data:
+        time.append(convertToSec(row[0]))
+        latitude = float(row[1])/10**7
+        longitude = float(row[2])/10**7
+        nav = Navigation()
+        nav.position_ll = LatLon(latitude, longitude)
+        nav.position_xy = nav.latlon_to_utm(latitude, longitude)
+        position.append(nav)
+
+# iterate through points:
+# Find first point in 20 m radius
+idx = 0
+distance = 23
+while distance > RADIUS:
+    idx +=1
+    distance = position[idx].position_ll.distance(CENTER) * 1000 # LatLon uses [km], we use [m]
+
+## get time of that point
+startTime = time[idx]
+
+# get all points from the next 5 minutes
+endTime = startTime + TIMESPAN
+endIdx = bisect.bisect(time, endTime)
+try:
+    positionsOfInterest = position[idx:endIdx]
+except:
+    print("end of 5 minute position keeping not in dataset!")
+    positionsOfInterest = position[idx:]
+
+# get Pc
+# sum up x and y positions to get Pc
+averageX = 0.
+averageY = 0.
+for point in positionsOfInterest:
+    averageX += point.position_xy[0]
+    averageY += point.position_xy[1]
+
+Pc = Navigation()
+Pc.position_xy = Point(averageX / len(positionsOfInterest), averageY / len(positionsOfInterest))
+Pc.position_ll = Pc.utm_to_latlon(Pc.position_xy.x, Pc.position_xy.y)
+
+if Pc.position_ll.distance(CENTER) * 1000 > RADIUS:
+    print("Pc is outside the 20 m circle!")
+
+# calculate distance to Pc for all points
+Pc_distances = []
+for point in positionsOfInterest:
+    distance = Pc.position_ll.distance(point.position_ll) * 1000
+    Pc_distances.append(distance)
+
+# remove 5% of points with largest distance to Pc
+# find next largest distance, this is the radius
+Pc_distances.sort()
+idx_95 = int(round(len(Pc_distances) * 0.95))
+considered_95 = Pc_distances[0:idx_95]
+finalRadius = considered_95[-1]
+print("The position keeping radius is " + str(finalRadius))
+
+
