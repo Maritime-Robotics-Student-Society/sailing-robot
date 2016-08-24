@@ -70,11 +70,10 @@ class Debugging_2D_plot():
         self.wp_Array = MarkerArray()
 
         count = 0
-        for wp in wp_list:
-            wp_coord = wp_table[wp]
+        for key in wp_table:
+            wp_coord = wp_table[key]
 
             current_wp_position = self.nav.latlon_to_utm( wp_coord[0], wp_coord[1])
-            #current_wp_position = self.nav.latlon_to_utm( msg.latitude, msg.longitude)
             current_wp = Marker()
 
             current_wp.header.frame_id = "map"
@@ -85,9 +84,14 @@ class Debugging_2D_plot():
             current_wp.scale.z = 1.5
 
             current_wp.color.a = 1.0
-            current_wp.color.r = 200.0/255.0
-            current_wp.color.g = 162.0/255.0
-            current_wp.color.b = 200.0/255.0
+            if key in wp_list:
+                current_wp.color.r = 200.0/255.0
+                current_wp.color.g = 162.0/255.0
+                current_wp.color.b = 200.0/255.0
+            else:
+                current_wp.color.r = 1.0
+                current_wp.color.g = 1.0 
+                current_wp.color.b = 1.0
             current_wp.pose.orientation.w = 1.0
             current_wp.pose.position.x = current_wp_position[0] - self.init_position[0]
             current_wp.pose.position.y = current_wp_position[1] - self.init_position[1]
