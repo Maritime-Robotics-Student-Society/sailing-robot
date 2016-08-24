@@ -81,7 +81,7 @@ for i in range(sub):
     row = ''
     for j in range(sub):
         if output_array[i][j] == 1:
-            if i<=3 or j>3:
+            if i<=(sub/2 -1) or j>(sub/2 -1):
                 score += 1
                 row = row + u"│X"
             else:
@@ -93,5 +93,5 @@ for i in range(sub):
         print u'├─' + u'┼─'*(sub-1) + u'┤'
 print u'└─' + u'┴─'*(sub-1) + u'┘'
 
-print 'Score: ' +  str(score)
+print 'Score: ' +  str(score) + '/' + str(sub*sub*3/4)
 
