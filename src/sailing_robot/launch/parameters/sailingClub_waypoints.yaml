@@ -11,8 +11,8 @@ wp/list: ["4", "5", "6"]
 
 
 # distance within waypoint is accepted, in [m]
-wp/acceptRadius: 0.5
-wp/tackVotingRadius: 0.1
+wp/acceptRadius: 1.5
+wp/tackVotingRadius: 20
 
 
 # Dictionary for looking up waypoints, using [lat, lon] format of NavSatFix
