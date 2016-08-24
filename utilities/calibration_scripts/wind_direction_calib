@@ -163,6 +163,7 @@ time.sleep(1)
 print "1"
 time.sleep(1)
 print "go!"
+raw_input()
 
 magy = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Y_MSB), b.read_byte_data(LSM, LSM_MAG_Y_LSB))
 magz = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_Z_MSB), b.read_byte_data(LSM, LSM_MAG_Z_LSB))
