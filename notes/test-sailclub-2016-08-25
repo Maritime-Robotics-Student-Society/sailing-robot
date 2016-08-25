@@ -1,0 +1,19 @@
+bag 1: remote controlled
+bag 2: mostly autonomous; when trying to rech second waypoint, boat increases distance to wp until it drifts ashore
+bag 3: position keeping one wp
+
+
+19:45: position keeping
+manually add wind sensor offset -10 degrees
+
+tacking works for a bit, then it fails on the other tack
+-> We need to catch this! try to tack for 10 sec (or a wind speed dependant time!), then jibe!
+
+19:59 pier takes control over boat again
+wind almost died off
+tide start going out quickly
+
+20:05 start area scanning
+jib is stuck, nana goes in to make it move
+
+20:11 abort: rain, no more wind, no more light
