@@ -1,5 +1,24 @@
+# Setup list for water tests
+# if one person is absent, their responsibility is shared amongst the rest, but it is clear what tasks have to be done by someone else now
 
-======= setup
+
+PIER + TONY
+- assemble boat
+- attach sails
+- check remote control works
+- check with Nana or Sophia if RPi is online
+- waterproof
+- get ready for calibration
+- set up gopro if we use it
+
+NANA
+- set up wifi
+- check wifi laptop can ssh onto boat
+- set up wind sensor
+
+SOPHIA + THOMAS
+
+======= Software setup
 - git pull
 - check if there is a more recent launch file
 - git push if needed
