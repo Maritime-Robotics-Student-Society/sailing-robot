@@ -1,0 +1,20 @@
+
+======= setup
+- git pull
+- check if there is a more recent launch file
+- git push if needed
+- set time
+- run roscore
+- run calibration script (compass + wind direction)
+- run launch file
+    check if data from wind direction and compass make sens
+        - apply a heeling angle to the boat and see if the heading changes (topic 'heading_comp')
+        - rotate the wind vane in various direction and check the topic 'wind_direction_apparent'
+        - rotate the boat and keep the wind vane in a fixed position and check if the topic 'wind_direction_apparent' fluctuates (it shouldn't)
+- check if sail servo is moving in relation to the wind direction
+- monitor boat position with rviz
+- put the boat in water and check if it actually floats, if not use a buoyancy aid or use autosub code instead of sailing boat one
+
+
+
+
