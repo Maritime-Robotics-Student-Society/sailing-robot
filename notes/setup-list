@@ -6,7 +6,7 @@ PIER + TONY
 - assemble boat
 - attach sails
 - check remote control works
-- check with Nana or Sophia if RPi is online
+- tell Nana and Sophia/Thomas when RPi is online; 
 - waterproof
 - get ready for calibration
 - set up gopro if we use it
@@ -22,7 +22,7 @@ SOPHIA + THOMAS
 - git pull
 - check if there is a more recent launch file
 - git push if needed
-- set time
+- set time   (if script doesnt work: sudo date -s 2016-08-25T17:30:45 )
 - run roscore
 - run calibration script (compass + wind direction)
 - run launch file
