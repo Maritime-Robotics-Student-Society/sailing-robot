@@ -1,6 +1,6 @@
 <launch>
     <!--
-    Water test 23.8.2016
+    Water test 25.8.2016
     -->
 
     <!--
@@ -31,7 +31,7 @@
 
     <node name="debugging_dump_params" pkg='sailing_robot' type="debugging_dump_params"/>
     <!-- Rosbag records messages for later investigation -->
-    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailingclub-08-23-"/>
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailingclub-08-25-"/>
     <!-- Also record GPS data as required by the competition -->
     <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log" respawn="true"/>
 
