@@ -45,7 +45,7 @@ void setup()
 void loop()
 {
   // Publish previously measured wind speed
-  Serial.print("Wind speed: ")
+  Serial.print("Wind speed: ");
   Serial.print(wind_speed);
   Serial.print("m/s  --- ");
   Serial.print(wind_speed*2);
