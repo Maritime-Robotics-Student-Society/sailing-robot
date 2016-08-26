@@ -6,7 +6,6 @@ from shapely.geometry import Point, Polygon
 from .navigation import angleSum
 from .taskbase import TaskBase
 from .heading_planning import TackVoting
-import rospy
 
 # For calculations, lay lines don't extend to infinity.
 # This is in m; 10km should be plenty for our purposes.
