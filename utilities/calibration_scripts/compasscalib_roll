@@ -227,6 +227,8 @@ res, ier = leastsq(mag_y_comp_residuals, (1, 1))
 assert 1 <= ier <= 4
 
 offset_Z, range_Z = res
+offset_Z = offset_Z.item()
+range_Z = range_Z.item()
 
 rospy.set_param('/calibration/compass', {'XOFFSET': offset_X,
                                           'YOFFSET': offset_Y,
