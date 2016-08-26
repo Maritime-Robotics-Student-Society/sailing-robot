@@ -6,6 +6,7 @@ from shapely.geometry import Point, Polygon
 from .navigation import angleSum
 from .taskbase import TaskBase
 from .heading_planning import TackVoting
+import rospy
 
 # For calculations, lay lines don't extend to infinity.
 # This is in m; 10km should be plenty for our purposes.
@@ -87,6 +88,13 @@ class HeadingPlan(TaskBase):
 
         wp_wind_angle = self.nav.heading_to_wind_angle(hwp)
         
+        # Detect if the waypoint is downwind, if so head directly to it
+        if (wp_wind_angle % 360) > 90 and (wp_wind_angle % 360) < 270:
+            goal_wind_angle = wp_wind_angle
+            state = 'normal'
+            return state, self.nav.wind_angle_to_heading(goal_wind_angle)
+
+
         tack_now = False
         if wp_wind_angle * boat_wind_angle > 0:
             # These two have the same sign, so we're on the better tack already
