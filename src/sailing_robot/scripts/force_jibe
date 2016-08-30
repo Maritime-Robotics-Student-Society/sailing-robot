@@ -1,0 +1,99 @@
+#!/usr/bin/python
+# READY FOR MIT
+# STILL A WORK IN PROGRESS, DO NOT USE
+
+import rospy
+from std_msgs.msg import Float32, Int16, String
+from sensor_msgs.msg import NavSatFix
+
+import time, math
+from sailing_robot.navigation import Navigation
+from sailing_robot.tasks import TasksRunner
+
+
+class Force_jibe():
+    def __init__(self):
+        """
+        """
+
+        rospy.init_node("Force_jibe", anonymous=True)
+
+        rospy.Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
+        self.wind_direction = 0
+
+        rospy.Subscriber('heading', Float32, self.update_heading)
+        self.heading = 0
+
+        self.nav = Navigation()
+        rospy.Subscriber('position', NavSatFix, self.update_position)
+
+        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
+        self.sailing_state = 'normal'
+        self.timer = 0
+
+
+        self.rate = rospy.Rate(rospy.get_param("config/rate"))
+        
+        self.time_tack = rospy.get_param("config/stupid/time_tack")
+        self.distance_new_wp = rospy.get_param("config/stupid/distance_new_wp")
+
+        self.looper()
+
+    def update_position(self, msg):
+        self.position = self.nav.latlon_to_utm( msg.latitude, msg.longitude)
+
+    def update_wind_direction(self, msg):
+        self.wind_direction = msg.data
+
+    def update_heading(self, msg):
+        self.heading = msg.data
+
+    def update_sailing_state(self, msg):
+        self.sailing_state = msg.data
+        if msg.data == 'normal':
+            self.timer = 0
+        elif timer == 0:
+            self.timer = int(time.clock())
+
+
+    def force_jibe(self):
+
+        wind_angle = math.radians(self.heading + self.wind_direction)
+
+        new_wp_utm = (self.position[0] - self.distance_new_wp * math.sin(wind_angle),
+                      self.position[1] - self.distance_new_wp * math.cos(wind_angle) )
+
+        new_wp = self.nav.utm_to_latlon(new_wp_utm[0], new_wp_utm[1])
+
+        task = {}
+        task['kind'] = 'to_waypoint'
+        task['lat'] = new_wp.lat.decimal_degree 
+        task['lon'] = new_wp.lon.decimal_degree 
+        task['target_radius'] = 1
+        task['tack_voting_radius'] = 0.01
+
+        ################################
+        #  Publish the new waypoint    #
+        #           here               #
+        ################################
+        
+
+    def looper(self):
+
+        while not rospy.is_shutdown():
+           
+            # check tacking issue
+            if (int(time.clock()) - self.timer) > self.time_tack:
+                rospy.logerr("Issue with tacking")
+                self.force_jibe()
+
+
+            self.rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        Force_jibe()
+    except rospy.ROSInterruptException:
+        pass
+
