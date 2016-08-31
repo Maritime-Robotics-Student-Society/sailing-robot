@@ -33,7 +33,9 @@ def insert_waypoint(msg):
     tasks_runner.insert_task({
         'kind': 'to_waypoint',
         'lat': msg.latitude,
-        'lon': msg.longitude
+        'lon': msg.longitude,
+        'target_radius': 1,     # set default value, hot fix for the force jibing node
+        'tack_voting_radius': 1 # set default value, hot fix for the force jibing node
     })
 
 if __name__ == '__main__':

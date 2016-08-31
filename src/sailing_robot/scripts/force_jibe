@@ -3,7 +3,7 @@
 # STILL A WORK IN PROGRESS, DO NOT USE
 
 import rospy
-from std_msgs.msg import Float32, Int16, String
+from std_msgs.msg import Float32, Float64, String
 from sensor_msgs.msg import NavSatFix
 
 import time, math
@@ -15,6 +15,7 @@ class Force_jibe():
     def __init__(self):
         """
         """
+        self.insert_wp_pub = rospy.Publisher('temporary_wp', NavSatFix, queue_size=10)
 
         rospy.init_node("Force_jibe", anonymous=True)
 
@@ -29,13 +30,13 @@ class Force_jibe():
 
         rospy.Subscriber('sailing_state', String, self.update_sailing_state)
         self.sailing_state = 'normal'
-        self.timer = 0
+        self.timer = time.time()
 
 
         self.rate = rospy.Rate(rospy.get_param("config/rate"))
         
-        self.time_tack = rospy.get_param("config/stupid/time_tack")
-        self.distance_new_wp = rospy.get_param("config/stupid/distance_new_wp")
+        self.time_tack = rospy.get_param("force_jibe/time_tack")
+        self.distance_new_wp = rospy.get_param("force_jibe/distance_new_wp")
 
         self.looper()
 
@@ -51,43 +52,39 @@ class Force_jibe():
     def update_sailing_state(self, msg):
         self.sailing_state = msg.data
         if msg.data == 'normal':
-            self.timer = 0
-        elif timer == 0:
-            self.timer = int(time.clock())
+            self.timer = time.time()
 
 
-    def force_jibe(self):
+    def generate_wp_downwind(self):
+        '''
+            Generate a new waypoint downwind from the boat
+        '''
 
         wind_angle = math.radians(self.heading + self.wind_direction)
 
         new_wp_utm = (self.position[0] - self.distance_new_wp * math.sin(wind_angle),
                       self.position[1] - self.distance_new_wp * math.cos(wind_angle) )
 
-        new_wp = self.nav.utm_to_latlon(new_wp_utm[0], new_wp_utm[1])
+        new_wp_latlon = self.nav.utm_to_latlon(new_wp_utm[0], new_wp_utm[1])
 
-        task = {}
-        task['kind'] = 'to_waypoint'
-        task['lat'] = new_wp.lat.decimal_degree 
-        task['lon'] = new_wp.lon.decimal_degree 
-        task['target_radius'] = 1
-        task['tack_voting_radius'] = 0.01
+        new_wp = NavSatFix()
 
-        ################################
-        #  Publish the new waypoint    #
-        #           here               #
-        ################################
-        
+        new_wp.latitude =  new_wp_latlon.lat.decimal_degree 
+        new_wp.longitude =  new_wp_latlon.lon.decimal_degree 
+
+        return new_wp   
 
     def looper(self):
 
         while not rospy.is_shutdown():
            
             # check tacking issue
-            if (int(time.clock()) - self.timer) > self.time_tack:
+            if self.sailing_state != 'normal' and (time.time() - self.timer) > self.time_tack:
                 rospy.logerr("Issue with tacking")
-                self.force_jibe()
+                new_wp = self.generate_wp_downwind()
 
 
+            self.insert_wp_pub(new_wp)
             self.rate.sleep()
 
 
