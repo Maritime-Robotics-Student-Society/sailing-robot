@@ -46,6 +46,12 @@ navigation/tackline_distance: 5
 # zone you are.
 navigation/utm_zone: 30
 
+# Heading
+# Define which heading the boat uses (compensate for the z axis or not
+heading/compensation: true
+
+heading/offset_true_north: 1,017 # in degree, for SOUTHAMPTON
+heading/offset_true_north: 2,6   # in degree, for PORTUGAL
 
 #
 # Rudder Parameters
