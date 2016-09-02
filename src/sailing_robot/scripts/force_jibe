@@ -82,9 +82,9 @@ class Force_jibe():
             if self.sailing_state != 'normal' and (time.time() - self.timer) > self.time_tack:
                 rospy.logerr("Issue with tacking")
                 new_wp = self.generate_wp_downwind()
+                self.insert_wp_pub.publish(new_wp)
 
 
-            self.insert_wp_pub(new_wp)
             self.rate.sleep()
 
 
