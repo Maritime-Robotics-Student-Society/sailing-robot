@@ -34,7 +34,7 @@ def insert_waypoint(msg):
         'kind': 'to_waypoint',
         'lat': msg.latitude,
         'lon': msg.longitude,
-        'target_radius': 1,     # set default value, hot fix for the force jibing node
+        'target_radius': 2.5,     # set default value, hot fix for the force jibing node
         'tack_voting_radius': 1 # set default value, hot fix for the force jibing node
     })
 
