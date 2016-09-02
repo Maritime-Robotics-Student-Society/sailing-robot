@@ -42,7 +42,7 @@ navigation/beating_angle: 45
 # Portugal in zone 29. http://www.dmap.co.uk/utmworld.htm
 # Distance calculations will be less accurate the further from the specified
 # zone you are.
-navigation/utm_zone: 30
+navigation/utm_zone: 29
 # True to turn by jibing instead of tacking:
 navigation/jibe_to_turn: false
 
@@ -50,8 +50,8 @@ navigation/jibe_to_turn: false
 # Define which heading the boat uses (compensate for the z axis or not
 heading/compensation: true
 
-heading/offset_true_north: -1.017 # in degree, for SOUTHAMPTON
-#heading/offset_true_north: -2.6   # in degree, for PORTUGAL
+#heading/offset_true_north: -1.017 # in degree, for SOUTHAMPTON
+heading/offset_true_north: -2.6   # in degree, for PORTUGAL
 
 #
 # Rudder Parameters
