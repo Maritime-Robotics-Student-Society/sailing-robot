@@ -16,7 +16,7 @@ def test_angle_subtract():
     assert_equal(angle_subtract(340, 10), -30)
 
 def test_utm_latlon_conversion():
-    n = Navigation(utm_zone=29)
+    n = Navigation(utm_zone=30)
     lat = 50.927482
     lon = -1.408787
     x, y = n.latlon_to_utm(lat, lon)
