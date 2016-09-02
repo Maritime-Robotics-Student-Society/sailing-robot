@@ -34,17 +34,17 @@ config/rate: 10
 #
 # Values relevant for higherlevel waypoint navigation
 
-# Angle area from going directly uptwind to the end of the deadzone (the total angular area of the deadzone is therefore 2*navigation/deadzone
+# Angle area from going directly upwind to the end of the deadzone (the total
+# angular area of the dead zone is therefore 2*beating_angle).
 # in [degrees]
-navigation/deadzone: 45
-# The definition where we change tack when going upwind is based on crossing a line parallel to the wind direction, going through a point at a given distance to the waypoint.
-# See https://github.com/Maritime-Robotics-Student-Society/sailing-robot/blob/master/notes/upwind-tactics.svg# in [m]
-navigation/tackline_distance: 5
+navigation/beating_angle: 45
 # Zone number of the UTM system to use. Southampton is in zone 30,
 # Portugal in zone 29. http://www.dmap.co.uk/utmworld.htm
 # Distance calculations will be less accurate the further from the specified
 # zone you are.
 navigation/utm_zone: 30
+# True to turn by jibing instead of tacking:
+navigation/jibe_to_turn: false
 
 # Heading
 # Define which heading the boat uses (compensate for the z axis or not
@@ -137,4 +137,3 @@ camera_detection/rate: 2  # [Hz]
 camera_detection/Lower_color: [2, 11, 100] # /!\ BGR colorspace
 # Upper color:
 camera_detection/Upper_color: [90, 91, 255] # /!\ BGR colorspace
-

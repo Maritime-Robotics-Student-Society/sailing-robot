@@ -12,7 +12,7 @@ class Navigation(object):
     heading, along with apparent wind angle.
     """
     def __init__(self, 
-                beating_angle=45, utm_zone=30):
+                beating_angle=45, utm_zone=30, jibe_to_turn=False):
         """
         beating_angle : Closest absolute angle relative to the wind that we can
             sail
@@ -28,6 +28,7 @@ class Navigation(object):
         self.heading = 0.
         self.wind_direction = 0.
         self.beating_angle = beating_angle
+        self.jibe_to_turn = jibe_to_turn
     
     def update_position(self, msg):
         self.position_ll = LatLon(msg.latitude, msg.longitude)
