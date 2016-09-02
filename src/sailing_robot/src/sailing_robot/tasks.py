@@ -101,7 +101,7 @@ class TasksRunner(object):
         self.on_temporary_task = True
         self.active_task = self._make_task(taskdict)
         self.active_task.start()
-        self.log('info', "Running intermediate task: {}".format(task.task_kind))
+        self.log('info', "Running intermediate task: {}".format(taskdict['kind']))
 
     def calculate_state_and_goal(self):
         """Use the active task to calculate what to do now.
