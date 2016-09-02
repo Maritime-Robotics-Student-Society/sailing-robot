@@ -68,10 +68,10 @@ class HeadingPlan(TaskBase):
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':
             # A tack/jibe is in progress
-            if sailing_state == 'jibe_to_port_tack':
+            if self.sailing_state == 'jibe_to_port_tack':
                 goal_angle = -180
                 continue_tack = boat_wind_angle < 0
-            elif sailing_state == 'jibe_to_stbd_tack':
+            elif self.sailing_state == 'jibe_to_stbd_tack':
                 goal_angle = 180
                 continue_tack = boat_wind_angle > 0
             if self.sailing_state == 'tack_to_port_tack':
