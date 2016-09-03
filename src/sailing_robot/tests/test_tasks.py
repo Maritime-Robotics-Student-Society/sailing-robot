@@ -7,8 +7,7 @@ from sailing_robot.station_keeping2 import StationKeeping
 
 tasks_def_1 = [
     {'kind': 'to_waypoint',
-     'lat': 50.936981,
-     'lon': -1.405315,
+     'waypoint_ll': [50.936981, -1.405315]
     },
     {'kind': 'keep_station',
      'marker_ll': [50.8, 1.01],

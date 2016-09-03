@@ -14,11 +14,20 @@ from .navigation import Navigation
 from .heading_planning_laylines import HeadingPlan
 from .station_keeping2 import StationKeeping
 from .return_to_safety import ReturnToSafetyZone
+from .obstacle_waypoints import ObstacleWaypoints
 
 def tasks_from_wps(wp_params):
     target_radius = wp_params['acceptRadius']
     tack_voting_radius = wp_params['tackVotingRadius']
     coordinates = wp_params['table']
+    
+    def expand_to_waypoint(wpid):
+        return {
+            'kind': 'to_waypoint',
+            'waypoint_ll': coordinates[wpid],
+            'target_radius': target_radius,
+            'tack_voting_radius': tack_voting_radius
+        }
 
     res = []
     if 'tasks' in wp_params:
@@ -27,13 +36,7 @@ def tasks_from_wps(wp_params):
             kind = wp_task['kind']
             if kind == 'to_waypoint':
                 lat, lon = coordinates[wp_task['waypoint']]
-                res.append({
-                    'kind': 'to_waypoint',
-                    'lat': lat,
-                    'lon': lon,
-                    'target_radius': target_radius,
-                    'tack_voting_radius': tack_voting_radius
-                })
+                res.append(expand_to_waypoint(wp_task['waypoint']))
             elif kind == 'keep_station':
                 lat, lon = coordinates[wp_task['waypoint']]
                 res.append({
@@ -43,18 +46,17 @@ def tasks_from_wps(wp_params):
                     'radius': wp_task.get('radius', 5),
                     'wind_angle': wp_task.get('wind_angle', 75),
                 })
+            elif kind == 'obstacle_waypoints':
+                res.append({
+                    'kind': 'obstacle_waypoints',
+                    'normal_wp': expand_to_waypoint(wp_task['normal']),
+                    'obstacle_wp': expand_to_waypoint(wp_task['obstacle']),
+                })
 
     else:
         # Short specification: just a series of waypoints to go around
         for wpid in wp_params['list']:
-            lat, lon = coordinates[wpid]
-            res.append({
-                'kind': 'to_waypoint',
-                'lat': lat,
-                'lon': lon,
-                'target_radius': target_radius,
-                'tack_voting_radius': tack_voting_radius
-            })
+            res.append(expand_to_waypoint(wpid))
 
     return res
 
@@ -86,13 +88,17 @@ class TasksRunner(object):
         taskdict = taskdict.copy()
         kind = taskdict.pop('kind')
         if kind == 'to_waypoint':
-            wp = LatLon(taskdict['lat'], taskdict['lon'])
+            wp = LatLon(*taskdict['waypoint_ll'])
             kw = {'target_radius': taskdict.get('target_radius', 2.0), 'tack_voting_radius': taskdict.get('tack_voting_radius', 15.)}
             task = HeadingPlan(waypoint=wp, nav=self.nav, **kw)
         elif kind == 'keep_station':
             task = StationKeeping(self.nav, **taskdict)
         elif kind == 'return_to_safety_zone':
             task = ReturnToSafetyZone(self.nav)
+        elif kind == 'obstacle_waypoints':
+            normal_wp_plan = self._make_task(taskdict['normal_wp'])
+            obstacle_wp_plan = self._make_task(taskdict['obstacle_wp'])
+            task = ObstacleWaypoints(self.nav, normal_wp_plan, obstacle_wp_plan)
         else:
             raise ValueError("Unknown task type: {}".format(kind))
         

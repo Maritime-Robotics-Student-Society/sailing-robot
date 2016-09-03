@@ -70,4 +70,5 @@ class RosTasksRunner(TasksRunner):
         self.register_debug_topics(task.debug_topics)
         task.log = self.log
         task.debug_pub = self.debug_pub
+        task.init_ros()
         return task
