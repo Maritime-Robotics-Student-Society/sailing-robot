@@ -13,6 +13,7 @@ import types
 from .navigation import Navigation
 from .heading_planning_laylines import HeadingPlan
 from .station_keeping import StationKeeping
+from .return_to_safety import ReturnToSafetyZone
 
 def tasks_from_wps(wp_params):
     target_radius = wp_params['acceptRadius']
@@ -65,6 +66,8 @@ class TasksRunner(object):
             markers = [tuple(p) for p in taskdict['markers']]
             task = StationKeeping(self.nav, markers,
                             buffer_width=taskdict.get('buffer_width', 10))
+        elif kind == 'return_to_safety_zone':
+            task = ReturnToSafetyZone(self.nav)
         else:
             raise ValueError("Unknown task type: {}".format(kind))
         
@@ -107,7 +110,14 @@ class TasksRunner(object):
         """Use the active task to calculate what to do now.
         
         Before using the active task, checks if it should go to the next task.
+
+        If a safety zone is specified, also checks if we're (nearly) out of it.
         """
         if self.active_task.check_end_condition():
             self.start_next_task()
+
+        if self.nav.check_safety_zone() and self.active_task.task_kind != 'return_to_safety_zone':
+            # We're about to wander out of the safety zone!
+            self.insert_task({'kind': 'return_to_safety_zone'})
+
         return self.active_task.calculate_state_and_goal()

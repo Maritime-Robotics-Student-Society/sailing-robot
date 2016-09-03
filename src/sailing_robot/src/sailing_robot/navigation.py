@@ -12,7 +12,8 @@ class Navigation(object):
     heading, along with apparent wind angle.
     """
     def __init__(self, 
-                beating_angle=45, utm_zone=30, jibe_to_turn=False):
+                beating_angle=45, utm_zone=30, jibe_to_turn=False,
+                safety_zone_ll=None, safety_zone_margin=5):
         """
         beating_angle : Closest absolute angle relative to the wind that we can
             sail
@@ -20,6 +21,10 @@ class Navigation(object):
             zone 30, Portugal in zone 29. http://www.dmap.co.uk/utmworld.htm
             Distance calculations will be less accurate the further from the
             specified zone you are.
+        jibe_to_turn : True to turn by jibing instead of tacking.
+        safety_zone_ll : A series of lat/lon points we should stay within.
+        safety_zone_margin : The safety buffer (in metres) to stay inside
+            the bounding box.
         """
         self.projection = Proj(proj='utm', zone=utm_zone, ellps='WGS84')
         self.position_ll = ll = LatLon(50.8, 1.02)
@@ -29,6 +34,15 @@ class Navigation(object):
         self.wind_direction = 0.
         self.beating_angle = beating_angle
         self.jibe_to_turn = jibe_to_turn
+        self.safety_zone_ll = safety_zone_ll
+        self.safety_zone_margin = safety_zone_margin
+        if safety_zone_ll:
+            self.safety_zone = Polygon([
+                self.latlon_to_utm(*p) for p in safety_zone_ll
+            ])
+            self.safety_zone_inner = self.safety_zone.buffer(-safety_zone_margin)
+        else:
+            self.safety_zone = self.safety_zone_inner = None
     
     def update_position(self, msg):
         self.position_ll = LatLon(msg.latitude, msg.longitude)
@@ -75,7 +89,23 @@ class Navigation(object):
         """Convert angle relative to the wind (+-180) to a compass heading (0-360).
         """
         return angleSum(self.absolute_wind_direction(), wind_angle)
-   
+
+    def check_safety_zone(self):
+        """Check if the boat is within the safety zone.
+
+        0 : Comfortably inside the safety zone (or no safety zone specified)
+        1 : Inside the safety zone, but in the margin
+        2 : Outside the safety zone
+        """
+        if self.safety_zone is None:
+            return 0
+
+        if self.position_xy.within(self.safety_zone_inner):
+            return 0
+        if self.position_xy.within(self.safety_zone):
+            return 1
+        return 2
+
     def subscribe_topics(self):
         """Subscribe to ROS topics to keep this nav object up to date.
         
