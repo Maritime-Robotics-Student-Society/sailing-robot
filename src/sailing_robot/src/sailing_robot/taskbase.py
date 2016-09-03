@@ -12,3 +12,6 @@ class TaskBase(object):
 
     def log(self, level, msg, *values):
         print(msg % values)
+
+    def init_ros(self):
+        pass

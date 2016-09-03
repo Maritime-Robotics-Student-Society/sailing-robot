@@ -31,7 +31,6 @@ class StationKeeping(TaskBase):
         self.start_time = 0
         self.head_to_waypoint = HeadingPlan(nav, LatLon(*marker_ll),
                             target_radius=radius, tack_voting_radius=radius)
-        self.head_to_waypoint.debug_pub = self._indirect_debug_pub
 
     debug_topics = [
         ('heading_to_waypoint', 'Float32'),
@@ -39,9 +38,10 @@ class StationKeeping(TaskBase):
         ('goal_wind_angle', 'Float32'),
     ]
 
-    def _indirect_debug_pub(self, topic, value):
-        '''Republish debugging stuff from our sub-task'''
-        self.debug_pub(topic, value)
+    def init_ros(self):
+        # Allow our sub-task to publish debugging stuff
+        self.head_to_waypoint.debug_pub = self.debug_pub
+        self.head_to_waypoint.log = self.log
 
     def start(self):
         self.start_time = time.time()
