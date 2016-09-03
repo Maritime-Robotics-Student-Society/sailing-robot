@@ -12,7 +12,7 @@ import types
 
 from .navigation import Navigation
 from .heading_planning_laylines import HeadingPlan
-from .station_keeping import StationKeeping
+from .station_keeping2 import StationKeeping
 from .return_to_safety import ReturnToSafetyZone
 
 def tasks_from_wps(wp_params):

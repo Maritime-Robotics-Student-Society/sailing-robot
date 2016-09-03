@@ -49,19 +49,10 @@ class HeadingPlan(TaskBase):
         ('goal_wind_angle', 'Float32'),
     ]
 
-    def distance_heading_to_waypoint(self):
-        """Calculate where we are relative to the waypoint, for debugging.
-        """
-        dx = self.waypoint_xy.x - self.nav.position_xy.x
-        dy = self.waypoint_xy.y - self.nav.position_xy.y
-        d = (dx**2 + dy**2) ** 0.5
-        h = math.degrees(math.atan2(dx, dy)) % 360
-        return d, h
-
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
         """
-        dwp, hwp = self.distance_heading_to_waypoint()
+        dwp, hwp = self.nav.distance_and_heading(self.waypoint_xy)
         self.debug_pub('distance_to_waypoint', dwp)
         self.debug_pub('heading_to_waypoint', hwp)
 

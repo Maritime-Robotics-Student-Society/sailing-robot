@@ -106,6 +106,17 @@ class Navigation(object):
             return 1
         return 2
 
+    def distance_and_heading(self, wp):
+        """Calculate the distance and heading from current position to wp.
+
+        wp should both be a shapely.geometry.Point object
+        """
+        dx = wp.x - self.position_xy.x
+        dy = wp.y - self.position_xy.y
+        d = (dx**2 + dy**2) ** 0.5
+        h = math.degrees(math.atan2(dx, dy)) % 360
+        return d, h
+
     def subscribe_topics(self):
         """Subscribe to ROS topics to keep this nav object up to date.
         
