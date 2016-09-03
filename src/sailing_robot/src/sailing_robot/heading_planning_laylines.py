@@ -74,7 +74,7 @@ class HeadingPlan(TaskBase):
             elif self.sailing_state == 'jibe_to_stbd_tack':
                 goal_angle = 180
                 continue_tack = boat_wind_angle > 0
-            if self.sailing_state == 'tack_to_port_tack':
+            elif self.sailing_state == 'tack_to_port_tack':
                 goal_angle = self.nav.beating_angle
                 continue_tack = boat_wind_angle < goal_angle
             else:  # 'tack_to_stbd_tack'
