@@ -7,8 +7,12 @@
 # position keeping: 4
 # position keeping: 4, 5
 # downwind: 6, 7
-wp/list: ["4", "5", "6"]
-
+wp/tasks: [
+  {"kind": "to_waypoint", "waypoint": "4"},
+  {"kind": "to_waypoint", "waypoint": "5"},
+  {"kind": "keep_station", "waypoint": "5", linger: 30},
+  {"kind": "to_waypoint", "waypoint": "6"},
+]
 
 # distance within waypoint is accepted, in [m]
 wp/acceptRadius: 1.5
@@ -26,8 +30,3 @@ wp/table: {"1" : [50.8896095, -1.3836603333333333],
             "7" : [50.889942, -1.384113]
 
 }
-
-
-
-
-

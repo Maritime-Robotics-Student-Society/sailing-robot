@@ -55,14 +55,17 @@ class Debugging_2D_plot():
 
 
         if rospy.has_param('wp/list'):
-            self.generate_wp_Array()
+            self.generate_wp_Array(rospy.get_param('wp/list'))
+        elif rospy.has_param('wp/tasks'):
+            tasks_list = rospy.get_param('wp/tasks')
+            wp_list = [t['waypoint'] for t in tasks_list if 'waypoint' in t]
+            self.generate_wp_Array(wp_list)
         else:
             rospy.logwarn("No waypoint list found in parameters")
         self.marker_publish()
 
 
-    def generate_wp_Array(self):
-        wp_list = rospy.get_param('wp/list')
+    def generate_wp_Array(self, wp_list):
         wp_table = rospy.get_param('wp/table')
 
         wp_list = list(set(wp_list)) # only print each waypoint once
@@ -102,8 +105,6 @@ class Debugging_2D_plot():
             count += 1
 
 
-
-
     def update_sailing_state(self, msg):
         self.sailing_state = msg.data
 
@@ -114,9 +115,7 @@ class Debugging_2D_plot():
 
     def marker_publish(self):
 
-
         while not rospy.is_shutdown():
-
             marker = Marker()
             marker.header.frame_id = "map"
             marker.type = marker.SPHERE
@@ -178,4 +177,3 @@ if __name__ == '__main__':
         Debugging_2D_plot()
     except rospy.ROSInterruptException:
         pass
-

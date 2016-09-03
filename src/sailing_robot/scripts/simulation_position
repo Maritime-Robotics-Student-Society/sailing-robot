@@ -35,9 +35,14 @@ class Position_simu():
         self.water_stream_speed = rospy.get_param("simulation/velocity/water_stream_speed")
 
         # Read init position form the /wp parameters
-        wp_list = rospy.get_param('wp/list')
+        try:
+            wp_list = rospy.get_param('wp/list')
+            wp0 = wp_list[0]
+        except KeyError:
+            task_list = rospy.get_param('wp/tasks')
+            wp0 = task_list[0]['waypoint']
         wp_table = rospy.get_param('wp/table')
-        init_position = wp_table[wp_list[0]]
+        init_position = wp_table[wp0]
 
         self.nav = Navigation()
         self.utm_position = self.nav.latlon_to_utm(init_position[0], init_position[1])
@@ -86,4 +91,3 @@ if __name__ == '__main__':
         Position_simu()
     except rospy.ROSInterruptException:
         pass
-

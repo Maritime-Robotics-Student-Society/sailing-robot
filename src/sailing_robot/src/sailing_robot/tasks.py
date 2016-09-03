@@ -21,15 +21,41 @@ def tasks_from_wps(wp_params):
     coordinates = wp_params['table']
 
     res = []
-    for wpid in wp_params['list']:
-        lat, lon = coordinates[wpid]
-        res.append({
-            'kind': 'to_waypoint',
-            'lat': lat,
-            'lon': lon,
-            'target_radius': target_radius,
-            'tack_voting_radius': tack_voting_radius
-        })
+    if 'tasks' in wp_params:
+        # Long specification: list of tasks
+        for wp_task in wp_params['tasks']:
+            kind = wp_task['kind']
+            if kind == 'to_waypoint':
+                lat, lon = coordinates[wp_task['waypoint']]
+                res.append({
+                    'kind': 'to_waypoint',
+                    'lat': lat,
+                    'lon': lon,
+                    'target_radius': target_radius,
+                    'tack_voting_radius': tack_voting_radius
+                })
+            elif kind == 'keep_station':
+                lat, lon = coordinates[wp_task['waypoint']]
+                res.append({
+                    'kind': 'keep_station',
+                    'marker_ll': (lat, lon),
+                    'linger': wp_task.get('linger', 300),
+                    'radius': wp_task.get('radius', 5),
+                    'wind_angle': wp_task.get('wind_angle', 75),
+                })
+
+    else:
+        # Short specification: just a series of waypoints to go around
+        for wpid in wp_params['list']:
+            lat, lon = coordinates[wpid]
+            res.append({
+                'kind': 'to_waypoint',
+                'lat': lat,
+                'lon': lon,
+                'target_radius': target_radius,
+                'tack_voting_radius': tack_voting_radius
+            })
+
     return res
 
 class TimedEnd(object):
