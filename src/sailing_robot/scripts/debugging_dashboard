@@ -37,6 +37,7 @@ simple_topics = [
     ('/heading_to_waypoint', Float32),
     ('/gps_satellites', Int16),
     ('/tack_rudder', Float32),
+    ('/task_ix', Int16),
 ]
 
 geo_topics = [

@@ -30,13 +30,18 @@ class StationKeeping(TaskBase):
         self.sailing_state = 'normal'  # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
         self.start_time = 0
         self.head_to_waypoint = HeadingPlan(nav, LatLon(*marker_ll),
-                            target_radius=radius, tack_voting_radius=2*radius)
+                            target_radius=radius, tack_voting_radius=radius)
+        self.head_to_waypoint.debug_pub = self._indirect_debug_pub
 
     debug_topics = [
         ('heading_to_waypoint', 'Float32'),
         ('distance_to_waypoint', 'Float32'),
         ('goal_wind_angle', 'Float32'),
     ]
+
+    def _indirect_debug_pub(self, topic, value):
+        '''Republish debugging stuff from our sub-task'''
+        self.debug_pub(topic, value)
 
     def start(self):
         self.start_time = time.time()

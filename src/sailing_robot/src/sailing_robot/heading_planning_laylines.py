@@ -88,6 +88,7 @@ class HeadingPlan(TaskBase):
         # Detect if the waypoint is downwind, if so head directly to it
         if (wp_wind_angle % 360) > 90 and (wp_wind_angle % 360) < 270:
             goal_wind_angle = wp_wind_angle
+            self.debug_pub('goal_wind_angle', goal_wind_angle)
             state = 'normal'
             return state, self.nav.wind_angle_to_heading(goal_wind_angle)
 

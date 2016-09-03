@@ -11,6 +11,7 @@ from .tasks import TasksRunner
 class RosTasksRunner(TasksRunner):
     def __init__(self, *args, **kwargs):
         self.debug_topics = {}
+        self.register_debug_topics([('task_ix', 'Int16')])
         super(RosTasksRunner, self).__init__(*args, **kwargs)
 
     @staticmethod

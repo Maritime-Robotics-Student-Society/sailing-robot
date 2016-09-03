@@ -109,6 +109,7 @@ class TasksRunner(object):
             self.log('warning', "Run all tasks, returning to start")
             self.task_ix = 0
 
+        self.debug_pub('task_ix', self.task_ix)
         self.active_task = self.tasks[self.task_ix]
         self.on_temporary_task = False
         endcond = '' # TODO
@@ -129,6 +130,7 @@ class TasksRunner(object):
         self.on_temporary_task = True
         self.active_task = self._make_task(taskdict)
         self.active_task.start()
+        self.debug_pub('task_ix', -1)
         self.log('info', "Running intermediate task: {}".format(taskdict['kind']))
 
     def calculate_state_and_goal(self):
@@ -146,3 +148,6 @@ class TasksRunner(object):
             self.insert_task({'kind': 'return_to_safety_zone'})
 
         return self.active_task.calculate_state_and_goal()
+
+    def debug_pub(self, topic, value):
+        pass  # Overridden in subclass to send ROS message

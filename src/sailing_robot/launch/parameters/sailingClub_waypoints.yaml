@@ -10,7 +10,7 @@
 wp/tasks: [
   {"kind": "to_waypoint", "waypoint": "4"},
   {"kind": "to_waypoint", "waypoint": "5"},
-  {"kind": "keep_station", "waypoint": "5", linger: 30},
+  {"kind": "keep_station", "waypoint": "5", linger: 60},
   {"kind": "to_waypoint", "waypoint": "6"},
 ]
 
