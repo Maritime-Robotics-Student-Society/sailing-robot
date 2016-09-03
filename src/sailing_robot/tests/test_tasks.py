@@ -3,7 +3,7 @@ import unittest
 from sailing_robot.tasks import TasksRunner
 from sailing_robot.navigation import Navigation
 from sailing_robot.heading_planning_laylines import HeadingPlan
-from sailing_robot.station_keeping import StationKeeping
+from sailing_robot.station_keeping2 import StationKeeping
 
 tasks_def_1 = [
     {'kind': 'to_waypoint',
@@ -11,12 +11,8 @@ tasks_def_1 = [
      'lon': -1.405315,
     },
     {'kind': 'keep_station',
-     'markers': [
-        [50.8, 1.01],
-        [50.8, 1.03],
-        [50.82, 1.01],
-        [50.82, 1.03],
-     ],
+     'marker_ll': [50.8, 1.01],
+     'linger': 90,
     },
 ]
 

@@ -57,15 +57,14 @@ class TasksRunner(object):
     def _make_task(self, taskdict):
         """Turn a task dict from params (or from tasks_from_wps) into a task object
         """
-        kind = taskdict['kind']
+        taskdict = taskdict.copy()
+        kind = taskdict.pop('kind')
         if kind == 'to_waypoint':
             wp = LatLon(taskdict['lat'], taskdict['lon'])
             kw = {'target_radius': taskdict.get('target_radius', 2.0), 'tack_voting_radius': taskdict.get('tack_voting_radius', 15.)}
             task = HeadingPlan(waypoint=wp, nav=self.nav, **kw)
         elif kind == 'keep_station':
-            markers = [tuple(p) for p in taskdict['markers']]
-            task = StationKeeping(self.nav, markers,
-                            buffer_width=taskdict.get('buffer_width', 10))
+            task = StationKeeping(self.nav, **taskdict)
         elif kind == 'return_to_safety_zone':
             task = ReturnToSafetyZone(self.nav)
         else:

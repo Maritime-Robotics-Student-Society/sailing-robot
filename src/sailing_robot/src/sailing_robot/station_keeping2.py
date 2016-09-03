@@ -22,14 +22,14 @@ class StationKeeping(TaskBase):
         """
         self.nav = nav
         self.marker_ll = marker_ll
-        self.marker = Point(self.nav.latlon_to_utm(self.marker_ll))
+        self.marker = Point(self.nav.latlon_to_utm(*marker_ll))
         self.linger = linger
         self.radius = radius
         self.wind_angle = wind_angle
         self.goal_heading = 0
         self.sailing_state = 'normal'  # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
         self.start_time = 0
-        self.head_to_waypoint = HeadingPlan(nav, LatLon(**marker_ll),
+        self.head_to_waypoint = HeadingPlan(nav, LatLon(*marker_ll),
                             target_radius=radius, tack_voting_radius=2*radius)
 
     debug_topics = [
