@@ -7,7 +7,7 @@ from sailing_robot.navigation import Navigation
 
 class HeadingPlanTests(unittest.TestCase):
     def setUp(self):
-        nav = Navigation(beating_angle=45)
+        nav = Navigation(beating_angle=45, utm_zone=30)
         nav.heading = 0
         nav.wind_direction = 225
         self.hp = HeadingPlan(nav)

@@ -21,16 +21,16 @@ tasks_bad = tasks_def_1 + [
 
 class TasksTests(unittest.TestCase):
     def test_load(self):
-        tr = TasksRunner(tasks_def_1, Navigation())
+        tr = TasksRunner(tasks_def_1, Navigation(utm_zone=30))
         self.assertIsInstance(tr.tasks[0], HeadingPlan)
         self.assertIsInstance(tr.tasks[1], StationKeeping)
 
     def test_load_bad(self):
         with self.assertRaises(ValueError):
-            tr = TasksRunner(tasks_bad, Navigation())
+            tr = TasksRunner(tasks_bad, Navigation(utm_zone=30))
 
     def test_step(self):
-        tr = TasksRunner(tasks_def_1, Navigation())
+        tr = TasksRunner(tasks_def_1, Navigation(utm_zone=30))
         tr.start_next_task()
         self.assertIsInstance(tr.active_task, HeadingPlan)
         tr.start_next_task()

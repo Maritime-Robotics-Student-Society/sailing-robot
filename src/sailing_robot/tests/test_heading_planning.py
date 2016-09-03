@@ -12,7 +12,7 @@ class DummyNSF(object):
 
 class HeadingPlanTests(unittest.TestCase):
     def setUp(self):
-        nav = Navigation(beating_angle=45)
+        nav = Navigation(beating_angle=45, utm_zone=30)
         self.hp = HeadingPlan(nav, waypoint=LatLon(50.7, -0.98),
                             tack_line_offset=0.01)
         self.hp.nav.update_position(DummyNSF(50.7, -1.02))
