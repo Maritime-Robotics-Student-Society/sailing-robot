@@ -28,7 +28,8 @@ class Debugging_2D_plot():
         rospy.Subscriber('sailing_state', String, self.update_sailing_state)
         self.sailing_state = 'normal'
 
-        self.nav = Navigation()
+        utm_zone = rospy.get_param('navigation/utm_zone')
+        self.nav = Navigation(utm_zone=utm_zone)
         rospy.Subscriber('position', NavSatFix, self.update_position)
         self.gps_fix_lock = True
 

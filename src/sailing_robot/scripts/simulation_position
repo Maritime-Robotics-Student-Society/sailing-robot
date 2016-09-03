@@ -44,7 +44,8 @@ class Position_simu():
         wp_table = rospy.get_param('wp/table')
         init_position = wp_table[wp0]
 
-        self.nav = Navigation()
+        utm_zone = rospy.get_param('navigation/utm_zone')
+        self.nav = Navigation(utm_zone=utm_zone)
         self.utm_position = self.nav.latlon_to_utm(init_position[0], init_position[1])
 
         rospy.loginfo("Position simulated")

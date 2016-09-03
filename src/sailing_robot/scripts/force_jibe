@@ -25,7 +25,8 @@ class Force_jibe():
         rospy.Subscriber('heading', Float32, self.update_heading)
         self.heading = 0
 
-        self.nav = Navigation()
+        utm_zone = rospy.get_param('navigation/utm_zone')
+        self.nav = Navigation(utm_zone=utm_zone)
         rospy.Subscriber('position', NavSatFix, self.update_position)
 
         rospy.Subscriber('sailing_state', String, self.update_sailing_state)
