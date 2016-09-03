@@ -19,14 +19,14 @@ margin = 4 # [m]
 
 wp1 = yaml_data['wp/table']['wp1']
 wp2 = yaml_data['wp/table']['wp2']
-wp3 = yaml_data['wp/table']['wp3']
+#wp3 = yaml_data['wp/table']['wp3']
 wp4 = yaml_data['wp/table']['wp4']
 
 
 nav = Navigation()
 wp1_utm = nav.latlon_to_utm(wp1[0], wp1[1])
 wp2_utm = nav.latlon_to_utm(wp2[0], wp2[1])
-wp3_utm = nav.latlon_to_utm(wp3[0], wp3[1])
+#wp3_utm = nav.latlon_to_utm(wp3[0], wp3[1])
 wp4_utm = nav.latlon_to_utm(wp4[0], wp4[1])
 
 
@@ -66,17 +66,17 @@ wpE = to_wp(wpE)
 
 yaml_data['wp/tasks'] = [{'kind': 'to_waypoint', 'waypoint': 'A'},
                         {'kind': 'to_waypoint', 'waypoint': 'B'},
-                        {'kind': 'obstacle_waypoints', 'normal': 'C0', 'obstacle': 'C1'},
+                        {'kind': 'obstacle_waypoints', 'normal': 'D', 'obstacle': 'C1'},
                         {'kind': 'to_waypoint', 'waypoint': 'D'},
                         {'kind': 'to_waypoint', 'waypoint': 'E'},
                         {'kind': 'to_waypoint', 'waypoint': 'D'},
-                        {'kind': 'obstacle_waypoints', 'normal': 'C0', 'obstacle': 'C1'},
+                        {'kind': 'obstacle_waypoints', 'normal': 'B', 'obstacle': 'C1'},
                         {'kind': 'to_waypoint', 'waypoint': 'B'},
                         ]
 
-yaml_data['wp/list'] = ['A']
+yaml_data['wp/list'] = ['A', 'B', 'C0', 'C1', 'D', 'E']
 
-yaml_data['wp/table'] = {}
+#yaml_data['wp/table'] = {}
 yaml_data['wp/table']['A'] = wpA
 yaml_data['wp/table']['B'] = wpB
 yaml_data['wp/table']['C0'] = wpC0
