@@ -18,7 +18,7 @@ CLOCKWISE = False
 input_file = sys.argv[1]
 yaml_data = yaml.load(file(input_file, 'r'), Loader=yaml.Loader)
 
-output_file = input_file[:-5] + "_round.yaml"
+output_file = input_file[:-5] + "_gen_round.yaml"
 
 
 # Generate the list of buoys

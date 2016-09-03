@@ -13,7 +13,7 @@ from sailing_robot.navigation import Navigation
 input_file = sys.argv[1]
 yaml_data = yaml.load(file(input_file, 'r'), Loader=yaml.Loader)
 
-output_file = input_file[:-5] + "_auto_gen.yaml"
+output_file = input_file[:-5] + "_gen_area.yaml"
 
 
 wpA = yaml_data['wp/table']['A']
