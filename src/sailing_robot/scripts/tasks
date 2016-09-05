@@ -32,8 +32,7 @@ def goal_heading_publisher(tasks_runner):
 def insert_waypoint(msg):
     tasks_runner.insert_task({
         'kind': 'to_waypoint',
-        'lat': msg.latitude,
-        'lon': msg.longitude,
+        'waypoint_ll': (msg.latitude, msg.longitude),
         'target_radius': 2.5,     # set default value, hot fix for the force jibing node
         'tack_voting_radius': 1 # set default value, hot fix for the force jibing node
     })
