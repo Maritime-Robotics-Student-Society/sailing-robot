@@ -26,6 +26,9 @@ msg/_*.py
 .project
 .cproject
 
+# Jupyter notebook stuff
+.ipynb_checkpoints/
+
 # qcreator stuff
 CMakeLists.txt.user
 
@@ -43,6 +46,8 @@ qtcreator-*
 
 # Emacs
 .#*
+# Vim
+*.swp
 
 # Catkin custom files
 CATKIN_IGNORE
@@ -54,3 +59,6 @@ CATKIN_IGNORE
 
 # ignore automatically generated docs files
 /src/sailing_robot/doc/*
+
+# Ignore recorded data from tests
+/recorded_data/
