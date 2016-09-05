@@ -13,7 +13,7 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/sailingClub_waypoints.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/viana_test_waypoints.yaml" command="load"/>
     
     <param name="log_name" value="viana_test1" />
 
