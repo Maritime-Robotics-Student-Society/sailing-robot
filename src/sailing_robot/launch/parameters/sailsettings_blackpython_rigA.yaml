@@ -1,0 +1,19 @@
+# format: wind angle (as read from wind sensor), wind speed (m/s), scaled servo PWM
+# scaled servo PWM: 0 = sail fully sheeted in, min PWM; 1 = sail fully out, max PWM
+# linearly scaled inbetween
+# CAUTION: include 0 angle and 180 angle, since those are the initial values in the lookup script
+
+
+
+sailsettings/table: {'0': 0,
+                '35': 0,
+                '45':0,
+                '55':0.0833,
+                '60':0.2833,
+                '75':0.3833,
+                '90':0.5667,
+                '135':0.9333,
+                '180':1,}
+
+
+sailsettings/windSpeed: 6
