@@ -1,0 +1,19 @@
+
+wp/tasks: [
+  {"kind": "to_waypoint", "waypoint": "1"},
+  {"kind": "to_waypoint", "waypoint": "2"},
+  {"kind": "keep_station", "waypoint": "2", linger: 60},
+  {"kind": "to_waypoint", "waypoint": "3"},
+]
+
+# distance within waypoint is accepted, in [m]
+wp/acceptRadius: 1.5
+wp/tackVotingRadius: 20
+
+
+# Dictionary for looking up waypoints, using [lat, lon] format of NavSatFix
+#
+wp/table: {"1" : [41.6929383, -8.8217432],
+            "2" : [41.6926909, -8.8218753],
+            "3" : [41.6927538, -8.8222401]
+}
