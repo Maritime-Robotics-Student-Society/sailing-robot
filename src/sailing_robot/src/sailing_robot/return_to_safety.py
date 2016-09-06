@@ -95,7 +95,7 @@ class ReturnToSafetyZone(TaskBase):
         # If wp_wind_angle and boat_wind_angle have the same sign, we're on the better tack already
         # Or if we're between the laylines; stick to our current tack for now
         if (wp_wind_angle * boat_wind_angle > 0) \
-                or not self.nav.position_xy.within(self.lay_triangle()):
+                or self.nav.position_xy.within(self.lay_triangle()):
             tack_now = False
         else:
             tack_now = True
