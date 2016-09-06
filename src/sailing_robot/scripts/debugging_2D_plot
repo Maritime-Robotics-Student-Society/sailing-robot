@@ -33,6 +33,7 @@ class Debugging_2D_plot():
         self.gps_fix_lock = True
 
         self.markerArray = MarkerArray()
+        self.radius = rospy.get_param('wp/acceptRadius')
 
         self.rate = rospy.Rate(rospy.get_param("config/rate"))
 
@@ -99,11 +100,11 @@ class Debugging_2D_plot():
         current_wp.header.frame_id = "map"
         current_wp.type = current_wp.SPHERE
         current_wp.action = current_wp.ADD
-        current_wp.scale.x = 1.5
-        current_wp.scale.y = 1.5
-        current_wp.scale.z = 1.5
+        current_wp.scale.x = self.radius
+        current_wp.scale.y = self.radius
+        current_wp.scale.z = self.radius
 
-        current_wp.color.a = 1.0
+        current_wp.color.a = 0.9
         current_wp.color.r, current_wp.color.g, current_wp.color.b = rgb
         current_wp.pose.orientation.w = 1.0
         current_wp.pose.position.x = current_wp_position[0] - self.init_position[0]
@@ -129,9 +130,9 @@ class Debugging_2D_plot():
             marker.header.frame_id = "map"
             marker.type = marker.SPHERE
             marker.action = marker.ADD
-            marker.scale.x = 1
-            marker.scale.y = 1
-            marker.scale.z = 1
+            marker.scale.x = 2
+            marker.scale.y = 2
+            marker.scale.z = 2
 
             if self.sailing_state == 'tack_to_port_tack':
                 marker.color.a = 1.0
