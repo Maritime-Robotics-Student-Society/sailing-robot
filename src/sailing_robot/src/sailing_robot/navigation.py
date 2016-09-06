@@ -3,7 +3,7 @@
 import math
 from LatLon import LatLon
 from pyproj import Proj
-from shapely.geometry import Point
+from shapely.geometry import Point, Polygon
 
 class Navigation(object):
     """Common navigation machinery used by different modules.
