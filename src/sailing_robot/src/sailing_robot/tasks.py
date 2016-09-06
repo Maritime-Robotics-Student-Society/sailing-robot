@@ -151,6 +151,7 @@ class TasksRunner(object):
 
         if self.nav.check_safety_zone() and self.active_task.task_kind != 'return_to_safety_zone':
             # We're about to wander out of the safety zone!
+            self.log('warning', 'At edge of safety zone')
             self.insert_task({'kind': 'return_to_safety_zone'})
 
         return self.active_task.calculate_state_and_goal()
