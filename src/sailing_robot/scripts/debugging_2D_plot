@@ -11,6 +11,8 @@ import rospy
 import math
 import time
 
+from shapely.geom import Polygon
+
 
 class Debugging_2D_plot():
     """
@@ -92,6 +94,12 @@ class Debugging_2D_plot():
             rgb = (162.0/255.0, 200.0/255.0, 200.0/255.0)
             limit_marker = self.make_marker(latlon, rgb)
             self.wp_Array.markers.append(limit_marker)
+
+        corners = [self.nav.latlon_to_utm(l) for l in limit_coords]
+        p = Polygon(corners)
+        centre_marker = self.make_marker((p.centroid.x, p.centroid.y), (1.0, 1.0, 0.6))
+        self.wp_Array.markers.append(centre_marker)
+        
 
     def make_marker(self, wp_coord, rgb):
         current_wp_position = self.nav.latlon_to_utm( wp_coord[0], wp_coord[1])
