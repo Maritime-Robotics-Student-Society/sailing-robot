@@ -23,3 +23,24 @@ def test_utm_latlon_conversion():
     ll = n.utm_to_latlon(x, y)
     assert_almost_equal(ll.lat.decimal_degree,  lat)
     assert_almost_equal(ll.lon.decimal_degree,  lon)
+
+class DummyNSFMsg(object):
+    def __init__(self, lat, lon):
+        self.latitude = lat
+        self.longitude = lon
+
+def test_safety_zone():
+    n = Navigation(safety_zone_ll=[
+        (50.78, 1.00),
+        (50.78, 1.04),
+        (50.82, 1.04),
+        (50.82, 1.00),
+    ])
+    n.update_position(DummyNSFMsg(50.8, 1.02))
+    assert_equal(n.check_safety_zone(), 0)
+    
+    n.update_position(DummyNSFMsg(50.78001, 1.02))
+    assert_equal(n.check_safety_zone(), 1)
+    
+    n.update_position(DummyNSFMsg(50.75, 1.02))
+    assert_equal(n.check_safety_zone(), 2)
