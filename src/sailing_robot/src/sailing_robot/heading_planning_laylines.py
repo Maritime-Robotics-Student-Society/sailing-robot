@@ -126,6 +126,7 @@ class HeadingPlan(TaskBase):
                     state = 'tack_to_port_tack'
                     goal_wind_angle = self.nav.beating_angle
             self.sailing_state = state
+            self.log('info', 'Starting tack/jibe (%s)', state)
         else:
             # Stay on our current tack
             if on_port_tack:
