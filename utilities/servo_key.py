@@ -23,6 +23,7 @@ import argparse
 import time
 import curses
 import atexit
+import sys
 
 import pigpio
 
@@ -130,6 +131,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('servo_pin', type=int,
         help='Pin number to test (should be 24 for sail, 13 for rudder)')
+    if len(sys.argv) < 2:
+        ap.print_help()
+        sys.exit(1)
     args = ap.parse_args()
 
     interact(args.servo_pin)
