@@ -5,5 +5,5 @@ rudder/servohigherlimits: 2000
 
 sail/pin: 24
 sail/PWMoffset: 0
-sail/servolowerlimits: 1095
-sail/servohigherlimits: 1395
+sail/servolowerlimits: 1120
+sail/servohigherlimits: 1450
