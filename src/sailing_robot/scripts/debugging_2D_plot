@@ -95,7 +95,7 @@ class Debugging_2D_plot():
             limit_marker = self.make_marker(latlon, rgb)
             self.wp_Array.markers.append(limit_marker)
 
-        corners = [self.nav.latlon_to_utm(l) for l in limit_coords]
+        corners = [self.nav.latlon_to_utm(*l) for l in limit_coords]
         p = Polygon(corners)
         centre_marker = self.make_marker((p.centroid.x, p.centroid.y), (1.0, 1.0, 0.6))
         self.wp_Array.markers.append(centre_marker)
