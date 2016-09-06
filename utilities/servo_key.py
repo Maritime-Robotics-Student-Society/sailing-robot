@@ -78,9 +78,10 @@ def cleanup():
    curses.endwin()
    pi.stop()
 
-def interact(servo_pin):
-    pi = pigpio.pi()
+pi = pigpio.pi()
 
+def interact(servo_pin):
+    global stdscr
     stdscr = curses.initscr()
     curses.noecho()
     curses.cbreak()
@@ -127,11 +128,11 @@ def interact(servo_pin):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('servo_pin',
+    ap.add_argument('servo_pin', type=int,
         help='Pin number to test (should be 24 for sail, 13 for rudder)')
     args = ap.parse_args()
 
-    interact(ap.servo_pin)
+    interact(args.servo_pin)
 
 if __name__ == '__main__':
     main()
