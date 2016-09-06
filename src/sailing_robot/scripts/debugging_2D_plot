@@ -11,7 +11,7 @@ import rospy
 import math
 import time
 
-from shapely.geom import Polygon
+from shapely.geometry import Polygon
 
 
 class Debugging_2D_plot():
