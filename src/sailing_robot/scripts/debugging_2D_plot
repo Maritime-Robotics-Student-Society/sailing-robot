@@ -12,7 +12,6 @@ import math
 import time
 
 
-
 class Debugging_2D_plot():
     """
         Node that publish visualisation objects (for RViz)
@@ -47,6 +46,7 @@ class Debugging_2D_plot():
             self.colour_blue = 0
 
         self.count = 0
+        self._id_counter = 0
         self.MARKERS_MAX = 500
 
         while self.gps_fix_lock and not rospy.is_shutdown():
@@ -73,38 +73,46 @@ class Debugging_2D_plot():
 
         self.wp_Array = MarkerArray()
 
-        count = 0
         for key in wp_table:
             wp_coord = wp_table[key]
-
-            current_wp_position = self.nav.latlon_to_utm( wp_coord[0], wp_coord[1])
-            current_wp = Marker()
-
-            current_wp.header.frame_id = "map"
-            current_wp.type = current_wp.SPHERE
-            current_wp.action = current_wp.ADD
-            current_wp.scale.x = 1.5
-            current_wp.scale.y = 1.5
-            current_wp.scale.z = 1.5
-
-            current_wp.color.a = 1.0
             if key in wp_list:
-                current_wp.color.r = 200.0/255.0
-                current_wp.color.g = 162.0/255.0
-                current_wp.color.b = 200.0/255.0
+                rgb = (200.0/255.0, 162.0/255.0, 200.0/255.0)
             else:
-                current_wp.color.r = 1.0
-                current_wp.color.g = 1.0 
-                current_wp.color.b = 1.0
-            current_wp.pose.orientation.w = 1.0
-            current_wp.pose.position.x = current_wp_position[0] - self.init_position[0]
-            current_wp.pose.position.y = current_wp_position[1] - self.init_position[1]
-            current_wp.pose.position.z = 0 
-            current_wp.id = count
-
+                rgb = (1.0, 1.0, 1.0)
+            current_wp = make_marker(wp_coord, rgb)
             self.wp_Array.markers.append(current_wp)
-            count += 1
 
+        try:
+            limit_coords = rospy.get_param('navigation/safety_zone_ll')
+        except KeyError:
+            return
+        
+        for latlon in limit_coords:
+            rgb = (162.0/255.0, 200.0/255.0, 200.0/255.0)
+            limit_marker = make_marker(latlon, rgb)
+            self.wp_Array.markers.append(limit_marker)
+
+    def make_marker(self, coords, rgb):
+        current_wp_position = self.nav.latlon_to_utm( wp_coord[0], wp_coord[1])
+        current_wp = Marker()
+
+        current_wp.header.frame_id = "map"
+        current_wp.type = current_wp.SPHERE
+        current_wp.action = current_wp.ADD
+        current_wp.scale.x = 1.5
+        current_wp.scale.y = 1.5
+        current_wp.scale.z = 1.5
+
+        current_wp.color.a = 1.0
+        current_wp.color.r, current_wp.color.g, current_wp.color.b = rgb
+        current_wp.pose.orientation.w = 1.0
+        current_wp.pose.position.x = current_wp_position[0] - self.init_position[0]
+        current_wp.pose.position.y = current_wp_position[1] - self.init_position[1]
+        current_wp.pose.position.z = 0
+        current_wp.id = self._id_counter
+        self._id_counter += 1
+        
+        return current_wp
 
     def update_sailing_state(self, msg):
         self.sailing_state = msg.data
@@ -163,8 +171,7 @@ class Debugging_2D_plot():
 
 
             self.publisher.publish(self.markerArray)
-            if rospy.has_param('wp/list'):
-                self.publisher_waypoint.publish(self.wp_Array)
+            self.publisher_waypoint.publish(self.wp_Array)
             self.publisher_origin.publish(self.init_position_gps)
 
             self.count += 1
