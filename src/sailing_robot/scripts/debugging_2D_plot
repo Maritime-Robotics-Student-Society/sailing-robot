@@ -79,7 +79,7 @@ class Debugging_2D_plot():
                 rgb = (200.0/255.0, 162.0/255.0, 200.0/255.0)
             else:
                 rgb = (1.0, 1.0, 1.0)
-            current_wp = make_marker(wp_coord, rgb)
+            current_wp = self.make_marker(wp_coord, rgb)
             self.wp_Array.markers.append(current_wp)
 
         try:
@@ -89,10 +89,10 @@ class Debugging_2D_plot():
         
         for latlon in limit_coords:
             rgb = (162.0/255.0, 200.0/255.0, 200.0/255.0)
-            limit_marker = make_marker(latlon, rgb)
+            limit_marker = self.make_marker(latlon, rgb)
             self.wp_Array.markers.append(limit_marker)
 
-    def make_marker(self, coords, rgb):
+    def make_marker(self, wp_coord, rgb):
         current_wp_position = self.nav.latlon_to_utm( wp_coord[0], wp_coord[1])
         current_wp = Marker()
 
