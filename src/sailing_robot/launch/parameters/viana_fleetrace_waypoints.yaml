@@ -1,6 +1,5 @@
 
 wp/tasks: [
-  {"kind": "to_waypoint", "waypoint": "1"},
   {"kind": "to_waypoint", "waypoint": "5"},
   {"kind": "to_waypoint", "waypoint": "6"},
   {"kind": "to_waypoint", "waypoint": "4"},
