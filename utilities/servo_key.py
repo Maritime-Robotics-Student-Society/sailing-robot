@@ -2,15 +2,13 @@
 '''Servo testing script.
 
 Run this as:
-    ./servo_key.py 13
-
-To test a servo on pin 13. Pin 13 should be the rudder, and pin 24 the sail.
+    ./servo_key.py
 
 Press:
 
-- Left/right to increase/decrease pulse stepwise
-- Up/down to jump to min/max pulse (1000/2000 ms)
-- Home to jump to midpoint (1500 ms)
+- Left/right to increase/decrease rudder pulse (pin 13)
+- Up/down to increase/decrease sail pulse (pin 24)
+- Home to jump to starting positions
 - Q to quit.
 '''
 
@@ -26,6 +24,15 @@ import atexit
 import sys
 
 import pigpio
+
+RUDDER_PIN = 13
+SAIL_PIN = 24
+
+RUDDER_START = 1500
+SAIL_START = 1250
+
+RUDDER_STEP = 100
+SAIL_STEP = 5
 
 MIN_PW = 1000
 MID_PW = 1500
@@ -82,6 +89,7 @@ def cleanup():
 pi = pigpio.pi()
 
 def interact(servo_pin):
+    print("Rudder pin {} / Sail pin {}".format(RUDDER_PIN, SAIL_PIN))
     global stdscr
     stdscr = curses.initscr()
     curses.noecho()
@@ -92,7 +100,8 @@ def interact(servo_pin):
     in_escape = False
     in_cursor = False
 
-    pulsewidth = MID_PW
+    rudder_pw = RUDDER_START
+    sail_pw = SAIL_START
 
     pi.set_servo_pulsewidth(servo_pin, pulsewidth)
 
@@ -105,38 +114,20 @@ def interact(servo_pin):
        if c == QUIT:
           break
 
-       pw = pulsewidth
-
        if c == HOME:
-          pw = MID_PW # Stop.
+          rudder_pw = MID_PW   # Reset
        elif c == UP_ARROW:
-          pw = MAX_PW # Fastest clockwise.
+          sail_pw = min(MAX_PW, sail_pw + SAIL_STEP)
        elif c == DOWN_ARROW:
-          pw = MIN_PW # Fastest anti-clockwise
+          sail_pw = max(MIN_PW, sail_pw - SAIL_STEP)
        elif c == LEFT_ARROW:
-          pw = pw - 5 # Shorten pulse.
-          if pw < MIN_PW:
-             pw = MIN_PW
+          rudder_pw = min(MIN_PW, rudder_pw - RUDDER_STEP)
        elif c == RIGHT_ARROW:
-          pw = pw + 5 # Lengthen pulse.
-          if pw > MAX_PW:
-             pw = MAX_PW
+          rudder_pw = max(MAX_PW, rudder_pw + RUDDER_STEP)
 
-       if pw != pulsewidth:
-          pulsewidth = pw
-          print("Current PWM %d" % pulsewidth, end='\r\n')
-          pi.set_servo_pulsewidth(servo_pin, pulsewidth)
-
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('servo_pin', type=int,
-        help='Pin number to test (should be 24 for sail, 13 for rudder)')
-    if len(sys.argv) < 2:
-        ap.print_help()
-        sys.exit(1)
-    args = ap.parse_args()
-
-    interact(args.servo_pin)
+      print("Rudder PWM {} / Sail PWM {}".format(rudder_pw, sail_pw), end='\r\n')
+      pi.set_servo_pulsewidth(RUDDER_PIN, rudder_pw)
+      pi.set_servo_pulsewidth(SAIL_PIN, sail_pw)
 
 if __name__ == '__main__':
-    main()
+    interact()
