@@ -96,6 +96,8 @@ def interact():
 
     atexit.register(cleanup) # Ensure original screen state is restored.
 
+    c = getch()
+
     print("Rudder pin {} / Sail pin {}".format(RUDDER_PIN, SAIL_PIN), end='\r\n')
     print('Left/Right: rudder', end='\r\n')
     print('Up/down: sail', end='\r\n')
@@ -115,8 +117,6 @@ def interact():
 
        time.sleep(0.01)
 
-       c = getch()
-
        if c == QUIT:
           break
 
@@ -134,6 +134,8 @@ def interact():
        print("Rudder PWM {} / Sail PWM {}".format(rudder_pw, sail_pw), end='\r\n')
        pi.set_servo_pulsewidth(RUDDER_PIN, rudder_pw)
        pi.set_servo_pulsewidth(SAIL_PIN, sail_pw)
+
+       c = getch()
 
 if __name__ == '__main__':
     interact()
