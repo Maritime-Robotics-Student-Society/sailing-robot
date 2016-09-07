@@ -4,7 +4,7 @@
 simulation/wind/speed: 5
 
 # wind direction relative to north
-simulation/wind/direction: 220
+simulation/wind/direction: 180
 
 # A gaussian noise is generated on both wind speed and wind direction, use a value of 0 to remove the noise generation.
 # These parameters are the 'width' of the gaussian distribution
@@ -27,8 +27,8 @@ simulation/velocity/tacking_punishment_time: 3 # [s]
 simulation/velocity/tacking_punishment_coefficient: 0.2
 
 # simulate a constant water stream
-simulation/velocity/water_stream_speed: 0.0     # [m/s]
-simulation/velocity/water_stream_direction: 220   # [degree]
+simulation/velocity/water_stream_speed: 0.5     # [m/s]
+simulation/velocity/water_stream_direction: 180   # [degree]
 
 
 simulation/heading_init: 270.0
