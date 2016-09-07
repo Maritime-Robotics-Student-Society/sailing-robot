@@ -88,8 +88,7 @@ def cleanup():
 
 pi = pigpio.pi()
 
-def interact(servo_pin):
-    print("Rudder pin {} / Sail pin {}".format(RUDDER_PIN, SAIL_PIN))
+def interact():
     global stdscr
     stdscr = curses.initscr()
     curses.noecho()
@@ -97,19 +96,26 @@ def interact(servo_pin):
 
     atexit.register(cleanup) # Ensure original screen state is restored.
 
+    c = getch()
+
+    print("Rudder pin {} / Sail pin {}".format(RUDDER_PIN, SAIL_PIN), end='\r\n')
+    print('Left/Right: rudder', end='\r\n')
+    print('Up/down: sail', end='\r\n')
+    print('Home: reset', end='\r\n')
+    print('Q: quit', end='\r\n')
+
     in_escape = False
     in_cursor = False
 
     rudder_pw = RUDDER_START
     sail_pw = SAIL_START
 
-    pi.set_servo_pulsewidth(servo_pin, pulsewidth)
+    pi.set_servo_pulsewidth(SAIL_PIN, sail_pw)
+    pi.set_servo_pulsewidth(RUDDER_PIN, rudder_pw)
 
     while True:
 
        time.sleep(0.01)
-
-       c = getch()
 
        if c == QUIT:
           break
@@ -121,13 +127,15 @@ def interact(servo_pin):
        elif c == DOWN_ARROW:
           sail_pw = max(MIN_PW, sail_pw - SAIL_STEP)
        elif c == LEFT_ARROW:
-          rudder_pw = min(MIN_PW, rudder_pw - RUDDER_STEP)
+          rudder_pw = max(MIN_PW, rudder_pw - RUDDER_STEP)
        elif c == RIGHT_ARROW:
-          rudder_pw = max(MAX_PW, rudder_pw + RUDDER_STEP)
+          rudder_pw = min(MAX_PW, rudder_pw + RUDDER_STEP)
 
-      print("Rudder PWM {} / Sail PWM {}".format(rudder_pw, sail_pw), end='\r\n')
-      pi.set_servo_pulsewidth(RUDDER_PIN, rudder_pw)
-      pi.set_servo_pulsewidth(SAIL_PIN, sail_pw)
+       print("Rudder PWM {} / Sail PWM {}".format(rudder_pw, sail_pw), end='\r\n')
+       pi.set_servo_pulsewidth(RUDDER_PIN, rudder_pw)
+       pi.set_servo_pulsewidth(SAIL_PIN, sail_pw)
+
+       c = getch()
 
 if __name__ == '__main__':
     interact()

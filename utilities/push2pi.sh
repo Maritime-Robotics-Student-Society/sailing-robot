@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 echo pushing to the pi
 git push pi@192.168.42.1:sailing-robot-bare 
