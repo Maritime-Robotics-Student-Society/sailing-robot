@@ -27,8 +27,8 @@ def convertToSec(timeString):
     return time
 
 # Constants that need adapting
-CENTER = LatLon(50.8897983, -1.3840460)
-FILE = "../../../logs/gps-trace-2016-08-06T15.06.03.csv"
+CENTER = LatLon(41.68846, -8.82469)
+FILE = "recorded_data/gps-trace_viana_position_keeping_2016-09-07T11.24.32.csv"
 
 # Competition rules
 RADIUS = 20 # 20 m
@@ -70,6 +70,19 @@ except:
     print("end of 5 minute position keeping not in dataset!")
     positionsOfInterest = position[idx:]
 
+minute_idx = bisect.bisect(time, startTime + 60)
+first_minute = positionsOfInterest[idx:minute_idx]
+print('%d points in first minute' % minute_idx)
+for point in first_minute:
+    distance = point.position_ll.distance(CENTER) * 1000
+    if distance > 20:
+        print('Left 20m circle during first minute')
+        break
+    else:
+        print('Stayed within 20m during first minute :-)')
+
+print('Using %d points' % len(positionsOfInterest))
+
 # get Pc
 # sum up x and y positions to get Pc
 averageX = 0.
@@ -94,9 +107,8 @@ for point in positionsOfInterest:
 # remove 5% of points with largest distance to Pc
 # find next largest distance, this is the radius
 Pc_distances.sort()
+#print(Pc_distances)
 idx_95 = int(round(len(Pc_distances) * 0.95))
 considered_95 = Pc_distances[0:idx_95]
 finalRadius = considered_95[-1]
 print("The position keeping radius is " + str(finalRadius))
-
-
