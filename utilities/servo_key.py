@@ -1,16 +1,30 @@
 #!/usr/bin/env python
+'''Servo testing script.
 
+Run this as:
+    ./servo_key.py 13
+
+To test a servo on pin 13. Pin 13 should be the rudder, and pin 24 the sail.
+
+Press:
+
+- Left/right to increase/decrease pulse stepwise
+- Up/down to jump to min/max pulse (1000/2000 ms)
+- Home to jump to midpoint (1500 ms)
+- Q to quit.
+'''
 
 # 2015-04-10
 # Public Domain
 
+from __future__ import print_function
+
+import argparse
 import time
 import curses
 import atexit
 
-import pigpio 
-
-SERVO = 24
+import pigpio
 
 MIN_PW = 1000
 MID_PW = 1500
@@ -64,48 +78,60 @@ def cleanup():
    curses.endwin()
    pi.stop()
 
-pi = pigpio.pi()
+def interact(servo_pin):
+    pi = pigpio.pi()
 
-stdscr = curses.initscr()
-curses.noecho()
-curses.cbreak()
+    stdscr = curses.initscr()
+    curses.noecho()
+    curses.cbreak()
 
-atexit.register(cleanup) # Ensure original screen state is restored.
+    atexit.register(cleanup) # Ensure original screen state is restored.
 
-in_escape = False
-in_cursor = False
+    in_escape = False
+    in_cursor = False
 
-pulsewidth = MID_PW
+    pulsewidth = MID_PW
 
-pi.set_servo_pulsewidth(SERVO, pulsewidth)
+    pi.set_servo_pulsewidth(servo_pin, pulsewidth)
 
-while True:
+    while True:
 
-   time.sleep(0.01)
+       time.sleep(0.01)
 
-   c = getch()
+       c = getch()
 
-   if c == QUIT:
-      break
+       if c == QUIT:
+          break
 
-   pw = pulsewidth
+       pw = pulsewidth
 
-   if c == HOME:
-      pw = MID_PW # Stop.
-   elif c == UP_ARROW:
-      pw = MAX_PW # Fastest clockwise.
-   elif c == DOWN_ARROW:
-      pw = MIN_PW # Fastest anti-clockwise
-   elif c == LEFT_ARROW:
-      pw = pw - 5 # Shorten pulse.
-      if pw < MIN_PW:
-         pw = MIN_PW
-   elif c == RIGHT_ARROW:
-      pw = pw + 5 # Lengthen pulse.
-      if pw > MAX_PW:
-         pw = MAX_PW
+       if c == HOME:
+          pw = MID_PW # Stop.
+       elif c == UP_ARROW:
+          pw = MAX_PW # Fastest clockwise.
+       elif c == DOWN_ARROW:
+          pw = MIN_PW # Fastest anti-clockwise
+       elif c == LEFT_ARROW:
+          pw = pw - 5 # Shorten pulse.
+          if pw < MIN_PW:
+             pw = MIN_PW
+       elif c == RIGHT_ARROW:
+          pw = pw + 5 # Lengthen pulse.
+          if pw > MAX_PW:
+             pw = MAX_PW
 
-   if pw != pulsewidth:
-      pulsewidth = pw
-      print("Current PWM %d" % pulsewidth)
-      pi.set_servo_pulsewidth(SERVO, pulsewidth)
+       if pw != pulsewidth:
+          pulsewidth = pw
+          print("Current PWM %d" % pulsewidth, end='\r\n')
+          pi.set_servo_pulsewidth(servo_pin, pulsewidth)
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('servo_pin',
+        help='Pin number to test (should be 24 for sail, 13 for rudder)')
+    args = ap.parse_args()
+
+    interact(ap.servo_pin)
+
+if __name__ == '__main__':
+    main()
