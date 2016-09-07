@@ -97,6 +97,10 @@ def interact():
     atexit.register(cleanup) # Ensure original screen state is restored.
 
     print("Rudder pin {} / Sail pin {}".format(RUDDER_PIN, SAIL_PIN), end='\r\n')
+    print('Left/Right: rudder', end='\r\n')
+    print('Up/down: sail', end='\r\n')
+    print('Home: reset', end='\r\n')
+    print('Q: quit', end='\r\n')
 
     in_escape = False
     in_cursor = False
