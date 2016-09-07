@@ -44,7 +44,7 @@ navigation/beating_angle: 45
 # zone you are.
 navigation/utm_zone: 29
 # True to turn by jibing instead of tacking:
-navigation/jibe_to_turn: false
+navigation/jibe_to_turn: true
 
 # Heading
 # Define which heading the boat uses (compensate for the z axis or not
