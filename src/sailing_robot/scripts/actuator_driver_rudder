@@ -13,6 +13,8 @@ rudderservo_netural_point = (rudderservo_lower_limits +
                              rudderservo_higher_limits) / 2
 rudderservo_range = (rudderservo_higher_limits - rudderservo_lower_limits)
 
+PIN = rospy.get_param('rudder/pin')
+
 def setup():
     pi = pigpio.pi()
     pi.set_mode(13, pigpio.OUTPUT) # GPIO 13/RPi PIN 33 as rudder servo pin
@@ -22,10 +24,28 @@ def rudderservoPWMcontrol(data):
     degrees = data.data
     pwm = rudderservo_range*(-1.0*degrees)/90 + rudderservo_netural_point +\
          rudderservo_PWM_offset
-    pi.set_servo_pulsewidth(13, pwm)
+    pi.set_servo_pulsewidth(PIN, pwm)
+
+def post():
+    '''Power-On Self Test'''
+    if not rospy.get_param('do_post', False):
+        return
+
+    for _ in range(4):
+        pi.set_servo_pulsewidth(PIN, rudderservo_netural_point)
+        time.sleep(0.25)
+        pi.set_servo_pulsewidth(PIN, rudderservo_lower_limits)
+        time.sleep(0.25)
+
+    for _ in range(4):
+        pi.set_servo_pulsewidth(PIN, rudderservo_netural_point)
+        time.sleep(0.25)
+        pi.set_servo_pulsewidth(PIN, rudderservo_higher_limits)
+        time.sleep(0.25)
 
 if __name__ == '__main__':
-    pi = pigpio.pi();
+    pi = pigpio.pi()
+    post()
     try:
         rospy.init_node('actuator_driver_servos', anonymous=True)
         rospy.Subscriber('rudder_control', Int16, rudderservoPWMcontrol)

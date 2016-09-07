@@ -137,3 +137,7 @@ camera_detection/rate: 2  # [Hz]
 camera_detection/Lower_color: [2, 11, 100] # /!\ BGR colorspace
 # Upper color:
 camera_detection/Upper_color: [90, 91, 255] # /!\ BGR colorspace
+
+# Power-On Self Test. If run, the rudder will wiggle and the sheet move
+# when ROS is started, to check everything is working.
+do_post: false

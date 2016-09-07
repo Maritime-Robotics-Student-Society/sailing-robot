@@ -4,12 +4,13 @@ Node looks up correct sail setting from table
 Subscribes: wind direction apparent
 Sets sail actuator to correct PWM value
 """
+import time
 import rospy
 from std_msgs.msg import Float64, Float32
 import pigpio
 from sailing_robot.sail_table import SailTable
 
-SAILGPIO = 24
+SAILGPIO = rospy.get_param('sail/pin')
 
 # get dictionary for the boat specific sail PWM settings
 sail_table_dict = rospy.get_param('sailsettings/table')
@@ -32,9 +33,20 @@ def sail_servo_update(msg):
     debug_pub_pwm.publish(sheetPWM)
     piPWM.set_servo_pulsewidth(SAILGPIO, sheetPWM)
 
+def post():
+    '''Power-On Self Test'''
+    if not rospy.get_param('do_post', False):
+        pass
+
+    piPWM.set_servo_pulsewidth(SAILGPIO, minPWM)
+    time.sleep(3)
+    piPWM.set_servo_pulsewidth(SAILGPIO, maxPWM)
+    time.sleep(3)
+
 if __name__ == '__main__':
     piPWM = pigpio.pi();
     piPWM.set_mode(SAILGPIO, pigpio.OUTPUT) # GPIO 24/RPi PIN 18 as sail servo pin
+    post()
     try:
         debug_pub = rospy.Publisher('debug_sailsheet_normalized', Float32, queue_size=10)
         debug_pub_pwm = rospy.Publisher('debug_sailsheet_pwm', Float32, queue_size=10)
