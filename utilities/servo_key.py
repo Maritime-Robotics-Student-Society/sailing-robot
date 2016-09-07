@@ -122,9 +122,9 @@ def interact():
        elif c == DOWN_ARROW:
           sail_pw = max(MIN_PW, sail_pw - SAIL_STEP)
        elif c == LEFT_ARROW:
-          rudder_pw = min(MIN_PW, rudder_pw - RUDDER_STEP)
+          rudder_pw = max(MIN_PW, rudder_pw - RUDDER_STEP)
        elif c == RIGHT_ARROW:
-          rudder_pw = max(MAX_PW, rudder_pw + RUDDER_STEP)
+          rudder_pw = min(MAX_PW, rudder_pw + RUDDER_STEP)
 
        print("Rudder PWM {} / Sail PWM {}".format(rudder_pw, sail_pw), end='\r\n')
        pi.set_servo_pulsewidth(RUDDER_PIN, rudder_pw)
