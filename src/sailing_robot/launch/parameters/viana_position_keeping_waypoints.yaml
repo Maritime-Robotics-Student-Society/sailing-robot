@@ -1,11 +1,11 @@
 
 wp/tasks: [
-  {"kind": "to_waypoint", "waypoint": "1"},
-  {"kind": "keep_station", "waypoint": "1", linger: 300, wind_angle: 45},
+  {"kind": "to_waypoint", "waypoint": "course1"},
+  {"kind": "keep_station", "waypoint": "course1", linger: 3000, wind_angle: 45, radius:4},
 ]
 
 # distance within waypoint is accepted, in [m]
-wp/acceptRadius: 8
+wp/acceptRadius: 4
 wp/tackVotingRadius: 20
 
 
@@ -18,6 +18,9 @@ wp/table: {"0" : [41.6912384, -8.8227519],  # RIB, LHS of start/finish line
            "4" : [41.6905097, -8.8219375],
             f1: [41.69117512169704, -8.822531747768949],
             f2: [41.691063278364496, -8.82272015160325],
+            course1: [ 41.68846, -8.82469],
+            course2: [ 41.68785, -8.82535],
+
 }
 
 navigation/safety_zone_ll: []
