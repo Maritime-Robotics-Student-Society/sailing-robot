@@ -125,9 +125,9 @@ def interact(servo_pin):
        elif c == RIGHT_ARROW:
           rudder_pw = max(MAX_PW, rudder_pw + RUDDER_STEP)
 
-      print("Rudder PWM {} / Sail PWM {}".format(rudder_pw, sail_pw), end='\r\n')
-      pi.set_servo_pulsewidth(RUDDER_PIN, rudder_pw)
-      pi.set_servo_pulsewidth(SAIL_PIN, sail_pw)
+       print("Rudder PWM {} / Sail PWM {}".format(rudder_pw, sail_pw), end='\r\n')
+       pi.set_servo_pulsewidth(RUDDER_PIN, rudder_pw)
+       pi.set_servo_pulsewidth(SAIL_PIN, sail_pw)
 
 if __name__ == '__main__':
     interact()
