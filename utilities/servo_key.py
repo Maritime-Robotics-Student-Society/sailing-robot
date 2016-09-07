@@ -89,13 +89,14 @@ def cleanup():
 pi = pigpio.pi()
 
 def interact():
-    print("Rudder pin {} / Sail pin {}".format(RUDDER_PIN, SAIL_PIN))
     global stdscr
     stdscr = curses.initscr()
     curses.noecho()
     curses.cbreak()
 
     atexit.register(cleanup) # Ensure original screen state is restored.
+
+    print("Rudder pin {} / Sail pin {}".format(RUDDER_PIN, SAIL_PIN), end='\r\n')
 
     in_escape = False
     in_cursor = False
