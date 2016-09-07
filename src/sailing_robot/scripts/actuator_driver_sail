@@ -38,8 +38,10 @@ def post():
     if not rospy.get_param('do_post', False):
         pass
 
+    rospy.logwarn('sail test: sheet in')
     piPWM.set_servo_pulsewidth(SAILGPIO, minPWM)
     time.sleep(3)
+    rospy.logwarn('sail test: sheet out')
     piPWM.set_servo_pulsewidth(SAILGPIO, maxPWM)
     time.sleep(3)
 
