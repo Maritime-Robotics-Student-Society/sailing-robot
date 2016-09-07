@@ -64,11 +64,10 @@ startTime = time[idx]
 # get all points from the next 5 minutes
 endTime = startTime + TIMESPAN
 endIdx = bisect.bisect(time, endTime)
-try:
-    positionsOfInterest = position[idx:endIdx]
-except:
+if endIdx >= len(position):
     print("end of 5 minute position keeping not in dataset!")
-    positionsOfInterest = position[idx:]
+
+positionsOfInterest = position[idx:endIdx]
 
 minute_idx = bisect.bisect(time, startTime + 60)
 first_minute = positionsOfInterest[idx:minute_idx]
@@ -78,8 +77,8 @@ for point in first_minute:
     if distance > 20:
         print('Left 20m circle during first minute')
         break
-    else:
-        print('Stayed within 20m during first minute :-)')
+else:
+    print('Stayed within 20m during first minute :-)')
 
 print('Using %d points' % len(positionsOfInterest))
 
