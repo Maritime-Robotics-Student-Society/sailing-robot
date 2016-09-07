@@ -88,7 +88,7 @@ def cleanup():
 
 pi = pigpio.pi()
 
-def interact(servo_pin):
+def interact():
     print("Rudder pin {} / Sail pin {}".format(RUDDER_PIN, SAIL_PIN))
     global stdscr
     stdscr = curses.initscr()
@@ -103,7 +103,8 @@ def interact(servo_pin):
     rudder_pw = RUDDER_START
     sail_pw = SAIL_START
 
-    pi.set_servo_pulsewidth(servo_pin, pulsewidth)
+    pi.set_servo_pulsewidth(SAIL_PIN, sail_pw)
+    pi.set_servo_pulsewidth(RUDDER_PIN, rudder_pw)
 
     while True:
 
