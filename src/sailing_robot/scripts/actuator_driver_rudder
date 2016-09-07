@@ -31,12 +31,14 @@ def post():
     if not rospy.get_param('do_post', False):
         return
 
+    rospy.logwarn('rudder test: lower limit')
     for _ in range(4):
         pi.set_servo_pulsewidth(PIN, rudderservo_netural_point)
         time.sleep(0.25)
         pi.set_servo_pulsewidth(PIN, rudderservo_lower_limits)
         time.sleep(0.25)
 
+    rospy.logwarn('rudder test: higher limit')
     for _ in range(4):
         pi.set_servo_pulsewidth(PIN, rudderservo_netural_point)
         time.sleep(0.25)
