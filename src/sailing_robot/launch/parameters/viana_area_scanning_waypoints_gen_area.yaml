@@ -1,0 +1,74 @@
+
+
+# distance within waypoint is accepted, in [m]
+wp/acceptRadius: 8
+wp/tackVotingRadius: 0.20
+
+
+wp/table:
+  '1': [41.69074524137378, -8.823156740152115]
+  '10': [41.691069775258015, -8.8222653110966]
+  '11': [41.690954125625375, -8.822449494252226]
+  '12': [41.69083847569394, -8.822633676748353]
+  '13': [41.6907228254637, -8.82281785858504]
+  '14': [41.69058475856945, -8.822663158974905]
+  '15': [41.69070040855476, -8.822478977256708]
+  '16': [41.6908160582413, -8.822294794879042]
+  '17': [41.69093170762904, -8.822110611841907]
+  '18': [41.691047356717974, -8.821926428145304]
+  '19': [41.691163005508116, -8.821742243789203]
+  '2': [41.69086089214769, -8.822972558856435]
+  '20': [41.69102493717907, -8.821587545432777]
+  '21': [41.69090928863385, -8.82177172967036]
+  '22': [41.690793639789824, -8.821955913248473]
+  '23': [41.69065557174031, -8.821801215316327]
+  '24': [41.690771220339435, -8.821617031856704]
+  '25': [41.690886868639765, -8.821432847737611]
+  '26': [41.6907487998902, -8.821278150703705]
+  '27': [41.69063315183478, -8.821462334704307]
+  '28': [41.69051750348054, -8.82164651804544]
+  '29': [41.69024079230569, -8.822277506895716]
+  '3': [41.69097654262283, -8.822788376901286]
+  '30': [41.690125142632105, -8.822461687659768]
+  '4': [41.691092192799175, -8.822604194286669]
+  '5': [41.69120784267672, -8.822420011012582]
+  '6': [41.69132349225549, -8.822235827079027]
+  '7': [41.691439141535426, -8.822051642485974]
+  '8': [41.69130107362691, -8.821896942806944]
+  '9': [41.691185424591865, -8.822081127281507]
+  A: [41.6908721, -8.823142]
+  B: [41.6904579, -8.8226779]
+  D: [41.6900449, -8.8222149]
+  E: [41.691566, -8.8220369]
+wp/tasks:
+- {kind: to_waypoint, waypoint: '1'}
+- {kind: to_waypoint, waypoint: '2'}
+- {kind: start_timer, seconds: 1500, jump_to: last_point}
+- {kind: to_waypoint, waypoint: '3'}
+- {kind: to_waypoint, waypoint: '4'}
+- {kind: to_waypoint, waypoint: '5'}
+- {kind: to_waypoint, waypoint: '6'}
+- {kind: to_waypoint, waypoint: '7'}
+- {kind: to_waypoint, waypoint: '8'}
+- {kind: to_waypoint, waypoint: '9'}
+- {kind: to_waypoint, waypoint: '10'}
+- {kind: to_waypoint, waypoint: '11'}
+- {kind: to_waypoint, waypoint: '12'}
+- {kind: to_waypoint, waypoint: '13'}
+- {kind: to_waypoint, waypoint: '14'}
+- {kind: to_waypoint, waypoint: '15'}
+- {kind: to_waypoint, waypoint: '16'}
+- {kind: to_waypoint, waypoint: '17'}
+- {kind: to_waypoint, waypoint: '18'}
+- {kind: to_waypoint, waypoint: '19'}
+- {kind: to_waypoint, waypoint: '20'}
+- {kind: to_waypoint, waypoint: '21'}
+- {kind: to_waypoint, waypoint: '22'}
+- {kind: to_waypoint, waypoint: '23'}
+- {kind: to_waypoint, waypoint: '24'}
+- {kind: to_waypoint, waypoint: '25'}
+- {kind: to_waypoint, waypoint: '26'}
+- {kind: to_waypoint, waypoint: '27'}
+- {kind: to_waypoint, waypoint: '28'}
+- {kind: to_waypoint, waypoint: '29',  jump_label: last_point}
+- {kind: to_waypoint, waypoint: '30'}
