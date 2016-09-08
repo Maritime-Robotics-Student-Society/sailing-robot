@@ -27,7 +27,7 @@ simulation/velocity/tacking_punishment_time: 3 # [s]
 simulation/velocity/tacking_punishment_coefficient: 0.2
 
 # simulate a constant water stream
-simulation/velocity/water_stream_speed: 0.5     # [m/s]
+simulation/velocity/water_stream_speed: 0.0     # [m/s]
 simulation/velocity/water_stream_direction: 180   # [degree]
 
 
