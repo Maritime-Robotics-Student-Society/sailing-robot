@@ -104,7 +104,7 @@ class TasksRunner(object):
         """
         taskdict = taskdict.copy()
         kind = taskdict.pop('kind')
-        jump_label = taskdict.pop('jump_label')
+        jump_label = taskdict.pop('jump_label', None)
         if kind == 'to_waypoint':
             wp = LatLon(*taskdict['waypoint_ll'])
             kw = {'target_radius': taskdict.get('target_radius', 2.0), 'tack_voting_radius': taskdict.get('tack_voting_radius', 15.)}
