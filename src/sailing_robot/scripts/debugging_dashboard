@@ -40,6 +40,7 @@ simple_topics = [
     ('/task_ix', Int16),
     ('/active_task_kind', String),
     ('/latest_waypoint_id', String),
+    ('/wind_direction_average', Float32),
 ]
 
 geo_topics = [

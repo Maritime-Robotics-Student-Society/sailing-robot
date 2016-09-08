@@ -79,7 +79,7 @@ body {
     <img id='heading_hand' src='/static/heading_hand.svg' class='compass_hand'>
     <img id='goal_hand' src='/static/goal_hand.svg' class='compass_hand'>
     <img id='waypoint_hand' src='/static/waypoint_hand.svg' class='compass_hand'>
-    <!--<img id='wind_hand' src='/static/wind_hand.svg' class='compass_hand'>-->
+    <img id='wind_hand' src='/static/wind_hand.svg' class='compass_hand'>
   </div>
 
 <script>
@@ -182,6 +182,7 @@ topic_handlers = {
   '/heading': [update_compass_hand('heading')],
   '/goal_heading': [update_compass_hand('goal')],
   '/heading_to_waypoint': [update_compass_hand('waypoint')],
+  '/wind_direction_average': [update_compass_hand('wind')],
 };
 
 window.addEventListener("load", function(event) {
