@@ -148,7 +148,7 @@ class TasksRunner(object):
 
     def set_jump(self, label):
         '''Jump callback to jump to task on next time step.'''
-        self._jump_next = None
+        self._jump_next = label
         self.log('error', "Set jump label %r", label)
     
     def process_jump(self):
