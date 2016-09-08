@@ -167,7 +167,7 @@ class TasksRunner(object):
                 self.debug_pub('task_ix', i)
                 self.active_task = self.tasks[self.task_ix]
                 self.active_task.start()
-                self.log('warn', "Jumped to task {}: {}".format(
+                self.log('warning', "Jumped to task {}: {}".format(
                             self.task_ix, self.active_task.task_kind
                 ))
                 return True

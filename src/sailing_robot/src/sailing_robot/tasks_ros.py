@@ -25,8 +25,10 @@ class RosTasksRunner(TasksRunner):
             rospy.logwarn(msg, *values)
         elif level == 'info':
             rospy.loginfo(msg, *values)
-        else:
+        elif level == 'debug':
             rospy.logdebug(msg, *values)
+        else:
+            rospy.logerr(msg, *values)
 
     def register_debug_topics(self, topics):
         """Sets up publishers for a task's debugging topics.
