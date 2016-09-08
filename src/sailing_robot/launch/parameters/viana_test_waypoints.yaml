@@ -1,9 +1,9 @@
 
 wp/tasks: [
   {"kind": "to_waypoint", "waypoint": "1"},
+  {"kind": "start_timer", "seconds": 5, "jump_to": "last_point"}
   {"kind": "to_waypoint", "waypoint": "2"},
-  {"kind": "keep_station", "waypoint": "2", linger: 60},
-  {"kind": "to_waypoint", "waypoint": "3"},
+  {"kind": "to_waypoint", "waypoint": "3", "jump_label": "last_point"},
 ]
 
 # distance within waypoint is accepted, in [m]
