@@ -15,6 +15,7 @@ from .heading_planning_laylines import HeadingPlan
 from .station_keeping2 import StationKeeping
 from .return_to_safety import ReturnToSafetyZone
 from .obstacle_waypoints import ObstacleWaypoints
+from .timeout import StartTimer
 
 def tasks_from_wps(wp_params):
     target_radius = wp_params['acceptRadius']
@@ -36,22 +37,28 @@ def tasks_from_wps(wp_params):
             kind = wp_task['kind']
             if kind == 'to_waypoint':
                 lat, lon = coordinates[wp_task['waypoint']]
-                res.append(expand_to_waypoint(wp_task['waypoint']))
+                expanded_task = expand_to_waypoint(wp_task['waypoint'])
             elif kind == 'keep_station':
                 lat, lon = coordinates[wp_task['waypoint']]
-                res.append({
+                expanded_task = {
                     'kind': 'keep_station',
                     'marker_ll': (lat, lon),
                     'linger': wp_task.get('linger', 300),
                     'radius': wp_task.get('radius', 5),
                     'wind_angle': wp_task.get('wind_angle', 75),
-                })
+                }
             elif kind == 'obstacle_waypoints':
-                res.append({
+                expanded_task = {
                     'kind': 'obstacle_waypoints',
                     'normal_wp': expand_to_waypoint(wp_task['normal']),
                     'obstacle_wp': expand_to_waypoint(wp_task['obstacle']),
-                })
+                }
+            elif kind == 'start_timer':
+                expanded_task = wp_task.copy()
+
+            # Copy over any jump label
+            expanded_task['jump_label'] = wp_task.get('jump_label', None)
+            res.append(expanded_task)
 
     else:
         # Short specification: just a series of waypoints to go around
@@ -76,7 +83,17 @@ class TasksRunner(object):
         self.task_ix = -1
         self.active_task = None
         self.nav = nav
+        self._jump_next = None
         self.tasks = [self._make_task(d) for d in tasks]
+        self.check_jump_labels()
+    
+    def check_jump_labels(self):
+        jump_labels = set([t.jump_label for t in self.tasks if t.jump_label is not None])
+        for t in tasks:
+            if t.task_kind == 'start_timer':
+                if t.jump_to not in jump_labels:
+                    raise ValueError('Timer tries to jump to %r, label not found'
+                                        % t.jump_to)
 
     @staticmethod
     def log(level, msg, *values):
@@ -87,6 +104,7 @@ class TasksRunner(object):
         """
         taskdict = taskdict.copy()
         kind = taskdict.pop('kind')
+        jump_label = taskdict.pop('jump_label')
         if kind == 'to_waypoint':
             wp = LatLon(*taskdict['waypoint_ll'])
             kw = {'target_radius': taskdict.get('target_radius', 2.0), 'tack_voting_radius': taskdict.get('tack_voting_radius', 15.)}
@@ -99,10 +117,14 @@ class TasksRunner(object):
             normal_wp_plan = self._make_task(taskdict['normal_wp'])
             obstacle_wp_plan = self._make_task(taskdict['obstacle_wp'])
             task = ObstacleWaypoints(self.nav, normal_wp_plan, obstacle_wp_plan)
+        elif kind == 'start_timer':
+            task = StartTimer(self.nav, seconds=taskdict['seconds'],
+                      jump_to=taskdict['jump_to'], jump_callback=self.set_jump)
         else:
             raise ValueError("Unknown task type: {}".format(kind))
         
         task.task_kind = kind
+        task.jump_label = jump_label
         return task
     
     on_temporary_task = False
@@ -123,6 +145,35 @@ class TasksRunner(object):
                     self.task_ix, self.active_task.task_kind, '/'.join(endcond)
         ))
         self.active_task.start()
+
+    def set_jump(self, label):
+        '''Jump callback to jump to task on next time step.'''
+        self._jump_next = None
+    
+    def process_jump(self):
+        '''If a jump is set, go to that task, and clear the jump.
+        
+        Returns True if a jump occurred.
+        '''
+        if self._jump_next is None:
+            return False
+        
+        label = self._jump_next
+        self._jump_next = None
+        for i, task in enumerate(self.tasks):
+            if task.jump_label == label:
+                self.task_ix = i
+                self.on_temporary_task = False
+                self.debug_pub('task_ix', i)
+                self.active_task = self.tasks[self.task_ix]
+                self.active_task.start()
+                self.log('info', "Jumped to task {}: {}".format(
+                            self.task_ix, self.active_task.task_kind
+                ))
+                return True
+        
+        self.log('error', "Couldn't find jump label %r", label)
+        return False
 
     def insert_task(self, taskdict):
         """Do a temporary task.
@@ -146,6 +197,8 @@ class TasksRunner(object):
 
         If a safety zone is specified, also checks if we're (nearly) out of it.
         """
+        self.process_jump()
+
         if self.active_task.check_end_condition():
             self.start_next_task()
 

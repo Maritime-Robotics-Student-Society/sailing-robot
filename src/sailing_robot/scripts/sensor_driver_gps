@@ -3,6 +3,7 @@
 import serial
 import pynmea2
 import re
+import time
 import traceback
 
 import rospy
@@ -63,8 +64,40 @@ def pos_publisher():
             wtime.time_s = sentence.timestamp.second
             gps_pub.publish(wtime)
 
+def set_gps_options():
+    '''Send ublox commands to turn off some data and change GPS rate to 5Hz.
+    
+    Thanks to Simon of team Anemoi for info on how to do this.
+    '''
+    if not rospy.get_param('change_gps_rate', False):
+        return
+    
+    serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x02\x00\x00\x00\x00\x00\x01\x02\x32\x10\x13')
+    time.sleep(1)
+
+    # GxGSV off
+    serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x03\x00\x00\x00\x00\x00\x01\x03\x39\x10\x13')
+    time.sleep(1)
+
+    # GxRMC off
+    serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x04\x00\x00\x00\x00\x00\x01\x04\x40\x10\x13')
+    time.sleep(1)
+
+    # GxVTG off
+    serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x05\x00\x00\x00\x00\x00\x01\x05\x47\x10\x13')
+    time.sleep(1)
+
+    # GxGLL off
+    serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x01\x00\x00\x00\x00\x00\x01\x01\x2B\x10\x13')
+    time.sleep(1)
+
+    # NMEA rate: 5Hz
+    serial_port.write(b'\xB5\x62\x06\x08\x06\x00\xC8\x00\x01\x00\x01\x00\xDE\x6A\x10\x13')
+    time.sleep(1)
+
 if __name__ == '__main__':
     try:
+        set_gps_options()
         pos_pub = rospy.Publisher('position', NavSatFix, queue_size=10)
         gps_pub = rospy.Publisher('gps_fix', gpswtime, queue_size=10)
         nsats_pub = rospy.Publisher('gps_satellites', Int16, queue_size=10)
