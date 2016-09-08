@@ -17,3 +17,5 @@ sailsettings/table: {'0': 0,
 
 
 sailsettings/windSpeed: 6
+
+sailsettings/sheet_out_to_jibe: true
