@@ -36,8 +36,8 @@ class SailData(object):
     def calculate_sheet_setting(self):
         if sheet_out_to_jibe and \
                 self.sailing_state in ('jibe_to_stbd_tack', 'jibe_to_port_tack'):
-            # Sheet fully out for jibe
-            return 1.0
+            # Sheet mostly out for jibe
+            return 0.75
 
         windDirection = self.wind_direction_apparent
         if windDirection > 180:
