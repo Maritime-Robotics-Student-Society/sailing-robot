@@ -27,7 +27,8 @@ def tasks_from_wps(wp_params):
             'kind': 'to_waypoint',
             'waypoint_ll': coordinates[wpid],
             'target_radius': target_radius,
-            'tack_voting_radius': tack_voting_radius
+            'tack_voting_radius': tack_voting_radius,
+            'waypoint_id': wpid,
         }
 
     res = []
@@ -107,7 +108,10 @@ class TasksRunner(object):
         jump_label = taskdict.pop('jump_label', None)
         if kind == 'to_waypoint':
             wp = LatLon(*taskdict['waypoint_ll'])
-            kw = {'target_radius': taskdict.get('target_radius', 2.0), 'tack_voting_radius': taskdict.get('tack_voting_radius', 15.)}
+            kw = {'target_radius': taskdict.get('target_radius', 2.0),
+                  'tack_voting_radius': taskdict.get('tack_voting_radius', 15.),
+                  'waypoint_id': taskdict.get('waypoint_id', None),
+                 }
             task = HeadingPlan(waypoint=wp, nav=self.nav, **kw)
         elif kind == 'keep_station':
             task = StationKeeping(self.nav, **taskdict)

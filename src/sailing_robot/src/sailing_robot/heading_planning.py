@@ -58,6 +58,7 @@ class HeadingPlan(TaskBase):
             waypoint=ll.LatLon(50.742810, 1.014469), # somewhere in the solent
             target_radius=2,
             tack_decision_samples=100, tack_decision_threshold=0.75,
+            waypoint_id=None,
             ):
         """Sail towards a waypoint.
 
@@ -72,6 +73,7 @@ class HeadingPlan(TaskBase):
         """
         self.nav = nav
         self.waypoint = waypoint
+        self.waypoint_id = waypoint_id
         x, y = self.nav.latlon_to_utm(waypoint.lat.decimal_degree, waypoint.lon.decimal_degree)
         self.waypoint_xy = Point(x, y)
         self.target_area = self.waypoint_xy.buffer(target_radius)
@@ -94,6 +96,7 @@ class HeadingPlan(TaskBase):
         ('heading_to_waypoint', 'Float32'),
         ('distance_to_waypoint', 'Float32'),
         ('goal_wind_angle', 'Float32'),
+        ('latest_waypoint_id', 'String'),
     ]
 
     def distance_heading_to_waypoint(self):
@@ -111,6 +114,7 @@ class HeadingPlan(TaskBase):
         dwp, hwp = self.distance_heading_to_waypoint()
         self.debug_pub('distance_to_waypoint', dwp)
         self.debug_pub('heading_to_waypoint', hwp)
+        self.debug_pub('latest_waypoint_id', self.waypoint_id)
 
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':

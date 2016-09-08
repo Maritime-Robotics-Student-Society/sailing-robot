@@ -14,7 +14,7 @@ LAYLINE_EXTENT = 10000
 class HeadingPlan(TaskBase):
     def __init__(self, nav,
             waypoint=ll.LatLon(50.742810, 1.014469), # somewhere in the solent
-            target_radius=2, tack_voting_radius=15,
+            target_radius=2, tack_voting_radius=15, waypoint_id=None,
             ):
         """Sail towards a waypoint.
 
@@ -35,6 +35,7 @@ class HeadingPlan(TaskBase):
         self.sailing_state = 'normal'  # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
         self.tack_voting = TackVoting(50, 35)
         self.tack_voting_radius = tack_voting_radius
+        self.waypoint_id = waypoint_id
     
     def start(self):
         pass
@@ -47,6 +48,7 @@ class HeadingPlan(TaskBase):
         ('heading_to_waypoint', 'Float32'),
         ('distance_to_waypoint', 'Float32'),
         ('goal_wind_angle', 'Float32'),
+        ('latest_waypoint_id', 'String'),
     ]
 
     def calculate_state_and_goal(self):
@@ -55,6 +57,7 @@ class HeadingPlan(TaskBase):
         dwp, hwp = self.nav.distance_and_heading(self.waypoint_xy)
         self.debug_pub('distance_to_waypoint', dwp)
         self.debug_pub('heading_to_waypoint', hwp)
+        self.debug_pub('latest_waypoint_id', self.waypoint_id)
 
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':
