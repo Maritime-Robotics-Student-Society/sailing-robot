@@ -25,7 +25,7 @@ class StartTimer(TaskBase):
     def start(self):
         # Create the timer here so that the task instance can be used more than
         # once.
-        self.timer = Timer(seconds, jump_callback, args=[jump_to])
+        self.timer = Timer(self.seconds, self.jump_callback, args=[self.jump_to])
         # If the tasks process dies, the timer thread should die
         self.timer.daemon = True
         self.timer.start()
