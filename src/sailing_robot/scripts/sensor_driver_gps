@@ -3,6 +3,7 @@
 import serial
 import pynmea2
 import re
+import time
 import traceback
 
 import rospy
