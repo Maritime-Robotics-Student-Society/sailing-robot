@@ -141,3 +141,8 @@ camera_detection/Upper_color: [90, 91, 255] # /!\ BGR colorspace
 # Power-On Self Test. If run, the rudder will wiggle and the sheet move
 # when ROS is started, to check everything is working.
 do_post: false
+
+# Change GPS rate to 5Hz - if we run into problems, turn this off to use the
+# default. Takes several seconds due to waits - this can probably be reduced if
+# needed.
+change_gps_rate: true
