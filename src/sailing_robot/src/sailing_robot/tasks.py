@@ -137,7 +137,6 @@ class TasksRunner(object):
             self.log('warning', "Run all tasks, returning to start")
             self.task_ix = 0
 
-        self.debug_pub('task_ix', self.task_ix)
         self.active_task = self.tasks[self.task_ix]
         self.on_temporary_task = False
         endcond = '' # TODO
@@ -164,7 +163,6 @@ class TasksRunner(object):
             if task.jump_label == label:
                 self.task_ix = i
                 self.on_temporary_task = False
-                self.debug_pub('task_ix', i)
                 self.active_task = self.tasks[self.task_ix]
                 self.active_task.start()
                 self.log('warning', "Jumped to task {}: {}".format(
@@ -187,7 +185,6 @@ class TasksRunner(object):
         self.on_temporary_task = True
         self.active_task = self._make_task(taskdict)
         self.active_task.start()
-        self.debug_pub('task_ix', -1)
         self.log('info', "Running intermediate task: {}".format(taskdict['kind']))
 
     def calculate_state_and_goal(self):
@@ -206,6 +203,8 @@ class TasksRunner(object):
             # We're about to wander out of the safety zone!
             self.log('warning', 'At edge of safety zone')
             self.insert_task({'kind': 'return_to_safety_zone'})
+
+        self.debug_pub('task_ix', self.task_ix)
 
         return self.active_task.calculate_state_and_goal()
 
