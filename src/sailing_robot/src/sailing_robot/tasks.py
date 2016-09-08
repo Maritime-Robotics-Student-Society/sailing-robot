@@ -89,7 +89,7 @@ class TasksRunner(object):
     
     def check_jump_labels(self):
         jump_labels = set([t.jump_label for t in self.tasks if t.jump_label is not None])
-        for t in tasks:
+        for t in self.tasks:
             if t.task_kind == 'start_timer':
                 if t.jump_to not in jump_labels:
                     raise ValueError('Timer tries to jump to %r, label not found'
