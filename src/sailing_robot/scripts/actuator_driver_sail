@@ -6,7 +6,7 @@ Sets sail actuator to correct PWM value
 """
 import time
 import rospy
-from std_msgs.msg import Float64, Float32
+from std_msgs.msg import Float64, Float32, String
 import pigpio
 from sailing_robot.sail_table import SailTable
 
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         rospy.init_node('actuator_driver_sail', anonymous=True)
 
         rospy.Subscriber('wind_direction_apparent', Float64, sail_data.update_wind)
-        rospy.Subscriber('sailing_state', Float64, sail_data.update_sailing_state)
+        rospy.Subscriber('sailing_state', String, sail_data.update_sailing_state)
         rate = rospy.Rate(rospy.get_param("config/rate"))
 
         while True:
