@@ -205,6 +205,7 @@ class TasksRunner(object):
             self.insert_task({'kind': 'return_to_safety_zone'})
 
         self.debug_pub('task_ix', self.task_ix)
+        self.debug_pub('active_task_kind', self.active_task.task_kind)
 
         return self.active_task.calculate_state_and_goal()
 
