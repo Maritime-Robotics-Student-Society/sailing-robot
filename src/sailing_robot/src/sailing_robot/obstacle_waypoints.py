@@ -58,4 +58,5 @@ class ObstacleWaypoints(TaskBase):
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
         """
+        self.debug_pub('latest_waypoint_id', self.active_plan.waypoint_id)
         return self.active_plan.calculate_state_and_goal()

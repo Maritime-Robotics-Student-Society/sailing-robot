@@ -23,7 +23,7 @@ import numpy as np
 
 
 # Number of subdivision (8 for MS class)
-sub = 8
+sub = 6
 
 # Load yaml file given in argument
 yaml_file = sys.argv[1]
@@ -94,4 +94,3 @@ for i in range(sub):
 print u'└─' + u'┴─'*(sub-1) + u'┘'
 
 print 'Score: ' +  str(score) + '/' + str(sub*sub*3/4)
-

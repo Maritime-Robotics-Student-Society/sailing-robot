@@ -57,6 +57,7 @@ class ReturnToSafetyZone(TaskBase):
         dwp, hwp = self.distance_heading_to_waypoint()
         self.debug_pub('distance_to_waypoint', dwp)
         self.debug_pub('heading_to_waypoint', hwp)
+        self.debug_pub('latest_waypoint_id', 'safety_zone_centroid')
 
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':

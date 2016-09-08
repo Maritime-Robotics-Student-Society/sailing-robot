@@ -7,7 +7,7 @@ from .taskbase import TaskBase
 class HeadingPlan(TaskBase):
     def __init__(self, nav,
             waypoint=ll.LatLon(50.742810, 1.014469), # somewhere in the solent
-            target_radius=2,
+            target_radius=2, waypoint_id=None,
             ):
         """Heading planning machinery, dumb version.
         
@@ -16,6 +16,7 @@ class HeadingPlan(TaskBase):
         """
         self.nav = nav
         self.waypoint = waypoint
+        self.waypoint_id = waypoint_id
         x, y = self.nav.latlon_to_utm(waypoint.lat.decimal_degree, waypoint.lon.decimal_degree)
         self.waypoint_xy = Point(x, y)
         self.target_area = self.waypoint_xy.buffer(target_radius)
@@ -36,6 +37,7 @@ class HeadingPlan(TaskBase):
     debug_topics = [
         ('distance_to_waypoint', 'Float32'),
         ('heading_to_waypoint', 'Float32'),
+        ('latest_waypoint_id', 'String'),
     ]
 
     def calculate_state_and_goal(self):
@@ -44,5 +46,6 @@ class HeadingPlan(TaskBase):
         dwp, hwp = self.distance_heading_to_waypoint()
         self.debug_pub('distance_to_waypoint', dwp)
         self.debug_pub('heading_to_waypoint', hwp)
+        self.debug_pub('latest_waypoint_id', self.waypoint_id)
         wp_heading = self.nav.position_ll.heading_initial(self.waypoint)
         return 'normal', wp_heading
