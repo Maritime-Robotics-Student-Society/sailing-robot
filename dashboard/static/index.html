@@ -43,6 +43,15 @@ body {
     width: 600px;
     text-align: center;
 }
+
+#magic_compass {
+  text-align: center;
+}
+
+.compass_hand {
+  height: 160px;
+  transform-origin: bottom center;
+}
 </style>
 </head>
 
@@ -55,7 +64,7 @@ body {
   </div>
   <table id='topics-table' class='zebra_table'><tbody></tbody></table>
 
-  <h2>/rosout</h2>
+  <!-- <h2>/rosout</h2>
   <div id='rosout'>
     <a id='rosout-level-debug' href='#'>Debug</a> -
     <a id='rosout-level-info' href='#'>Info</a> -
@@ -63,6 +72,14 @@ body {
     <a id='rosout-level-error' href='#'>Error</a> -
     <a id='rosout-level-fatal' href='#'>Fatal</a>
     <table id='rosout-display' class='zebra_table'><tbody></tbody></table>
+  </div> -->
+
+  <h2>Compass</h2>
+  <div id='magic_compass'>
+    <img id='heading_hand' src='/static/heading_hand.svg' class='compass_hand'>
+    <img id='goal_hand' src='/static/goal_hand.svg' class='compass_hand'>
+    <img id='waypoint_hand' src='/static/waypoint_hand.svg' class='compass_hand'>
+    <!--<img id='wind_hand' src='/static/wind_hand.svg' class='compass_hand'>-->
   </div>
 
 <script>
@@ -155,18 +172,34 @@ function rosout_handling(target_id) {
   return append_msg;
 }
 
+function update_compass_hand(name) {
+  return function(msg){
+    id(name+'_hand').style.transform = 'rotate('+msg.value+'deg)';
+  }
+}
+
+topic_handlers = {
+  '/heading': [update_compass_hand('heading')],
+  '/goal_heading': [update_compass_hand('goal')],
+  '/heading_to_waypoint': [update_compass_hand('waypoint')],
+};
+
 window.addEventListener("load", function(event) {
   var ws = new WebSocket('ws://' + location.host + '/updates');
-  var push_rosout = rosout_handling('rosout');
+  //var push_rosout = rosout_handling('rosout');
   ws.onopen = function(event) {
     id('connecting').style.display = 'none';
   };
   ws.onmessage = function(event) {
     var json_msg = JSON.parse(event.data);
     if (json_msg.topic === '/rosout') {
-      push_rosout(json_msg);
+      //push_rosout(json_msg);
+      0;
     } else {
       update_topic_table(json_msg);
+      (topic_handlers[json_msg.topic] || []).forEach(function(h) {
+        h(json_msg);
+      })
     }
   };
   ws.onclose = function(event) {
