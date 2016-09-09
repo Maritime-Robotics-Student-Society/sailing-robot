@@ -46,9 +46,11 @@ v14_unit = v14 / d14
 # Coordinates of waypoints (see scheme in the wiki
 wpA = wp1_utm -margin*v12_unit + 0.5*v14
 wpB = wp1_utm + v12/3 + 0.5*v14 
+wpB1 = wp1_utm + v12/3 + 1.5*v14
 wpC0 = wp1_utm + 0.5*v12 + 0.5*v14
-wpC1 = wp1_utm + 0.5*v12 - 0.5*v14
+wpC1 = wp1_utm + 0.5*v12 + 1.5*v14
 wpD =  wp2_utm - v12/3 + 0.5*v14
+wpD1 =  wp2_utm - v12/3 + 1.5*v14
 wpE = wp2_utm + margin*v12_unit + 0.5*v14
 
 
@@ -58,30 +60,36 @@ def to_wp(wp):
 
 wpA = to_wp(wpA)
 wpB = to_wp(wpB)
+wpB1 = to_wp(wpB1)
 wpC0 = to_wp(wpC0)
 wpC1 = to_wp(wpC1)
 wpD = to_wp(wpD)
+wpD1 = to_wp(wpD1)
 wpE = to_wp(wpE)
 
 
 yaml_data['wp/tasks'] = [{'kind': 'to_waypoint', 'waypoint': 'A'},
                         {'kind': 'to_waypoint', 'waypoint': 'B'},
+                        {'kind': 'obstacle_waypoints', 'normal': 'C0', 'obstacle': 'B1'},
                         {'kind': 'obstacle_waypoints', 'normal': 'D', 'obstacle': 'C1'},
                         {'kind': 'to_waypoint', 'waypoint': 'D'},
                         {'kind': 'to_waypoint', 'waypoint': 'E'},
                         {'kind': 'to_waypoint', 'waypoint': 'D'},
+                        {'kind': 'obstacle_waypoints', 'normal': 'C0', 'obstacle': 'D1'},
                         {'kind': 'obstacle_waypoints', 'normal': 'B', 'obstacle': 'C1'},
                         {'kind': 'to_waypoint', 'waypoint': 'B'},
                         ]
 
-yaml_data['wp/list'] = ['A', 'B', 'C0', 'C1', 'D', 'E']
+yaml_data['wp/list'] = ['A', 'B', 'B1', 'C0', 'C1', 'D', 'D1', 'E']
 
 #yaml_data['wp/table'] = {}
 yaml_data['wp/table']['A'] = wpA
 yaml_data['wp/table']['B'] = wpB
+yaml_data['wp/table']['B1'] = wpB1
 yaml_data['wp/table']['C0'] = wpC0
 yaml_data['wp/table']['C1'] = wpC1
 yaml_data['wp/table']['D'] = wpD
+yaml_data['wp/table']['D1'] = wpD1
 yaml_data['wp/table']['E'] = wpE
 
 yaml.dump(yaml_data, file(output_file, 'w'))

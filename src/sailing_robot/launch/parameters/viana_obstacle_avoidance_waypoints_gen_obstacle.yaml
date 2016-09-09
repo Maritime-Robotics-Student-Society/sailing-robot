@@ -1,10 +1,12 @@
-wp/list: [A, B, C0, C1, D, E]
+wp/list: [A, B, B1, C0, C1, D, D1, E]
 wp/table:
   A: [41.69020761052517, -8.82247809127125]
   B: [41.69052346756288, -8.822102303132368]
+  B1: [41.690384467169984, -8.821987903609795]
   C0: [41.69066795094366, -8.82193040357501]
-  C1: [41.69080695138766, -8.822044803473716]
+  C1: [41.69052895038339, -8.82181600416817]
   D: [41.690812434062174, -8.821758503248134]
+  D1: [41.690673433334524, -8.821644103957055]
   E: [41.69112828869981, -8.821382708067091]
   green1: [41.6903, -8.8231199]
   green2: [41.6914597, -8.82117]
@@ -15,10 +17,12 @@ wp/table:
 wp/tasks:
 - {kind: to_waypoint, waypoint: A}
 - {kind: to_waypoint, waypoint: B}
+- {kind: obstacle_waypoints, normal: C0, obstacle: B1}
 - {kind: obstacle_waypoints, normal: D, obstacle: C1}
 - {kind: to_waypoint, waypoint: D}
 - {kind: to_waypoint, waypoint: E}
 - {kind: to_waypoint, waypoint: D}
+- {kind: obstacle_waypoints, normal: C0, obstacle: D1}
 - {kind: obstacle_waypoints, normal: B, obstacle: C1}
 - {kind: to_waypoint, waypoint: B}
 
