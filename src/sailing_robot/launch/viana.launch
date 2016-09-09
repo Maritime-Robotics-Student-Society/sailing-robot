@@ -13,7 +13,7 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython_rigA.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/viana_obstacle_avoidance_waypoints_XXXXXXX.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/viana_obstacle_avoidance_waypoints_gen_obstacle.yaml" command="load"/>
     
     <param name="log_name" value="viana_obstacle_avoidance" />
 
