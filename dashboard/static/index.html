@@ -13,6 +13,9 @@ body {
   font-family: sans-serif;
 }
 
+#block_container tr {
+  vertical-align: top;
+}
 
 .zebra_table {
     margin: 0 auto;
@@ -46,6 +49,7 @@ body {
 
 #magic_compass {
   text-align: center;
+  padding-left: 150px;
 }
 
 .compass_hand {
@@ -62,7 +66,10 @@ body {
   <div id="connecting" class="overlay-box">
     Connecting...
   </div>
-  <table id='topics-table' class='zebra_table'><tbody></tbody></table>
+  <table class='block-container'><tr>
+  <td>
+    <table id='topics-table' class='zebra_table'><tbody></tbody></table>
+  </td>
 
   <!-- <h2>/rosout</h2>
   <div id='rosout'>
@@ -74,13 +81,16 @@ body {
     <table id='rosout-display' class='zebra_table'><tbody></tbody></table>
   </div> -->
 
-  <h2>Compass</h2>
+  <!-- <h2>Compass</h2> -->
+  <td>
   <div id='magic_compass'>
     <img id='heading_hand' src='/static/heading_hand.svg' class='compass_hand'>
     <img id='goal_hand' src='/static/goal_hand.svg' class='compass_hand'>
     <img id='waypoint_hand' src='/static/waypoint_hand.svg' class='compass_hand'>
     <img id='wind_hand' src='/static/wind_hand.svg' class='compass_hand'>
   </div>
+  </td>
+  </tr></table>
 
 <script>
 id = document.getElementById.bind(document);

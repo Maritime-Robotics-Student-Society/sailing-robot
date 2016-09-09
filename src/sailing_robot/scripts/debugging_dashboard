@@ -26,8 +26,8 @@ simple_topics = [
     # ('/mag_x_comp', Float32),
     # ('/mag_y_comp', Float32),
     # ('/mag_z', Float32),
-    ('/pitch', Float32),
-    ('/roll', Float32),
+    # ('/pitch', Float32),
+    # ('/roll', Float32),
     ('/goal_heading', Float32),
     ('/goal_wind_angle', Float32),
     ('/rudder_control', Int16),
@@ -36,7 +36,7 @@ simple_topics = [
     ('/distance_to_waypoint', Float32),
     ('/heading_to_waypoint', Float32),
     ('/gps_satellites', Int16),
-    ('/tack_rudder', Float32),
+    # ('/tack_rudder', Float32),
     ('/task_ix', Int16),
     ('/active_task_kind', String),
     ('/latest_waypoint_id', String),
@@ -44,7 +44,7 @@ simple_topics = [
 ]
 
 geo_topics = [
-    '/position',
+    # '/position',
 ]
 
 class MessageForwarder(object):
