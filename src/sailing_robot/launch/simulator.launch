@@ -33,6 +33,8 @@
     <node name = "simulation_wind_apparent" pkg="sailing_robot" type="simulation_wind_apparent" />
     <node name = "simulation_heading" pkg="sailing_robot" type="simulation_heading" />
 
+    <node name = "sensor_camera_detect" pkg="sailing_robot" type="sensor_camera_detect" />
+
     <!--node name = "force_jibe" pkg="sailing_robot" type="force_jibe" /-->
     <node name = "sensor_processed_wind_direction" pkg="sailing_robot" type="sensor_processed_wind_direction" />
 

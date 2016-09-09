@@ -3,6 +3,7 @@
 
 from std_msgs.msg import String
 
+import collections
 import rospy
 import time
 
@@ -20,10 +21,14 @@ class Camera_detection():
 
         rospy.init_node("sensor_camera_detect", anonymous=True)
 
-        self.rate = rospy.Rate(rospy.get_param("camera_detection/rate"))
+        sensor_rate = rospy.get_param("camera_detection/rate")
+        self.rate = rospy.Rate(sensor_rate)
         self.Lower = np.array( rospy.get_param('camera_detection/Lower_color'))
         self.Upper = np.array( rospy.get_param('camera_detection/Upper_color'))
         self.threshold = rospy.get_param('camera_detection/threshold')
+        AVE_TIME = rospy.get_param("camera_detection/average_time")   # lengh of the averaging in seconds
+        self.AVE_SIZE = int(AVE_TIME * sensor_rate)                        # size of the averaging sample
+        self.average_list = collections.deque(maxlen = self.AVE_SIZE)
 
         self.publish()
 
@@ -45,10 +50,16 @@ class Camera_detection():
                 percent_detect = 1.0*cv2.countNonZero(mask)  / image_size 
                 
                 if percent_detect >= self.threshold:
+                    self.average_list.append(1)
+                else:
+                    self.average_list.append(0)
+                
+                if sum(self.average_list)/self.AVE_SIZE > 0.7:
                     msg = 'detected'
                 else:
                     msg = 'nothing'
-                
+
+
                 self.publisher.publish(msg)
 
             self.rate.sleep() 

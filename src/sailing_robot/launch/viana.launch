@@ -13,9 +13,9 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython_rigA.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/viana_area_scanning_waypoints_gen_area.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/viana_obstacle_avoidance_waypoints_XXXXXXX.yaml" command="load"/>
     
-    <param name="log_name" value="viana_area_scanning" />
+    <param name="log_name" value="viana_obstacle_avoidance" />
 
     <!--
     Nodes
@@ -32,9 +32,11 @@
     <node name = "actuator_driver_sail" pkg="sailing_robot" type = "actuator_driver_sail" respawn="true"/>
     <node name = "actuator_driver_rudder" pkg="sailing_robot" type="actuator_driver_rudder"  respawn="true"/>
 
+    <node name = "sensor_camera_detect" pkg="sailing_robot" type="sensor_camera_detect" />
+
     <node name="debugging_dump_params" pkg='sailing_robot' type="debugging_dump_params"/>
     <!-- Rosbag records messages for later investigation -->
-    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/viana_area_scanning_"/>
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/viana_obstacle_avoidance_"/>
     <!-- Also record GPS data as required by the competition -->
     <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log" respawn="true"/>
 
