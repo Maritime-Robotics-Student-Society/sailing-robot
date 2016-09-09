@@ -131,12 +131,13 @@ force_jibe/distance_new_wp: 3 # [m]
 camera_detection/threshold: 0.04
 
 # Rate at wich picture are taken 
-camera_detection/rate: 2  # [Hz]
+camera_detection/rate: 5  # [Hz]
 
+camera_detection/average_time: 2  # [s]
 # Lower color:
-camera_detection/Lower_color: [2, 11, 100] # /!\ BGR colorspace
+camera_detection/Lower_color: [2, 11, 50] # /!\ BGR colorspace
 # Upper color:
-camera_detection/Upper_color: [90, 91, 255] # /!\ BGR colorspace
+camera_detection/Upper_color: [90, 90, 250] # /!\ BGR colorspace
 
 # Power-On Self Test. If run, the rudder will wiggle and the sheet move
 # when ROS is started, to check everything is working.
