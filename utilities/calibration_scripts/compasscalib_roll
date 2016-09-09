@@ -10,6 +10,7 @@
 #4. Connect the I2C device to the SDA and SCL pins of the Raspberry Pi and detect it using the command "i2cdetect -y 1".  It should show up as 1D (typically) or 1E (if the jumper is set).
 from __future__ import print_function
 
+import csv
 import numpy as np
 from scipy.optimize import leastsq
 import time, math
@@ -139,12 +140,18 @@ data_Y = []
 print('Hold the boat level and gently turn it around several times')
 raw_input('Press enter to start')
 
+f = open('calibration_level.csv', 'w')
+cw = csv.writer(f)
+cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
+
 for i in range(300):
     try:
         #Read data from the chips ----------------------
         time.sleep(0.1)
         
         magx, magy, magz = read_mag_field()
+        accx, accy, accz = read_acc()
+        cw.writerow([magx, magy, magz, accx, accy, accz])
 
         data_X.append(magx)
         data_Y.append(magy)
@@ -163,6 +170,8 @@ for i in range(300):
     except KeyboardInterrupt:
         print("Interrupted")
         break
+
+f.close()
 
 minx = min(data_X)
 miny = min(data_Y)
@@ -185,12 +194,21 @@ mag_x = []
 mag_y = []
 mag_z = []
 
+f = open('calibration_roll.csv', 'w')
+cw = csv.writer(f)
+cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
+
 
 for i in range(300):
     try:
         time.sleep(0.1)
-        pitch, roll = pitch_and_roll()
+        AccX, AccY, AccZ = read_acc()
+        pitch_r = math.atan2(AccX, math.sqrt(AccX**2 + AccZ**2))
+        roll_r = math.atan2(-AccY, -AccZ)
+        pitch, roll = math.degrees(pitch_r), math.degrees(roll_r)
+        # pitch, roll = pitch_and_roll()
         mag_xyz = read_mag_field()
+        cw.writerow(list(mag_xyz) + [AccX, AccY, AccZ])
         
         pitches.append(pitch)
         rolls.append(roll)
@@ -204,6 +222,8 @@ for i in range(300):
     except KeyboardInterrupt:
         print('Interrupted')
         break
+
+f.close()
 
 adjusted_x = (np.array(mag_x) - offset_X) / range_X
 adjusted_y = (np.array(mag_y) - offset_Y) / range_Y
