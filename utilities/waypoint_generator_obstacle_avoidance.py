@@ -47,11 +47,11 @@ v14_unit = v14 / d14
 wpA = wp1_utm -margin*v12_unit + 0.5*v14
 wpBx = wp1_utm + v12/6 + 0.5*v14
 wpB = wp1_utm + v12/3 + 0.5*v14 
-wpB1 = wp1_utm + v12/3 + 1.5*v14
+wpB1 = wp1_utm + v12/3 + 2.5*v14
 wpC0 = wp1_utm + 0.5*v12 + 0.5*v14
-wpC1 = wp1_utm + 0.5*v12 + 1.5*v14
+wpC1 = wp1_utm + 0.5*v12 + 2.5*v14
 wpD =  wp2_utm - v12/3 + 0.5*v14
-wpD1 =  wp2_utm - v12/3 + 1.5*v14
+wpD1 =  wp2_utm - v12/3 + 2.5*v14
 wpDx = wp2_utm - v12/6 + 0.5*v14
 wpE = wp2_utm + margin*v12_unit + 0.5*v14
 
