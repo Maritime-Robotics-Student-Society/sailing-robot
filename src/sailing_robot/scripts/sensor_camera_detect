@@ -29,13 +29,22 @@ class Camera_detection():
         AVE_TIME = rospy.get_param("camera_detection/average_time")   # lengh of the averaging in seconds
         self.AVE_SIZE = int(AVE_TIME * sensor_rate)                        # size of the averaging sample
         self.average_list = collections.deque(maxlen = self.AVE_SIZE)
-
         self.publish()
 
     def publish(self):
 
+
+        Lower_hsv1 = np.array( rospy.get_param('camera_detection/Lower_color_hsv1'))
+        Upper_hsv1 = np.array( rospy.get_param('camera_detection/Upper_color_hsv1'))
+        Lower_hsv2 = np.array( rospy.get_param('camera_detection/Lower_color_hsv2'))
+        Upper_hsv2 = np.array( rospy.get_param('camera_detection/Upper_color_hsv2'))
+
+
         camera = cv2.VideoCapture(0) 
-        (bool, image) = camera.read()
+        for i in range(50):
+            (bool, image) = camera.read()
+
+        rospy.logwarn('Camera ready')
         image_size = image.shape[0]*image.shape[1]
         self.rate.sleep()
 
@@ -43,18 +52,24 @@ class Camera_detection():
 
             (bool, image) = camera.read()
             if bool:
-                image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-                mask = cv2.inRange(image, self.Lower, self.Upper)
-                
+                hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+                #mask = cv2.inRange(image, self.Lower, self.Upper)
+
+                hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+                mask_hsv1 = cv2.inRange(hsv, Lower_hsv1, Upper_hsv1)
+                mask_hsv2 = cv2.inRange(hsv, Lower_hsv2, Upper_hsv2)
+             
                 # percentage of the image that contains the expected colors
-                percent_detect = 1.0*cv2.countNonZero(mask)  / image_size 
+
+                percent_detect1 = 1.0*cv2.countNonZero(mask_hsv1)  / image_size # percentage of the image that contains the expected colors
+                percent_detect2 = 1.0*cv2.countNonZero(mask_hsv2)  / image_size # percentage of the image that contains the expected colors
                 
-                if percent_detect >= self.threshold:
+                if percent_detect1+percent_detect2  >= self.threshold: 
                     self.average_list.append(1)
                 else:
                     self.average_list.append(0)
                 
-                if sum(self.average_list)/self.AVE_SIZE > 0.7:
+                if sum(self.average_list)/self.AVE_SIZE > 0.5:
                     msg = 'detected'
                 else:
                     msg = 'nothing'
