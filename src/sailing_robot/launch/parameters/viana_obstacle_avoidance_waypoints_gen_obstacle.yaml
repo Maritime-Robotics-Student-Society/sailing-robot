@@ -1,12 +1,14 @@
-wp/list: [A, B, B1, C0, C1, D, D1, E]
+wp/list: [A, Bx, B, B1, C0, C1, D, D1, Dx, E]
 wp/table:
   A: [41.69020761052517, -8.82247809127125]
   B: [41.69052346756288, -8.822102303132368]
   B1: [41.690384467169984, -8.821987903609795]
+  Bx: [41.69037898391984, -8.822274201920209]
   C0: [41.69066795094366, -8.82193040357501]
   C1: [41.69052895038339, -8.82181600416817]
   D: [41.690812434062174, -8.821758503248134]
   D1: [41.690673433334524, -8.821644103957055]
+  Dx: [41.690956916918424, -8.821586602151712]
   E: [41.69112828869981, -8.821382708067091]
   green1: [41.6903, -8.8231199]
   green2: [41.6914597, -8.82117]
@@ -16,15 +18,19 @@ wp/table:
   wp4: [41.690165, -8.8223889]
 wp/tasks:
 - {kind: to_waypoint, waypoint: A}
+- {kind: to_waypoint, waypoint: Bx}
 - {kind: to_waypoint, waypoint: B}
 - {kind: obstacle_waypoints, normal: C0, obstacle: B1}
 - {kind: obstacle_waypoints, normal: D, obstacle: C1}
 - {kind: to_waypoint, waypoint: D}
+- {kind: to_waypoint, waypoint: Dx}
 - {kind: to_waypoint, waypoint: E}
+- {kind: to_waypoint, waypoint: Dx}
 - {kind: to_waypoint, waypoint: D}
 - {kind: obstacle_waypoints, normal: C0, obstacle: D1}
 - {kind: obstacle_waypoints, normal: B, obstacle: C1}
 - {kind: to_waypoint, waypoint: B}
+- {kind: to_waypoint, waypoint: Bx}
 
 wp/acceptRadius: 8
 wp/tackVotingRadius: 1000
