@@ -36,9 +36,15 @@ def tasks_from_wps(wp_params):
         # Long specification: list of tasks
         for wp_task in wp_params['tasks']:
             kind = wp_task['kind']
+
             if kind == 'to_waypoint':
                 lat, lon = coordinates[wp_task['waypoint']]
                 expanded_task = expand_to_waypoint(wp_task['waypoint'])
+                if 'accept_radius' in wp_task:
+                    expanded_task['target_radius'] = wp_task['accept_radius']
+                if 'tack_voting_radius' in wp_task:
+                    expanded_task['tack_voting_radius'] = wp_task['accept_radius']
+
             elif kind == 'keep_station':
                 lat, lon = coordinates[wp_task['waypoint']]
                 expanded_task = {
@@ -48,12 +54,20 @@ def tasks_from_wps(wp_params):
                     'radius': wp_task.get('radius', 5),
                     'wind_angle': wp_task.get('wind_angle', 75),
                 }
+
             elif kind == 'obstacle_waypoints':
                 expanded_task = {
                     'kind': 'obstacle_waypoints',
                     'normal_wp': expand_to_waypoint(wp_task['normal']),
                     'obstacle_wp': expand_to_waypoint(wp_task['obstacle']),
                 }
+                if 'accept_radius' in wp_task:
+                    expanded_task['normal_wp']['target_radius'] = wp_task['accept_radius']
+                    expanded_task['obstacle_wp']['target_radius'] = wp_task['accept_radius']
+                if 'tack_voting_radius' in wp_task:
+                    expanded_task['normal_wp']['tack_voting_radius'] = wp_task['accept_radius']
+                    expanded_task['obstacle_wp']['tack_voting_radius'] = wp_task['accept_radius']
+
             elif kind == 'start_timer':
                 expanded_task = wp_task.copy()
 
