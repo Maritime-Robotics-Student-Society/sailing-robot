@@ -20,6 +20,74 @@ wp/tasks:
 - {kind: to_waypoint, waypoint: A}
 - {kind: to_waypoint, waypoint: Bx}
 - {kind: to_waypoint, waypoint: B}
+- {kind: to_waypoint, waypoint: C}
+- {kind: to_waypoint, waypoint: D}
+- {kind: to_waypoint, waypoint: Dx}
+- {kind: to_waypoint, waypoint: E}
+- {kind: to_waypoint, waypoint: Dx}
+- {kind: to_waypoint, waypoint: D}
+- {kind: to_waypoint, waypoint: C}
+- {kind: to_waypoint, waypoint: B}
+- {kind: to_waypoint, waypoint: Bx}
+- {kind: to_waypoint, waypoint: A}
+- {kind: to_waypoint, waypoint: Bx}
+- {kind: to_waypoint, waypoint: B}
+- {kind: obstacle_waypoints, normal: C0, obstacle: B1}
+- {kind: obstacle_waypoints, normal: D, obstacle: C1}
+- {kind: to_waypoint, waypoint: D}
+- {kind: to_waypoint, waypoint: Dx}
+- {kind: to_waypoint, waypoint: E}
+- {kind: to_waypoint, waypoint: Dx}
+- {kind: to_waypoint, waypoint: D}
+- {kind: obstacle_waypoints, normal: C0, obstacle: D1}
+- {kind: obstacle_waypoints, normal: B, obstacle: C1}
+- {kind: to_waypoint, waypoint: B}
+- {kind: to_waypoint, waypoint: Bx}
+- {kind: to_waypoint, waypoint: A}
+- {kind: to_waypoint, waypoint: Bx}
+- {kind: to_waypoint, waypoint: B}
+- {kind: obstacle_waypoints, normal: C0, obstacle: B1}
+- {kind: obstacle_waypoints, normal: D, obstacle: C1}
+- {kind: to_waypoint, waypoint: D}
+- {kind: to_waypoint, waypoint: Dx}
+- {kind: to_waypoint, waypoint: E}
+- {kind: to_waypoint, waypoint: Dx}
+- {kind: to_waypoint, waypoint: D}
+- {kind: obstacle_waypoints, normal: C0, obstacle: D1}
+- {kind: obstacle_waypoints, normal: B, obstacle: C1}
+- {kind: to_waypoint, waypoint: B}
+- {kind: to_waypoint, waypoint: Bx}
+- {kind: to_waypoint, waypoint: A}
+- {kind: to_waypoint, waypoint: Bx}
+- {kind: to_waypoint, waypoint: B}
+- {kind: obstacle_waypoints, normal: C0, obstacle: B1}
+- {kind: obstacle_waypoints, normal: D, obstacle: C1}
+- {kind: to_waypoint, waypoint: D}
+- {kind: to_waypoint, waypoint: Dx}
+- {kind: to_waypoint, waypoint: E}
+- {kind: to_waypoint, waypoint: Dx}
+- {kind: to_waypoint, waypoint: D}
+- {kind: obstacle_waypoints, normal: C0, obstacle: D1}
+- {kind: obstacle_waypoints, normal: B, obstacle: C1}
+- {kind: to_waypoint, waypoint: B}
+- {kind: to_waypoint, waypoint: Bx}
+- {kind: to_waypoint, waypoint: A}
+- {kind: to_waypoint, waypoint: Bx}
+- {kind: to_waypoint, waypoint: B}
+- {kind: obstacle_waypoints, normal: C0, obstacle: B1}
+- {kind: obstacle_waypoints, normal: D, obstacle: C1}
+- {kind: to_waypoint, waypoint: D}
+- {kind: to_waypoint, waypoint: Dx}
+- {kind: to_waypoint, waypoint: E}
+- {kind: to_waypoint, waypoint: Dx}
+- {kind: to_waypoint, waypoint: D}
+- {kind: obstacle_waypoints, normal: C0, obstacle: D1}
+- {kind: obstacle_waypoints, normal: B, obstacle: C1}
+- {kind: to_waypoint, waypoint: B}
+- {kind: to_waypoint, waypoint: Bx}
+- {kind: to_waypoint, waypoint: A}
+- {kind: to_waypoint, waypoint: Bx}
+- {kind: to_waypoint, waypoint: B}
 - {kind: obstacle_waypoints, normal: C0, obstacle: B1}
 - {kind: obstacle_waypoints, normal: D, obstacle: C1}
 - {kind: to_waypoint, waypoint: D}
