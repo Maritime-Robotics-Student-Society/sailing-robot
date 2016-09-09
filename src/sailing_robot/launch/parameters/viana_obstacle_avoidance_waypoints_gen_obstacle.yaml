@@ -21,3 +21,6 @@ wp/tasks:
 - {kind: to_waypoint, waypoint: D}
 - {kind: obstacle_waypoints, normal: B, obstacle: C1}
 - {kind: to_waypoint, waypoint: B}
+
+wp/acceptRadius: 8
+wp/tackVotingRadius: 1000
