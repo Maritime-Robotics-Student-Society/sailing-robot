@@ -4,7 +4,7 @@ Supply browser view of ros topics in local network
 """
 
 import rospy
-from std_msgs.msg import Float32, Float64, Int16, UInt16, String
+from std_msgs.msg import Float32, Float64, Int16, UInt16, String, Bool
 from sensor_msgs.msg import NavSatFix
 from rosgraph_msgs.msg import Log
 
@@ -42,6 +42,7 @@ simple_topics = [
     ('/latest_waypoint_id', String),
     ('/wind_direction_average', Float32),
     ('/camera_detection', String),
+    ('/remote_control', Bool),
 ]
 
 geo_topics = [
