@@ -28,6 +28,7 @@
     <node name = "tasks" pkg="sailing_robot" type = "tasks"  respawn="true"/>
     <node name = "tack" pkg="sailing_robot" type = "tack"  respawn="true"/>
 
+    <node name = "actuator_demand_sail" pkg="sailing_robot" type = "actuator_demand_sail" respawn="true"/>
     <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" respawn="true"/>
     <node name = "actuator_driver_sail" pkg="sailing_robot" type = "actuator_driver_sail" respawn="true"/>
     <node name = "actuator_driver_rudder" pkg="sailing_robot" type="actuator_driver_rudder"  respawn="true"/>
