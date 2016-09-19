@@ -52,7 +52,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -87,7 +87,7 @@
            id="tspan4225"
            y="550.58594"
            x="378.85632"
-           sodipodi:role="line"> </tspan><tspan
+           sodipodi:role="line" /><tspan
            id="tspan4227"
            y="565.57782"
            x="377.26453"
@@ -186,16 +186,16 @@
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="583.65967"
-       y="714.97125"
+       y="734.97125"
        id="text4186"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4188"
          x="583.65967"
-         y="714.97125">Different model,</tspan><tspan
+         y="734.97125">Different model,</tspan><tspan
          sodipodi:role="line"
          x="583.65967"
-         y="730.59625"
+         y="750.59625"
          id="tspan4190">e.g. vector fields</tspan></text>
     <text
        xml:space="preserve"
@@ -290,5 +290,31 @@
        d="m 291.05346,574.2773 -77.27667,77.27667"
        id="path4272"
        inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="124.78023"
+       y="691.39404"
+       id="text4312"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4314"
+         x="124.78023"
+         y="691.39404">New website</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="583.39111"
+       y="695.13678"
+       id="text4182-3"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4184-6"
+         x="583.39111"
+         y="695.13678">Handling waves</tspan><tspan
+         sodipodi:role="line"
+         x="583.39111"
+         y="710.76178"
+         id="tspan4204">&amp; current?</tspan></text>
   </g>
 </svg>
