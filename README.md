@@ -8,7 +8,7 @@
                 -..                       We are building an one meter long autonomous sailing boat  
                oMNm+.                     that compete for the 2016 World Sailing Robot Competition.
                o: ./o/                    These code are based on ROS framework. 
-               o:`Ns.                     Click WiKi page for more information. 
+               o:`Ns.                     
                o: dMMy-                   
                o: sMMMMy`                 Our project wouldn't be possible without kind sponsors: 
              : o: /MMMMMN/               
@@ -31,38 +31,5 @@
                                           and many anonymous donors who support us silently.
                                           Thank you for your support!
 ```
-First, get [ROS](http://www.ros.org/) set up. The easiest way to do this is with the [virtual machine](https://github.com/Maritime-Robotics-Student-Society/sailing-robot/wiki/Virtual-Machine-for-Windows-Mac-users).
 
-Now, clone the repository. If you're not familiar with git, you'll want to read up on that soon, but for now, you can run this command in a terminal:
-
-    git clone https://github.com/Maritime-Robotics-Student-Society/sailing-robot.git
-
-You now have a copy of the code on your computer. Change into the new folder:
-
-    cd sailing-robot
-
-This folder is a [catkin workspace](http://wiki.ros.org/catkin/workspaces). To get started, run:
-
-    catkin_make
-    source devel/setup.bash  # This sets up environment variables
-
-To run the tests:
-
-    catkin_make run_tests
-
-To launch the nodes
-
-    roslaunch sailing_robot test-all-systems.launch
-
-To run simulator, you need install dependencies
-    
-    sudo apt-get install python-scipy 
-    sudo pip install --user LatLon shapely scipy
-    
-then 
-
-    roslaunch sailing_robot simulator.launch &
-    sleep 10
-    rviz
-    
-
+Click Wiki page for more information. 
