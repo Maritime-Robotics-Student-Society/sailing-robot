@@ -29,7 +29,7 @@
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="420.03397"
+     inkscape:cx="240.22682"
      inkscape:cy="339.27716"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -316,5 +316,20 @@
          x="583.39111"
          y="710.76178"
          id="tspan4204">&amp; current?</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="583.65051"
+       y="628.4162"
+       id="text4182-36"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4184-7"
+         x="583.65051"
+         y="628.4162">Better wind</tspan><tspan
+         sodipodi:role="line"
+         x="583.65051"
+         y="644.0412"
+         id="tspan4199">simulation</tspan></text>
   </g>
 </svg>
