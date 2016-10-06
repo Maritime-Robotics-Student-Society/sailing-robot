@@ -11,16 +11,29 @@ import pigpio
 # GPIO 22/RPi PIN 15 as multiplexer connection
 GPIO = rospy.get_param('multiplexer/gpio', default=22)
 
+last_tick = 0
+last_interval = 0
+
+def tick(gpio, level, tick):
+    global last_tick
+    last_tick = tick
+
+def tock(gpio, level, tick):
+    global last_interval
+    last_interval = tick - last_tick
+
 if __name__ == '__main__':
     pi = pigpio.pi();
     pi.set_mode(GPIO, pigpio.INPUT)
     try:
-        pub = rospy.Publisher('remote_control', Float32, queue_size=10)
+        pub = rospy.Publisher('remote_control', Bool, queue_size=10)
         rate = rospy.Rate(rospy.get_param("config/rate"))
 
+        pi.callback(GPIO, pigpio.RISING_EDGE, tick)
+        pi.callback(GPIO, pigpio.FALLING_EDGE, tock)
+
         while True:
-            remote_control = pi.read(GPIO)
-            pub.publish(bool(remote_control))
+            pub.publish(last_interval > 1500)
             rate.sleep()
 
     except rospy.ROSInterruptException:
