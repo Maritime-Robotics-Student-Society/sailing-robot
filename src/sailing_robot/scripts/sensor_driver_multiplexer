@@ -26,6 +26,7 @@ if __name__ == '__main__':
     pi = pigpio.pi();
     pi.set_mode(GPIO, pigpio.INPUT)
     try:
+        rospy.init_node("sensor_driver_multiplexer", anonymous=True)
         pub = rospy.Publisher('remote_control', Bool, queue_size=10)
         rate = rospy.Rate(rospy.get_param("config/rate"))
 
