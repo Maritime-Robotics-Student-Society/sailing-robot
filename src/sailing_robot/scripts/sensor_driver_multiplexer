@@ -8,11 +8,12 @@ import rospy
 from std_msgs.msg import Bool
 import pigpio
 
+# GPIO 22/RPi PIN 15 as multiplexer connection
 GPIO = rospy.get_param('multiplexer/gpio', default=22)
 
 if __name__ == '__main__':
     pi = pigpio.pi();
-    pi.set_mode(GPIO, pigpio.INPUT) # GPIO 24/RPi PIN 18 as sail servo pin
+    pi.set_mode(GPIO, pigpio.INPUT)
     try:
         pub = rospy.Publisher('remote_control', Float32, queue_size=10)
         rate = rospy.Rate(rospy.get_param("config/rate"))
