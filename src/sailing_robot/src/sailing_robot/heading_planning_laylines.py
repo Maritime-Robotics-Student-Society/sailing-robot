@@ -45,19 +45,19 @@ class HeadingPlan(TaskBase):
         return self.nav.position_xy.within(self.target_area)
 
     debug_topics = [
-        ('heading_to_waypoint', 'Float32'),
-        ('distance_to_waypoint', 'Float32'),
-        ('goal_wind_angle', 'Float32'),
-        ('latest_waypoint_id', 'String'),
+        ('dbg_heading_to_waypoint', 'Float32'),
+        ('dbg_distance_to_waypoint', 'Float32'),
+        ('dbg_goal_wind_angle', 'Float32'),
+        ('dbg_latest_waypoint_id', 'String'),
     ]
 
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
         """
         dwp, hwp = self.nav.distance_and_heading(self.waypoint_xy)
-        self.debug_pub('distance_to_waypoint', dwp)
-        self.debug_pub('heading_to_waypoint', hwp)
-        self.debug_pub('latest_waypoint_id', self.waypoint_id)
+        self.debug_pub('dbg_distance_to_waypoint', dwp)
+        self.debug_pub('dbg_heading_to_waypoint', hwp)
+        self.debug_pub('dbg_latest_waypoint_id', self.waypoint_id)
 
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':
@@ -76,7 +76,7 @@ class HeadingPlan(TaskBase):
                 continue_tack = boat_wind_angle > goal_angle
 
             if continue_tack:
-                self.debug_pub('goal_wind_angle', goal_angle)
+                self.debug_pub('dbg_goal_wind_angle', goal_angle)
                 return self.sailing_state, self.nav.wind_angle_to_heading(goal_angle)
             else:
                 # Tack completed
@@ -91,7 +91,7 @@ class HeadingPlan(TaskBase):
         # Detect if the waypoint is downwind, if so head directly to it
         if (wp_wind_angle % 360) > 90 and (wp_wind_angle % 360) < 270:
             goal_wind_angle = wp_wind_angle
-            self.debug_pub('goal_wind_angle', goal_wind_angle)
+            self.debug_pub('dbg_goal_wind_angle', goal_wind_angle)
             state = 'normal'
             return state, self.nav.wind_angle_to_heading(goal_wind_angle)
 
@@ -138,7 +138,7 @@ class HeadingPlan(TaskBase):
                 goal_wind_angle = min(wp_wind_angle, -self.nav.beating_angle)
             state = 'normal'
             
-        self.debug_pub('goal_wind_angle', goal_wind_angle)
+        self.debug_pub('dbg_goal_wind_angle', goal_wind_angle)
         return state, self.nav.wind_angle_to_heading(goal_wind_angle)
 
     def lay_triangle(self):

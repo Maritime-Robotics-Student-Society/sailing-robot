@@ -33,9 +33,9 @@ class StationKeeping(TaskBase):
                             target_radius=radius, tack_voting_radius=radius)
 
     debug_topics = [
-        ('heading_to_waypoint', 'Float32'),
-        ('distance_to_waypoint', 'Float32'),
-        ('goal_wind_angle', 'Float32'),
+        ('dbg_heading_to_waypoint', 'Float32'),
+        ('dbg_distance_to_waypoint', 'Float32'),
+        ('dbg_goal_wind_angle', 'Float32'),
     ]
 
     def init_ros(self):
@@ -57,13 +57,13 @@ class StationKeeping(TaskBase):
         if dwp > self.radius:
             return self.head_to_waypoint.calculate_state_and_goal()
         
-        self.debug_pub('distance_to_waypoint', dwp)
-        self.debug_pub('heading_to_waypoint', hwp)
+        self.debug_pub('dbg_distance_to_waypoint', dwp)
+        self.debug_pub('dbg_heading_to_waypoint', hwp)
 
         if self.nav.angle_to_wind() < 0:
             goal_wind_angle = -self.wind_angle
         else:
             goal_wind_angle = self.wind_angle
         
-        self.debug_pub('goal_wind_angle', goal_wind_angle)
+        self.debug_pub('dbg_goal_wind_angle', goal_wind_angle)
         return 'normal', self.nav.wind_angle_to_heading(goal_wind_angle)
