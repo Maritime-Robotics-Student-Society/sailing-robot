@@ -117,18 +117,6 @@ class Navigation(object):
         h = math.degrees(math.atan2(dx, dy)) % 360
         return d, h
 
-    def subscribe_topics(self):
-        """Subscribe to ROS topics to keep this nav object up to date.
-        
-        Subscribes to /position, /heading and /wind_direction_apparent.
-        """
-        from rospy import Subscriber
-        from std_msgs.msg import Float32, Float64
-        from sensor_msgs.msg import NavSatFix
-        Subscriber('heading', Float32, self.update_heading)
-        Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
-        Subscriber('position', NavSatFix, self.update_position)
-
 ################
 # General utility functions
 ################

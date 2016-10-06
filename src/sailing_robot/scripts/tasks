@@ -45,8 +45,12 @@ if __name__ == '__main__':
         nav_options = rospy.get_param("navigation")
         nav = Navigation(**nav_options)
         tasks_runner = RosTasksRunner(tasks, nav)
-        tasks_runner.nav.subscribe_topics()
+
+        rospy.Subscriber('heading', Float32, nav.update_heading)
+        rospy.Subscriber('wind_direction_apparent', Float64, nav.update_wind_direction)
+        rospy.Subscriber('position', NavSatFix, nav.update_position)
         rospy.Subscriber('temporary_wp', NavSatFix, insert_waypoint)
+
         goal_heading_publisher(tasks_runner)
     except rospy.ROSInterruptException:
         pass
