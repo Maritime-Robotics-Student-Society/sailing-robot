@@ -41,7 +41,7 @@ then
 
   cd $folder/sailing-robot
   echo "Your personal folder is $folder"
-  source sailing-robot/devel/setup.bash
+  source $folder/sailing-robot/devel/setup.bash
 
 else
 
