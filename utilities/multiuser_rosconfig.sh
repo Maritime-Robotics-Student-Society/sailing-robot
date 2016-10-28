@@ -47,7 +47,7 @@ else
 
   mkdir -p "$folder"
   cd "$folder"
-  git clone https://github.com/Maritime-Robotics-Student-Society/sailing-robot.git
+  git clone ~/sailing-robot.git #https://github.com/Maritime-Robotics-Student-Society/sailing-robot.git
   cd sailing-robot
   catkin_make
   source devel/setup.bash
