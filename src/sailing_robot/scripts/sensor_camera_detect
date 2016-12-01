@@ -53,14 +53,10 @@ class Camera_detection():
             (bool, image) = camera.read()
             if bool:
                 hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-                #mask = cv2.inRange(image, self.Lower, self.Upper)
-
-                hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
                 mask_hsv1 = cv2.inRange(hsv, Lower_hsv1, Upper_hsv1)
                 mask_hsv2 = cv2.inRange(hsv, Lower_hsv2, Upper_hsv2)
              
                 # percentage of the image that contains the expected colors
-
                 percent_detect1 = 1.0*cv2.countNonZero(mask_hsv1)  / image_size # percentage of the image that contains the expected colors
                 percent_detect2 = 1.0*cv2.countNonZero(mask_hsv2)  / image_size # percentage of the image that contains the expected colors
                 
