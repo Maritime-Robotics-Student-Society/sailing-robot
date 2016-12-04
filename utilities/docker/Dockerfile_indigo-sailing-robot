@@ -4,6 +4,8 @@ Maintainer Martin Biggs
 USER root
 RUN apt-get --assume-yes install libgeos-dev python-scipy python-pip \
     && pip install Latlon shapely pynmea2 spidev wiringpi2 tornado
+# Fix for Mac's looking for python in /usr/local/bin
+RUN ln -s /usr/bin/python /usr/local/bin/python
 
 USER pi
 RUN bash -c "echo 'source /home/pi/sailing-robot/devel/setup.bash' >> ~/.bashrc"
