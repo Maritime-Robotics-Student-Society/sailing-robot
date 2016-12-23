@@ -41,13 +41,13 @@ then
 
   cd $folder/sailing-robot
   echo "Your personal folder is $folder"
-  source sailing-robot/devel/setup.bash
+  source $folder/sailing-robot/devel/setup.bash
 
 else
 
   mkdir -p "$folder"
   cd "$folder"
-  git clone https://github.com/Maritime-Robotics-Student-Society/sailing-robot.git
+  git clone ~/sailing-robot.git #https://github.com/Maritime-Robotics-Student-Society/sailing-robot.git
   cd sailing-robot
   catkin_make
   source devel/setup.bash
