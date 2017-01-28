@@ -37,9 +37,9 @@ class ReturnToSafetyZone(TaskBase):
         return self.nav.position_xy.within(self.safety_zone_double_margin)
 
     debug_topics = [
-        ('heading_to_waypoint', 'Float32'),
-        ('distance_to_waypoint', 'Float32'),
-        ('goal_wind_angle', 'Float32'),
+        ('dbg_heading_to_waypoint', 'Float32'),
+        ('dbg_distance_to_waypoint', 'Float32'),
+        ('dbg_goal_wind_angle', 'Float32'),
     ]
 
     def distance_heading_to_waypoint(self):
@@ -55,9 +55,9 @@ class ReturnToSafetyZone(TaskBase):
         """Work out what we want the boat to do
         """
         dwp, hwp = self.distance_heading_to_waypoint()
-        self.debug_pub('distance_to_waypoint', dwp)
-        self.debug_pub('heading_to_waypoint', hwp)
-        self.debug_pub('latest_waypoint_id', 'safety_zone_centroid')
+        self.debug_pub('dbg_distance_to_waypoint', dwp)
+        self.debug_pub('dbg_heading_to_waypoint', hwp)
+        self.debug_pub('dbg_latest_waypoint_id', 'safety_zone_centroid')
 
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':
@@ -76,7 +76,7 @@ class ReturnToSafetyZone(TaskBase):
                 continue_tack = boat_wind_angle > goal_angle
 
             if continue_tack:
-                self.debug_pub('goal_wind_angle', goal_angle)
+                self.debug_pub('dbg_goal_wind_angle', goal_angle)
                 return self.sailing_state, self.nav.wind_angle_to_heading(goal_angle)
             else:
                 # Tack completed
@@ -126,7 +126,7 @@ class ReturnToSafetyZone(TaskBase):
                 goal_wind_angle = min(wp_wind_angle, -self.nav.beating_angle)
             state = 'normal'
 
-        self.debug_pub('goal_wind_angle', goal_wind_angle)
+        self.debug_pub('dbg_goal_wind_angle', goal_wind_angle)
         return state, self.nav.wind_angle_to_heading(goal_wind_angle)
 
     def lay_triangle(self):

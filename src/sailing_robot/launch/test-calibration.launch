@@ -22,6 +22,7 @@
     <node name = "sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps" respawn="true"/>
     <node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu"  respawn="true"/>
     <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction"  respawn="true"/>
+    <node name = "sensor_driver_multiplexer" pkg='sailing_robot' type="sensor_driver_multiplexer" respawn="true"/>
     <node name = "actuator_driver_rudder" pkg="sailing_robot" type="actuator_driver_rudder"  respawn="true"/>
     <node name = "actuator_driver_sail" pkg="sailing_robot" type = "actuator_driver_sail" respawn="true"/>
 

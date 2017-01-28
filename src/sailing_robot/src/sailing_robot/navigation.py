@@ -12,7 +12,7 @@ class Navigation(object):
     heading, along with apparent wind angle.
     """
     def __init__(self, 
-                beating_angle=45, utm_zone=29, jibe_to_turn=False,
+                beating_angle=45, utm_zone=30, jibe_to_turn=False,
                 safety_zone_ll=None, safety_zone_margin=5):
         """
         beating_angle : Closest absolute angle relative to the wind that we can
@@ -116,18 +116,6 @@ class Navigation(object):
         d = (dx**2 + dy**2) ** 0.5
         h = math.degrees(math.atan2(dx, dy)) % 360
         return d, h
-
-    def subscribe_topics(self):
-        """Subscribe to ROS topics to keep this nav object up to date.
-        
-        Subscribes to /position, /heading and /wind_direction_apparent.
-        """
-        from rospy import Subscriber
-        from std_msgs.msg import Float32, Float64
-        from sensor_msgs.msg import NavSatFix
-        Subscriber('heading', Float32, self.update_heading)
-        Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
-        Subscriber('position', NavSatFix, self.update_position)
 
 ################
 # General utility functions

@@ -4,7 +4,7 @@
 from visualization_msgs.msg import Marker
 from visualization_msgs.msg import MarkerArray
 from sensor_msgs.msg import NavSatFix
-from std_msgs.msg import Float64, Float32, String
+from std_msgs.msg import Float64, Float32, String, Bool
 
 from sailing_robot.navigation import Navigation
 import rospy
@@ -28,6 +28,9 @@ class Debugging_2D_plot():
 
         rospy.Subscriber('sailing_state', String, self.update_sailing_state)
         self.sailing_state = 'normal'
+
+        rospy.Subscriber('remote_control', String, self.update_remote_control)
+        self.remote_control = False
 
         utm_zone = rospy.get_param('navigation/utm_zone')
         self.nav = Navigation(utm_zone=utm_zone)
@@ -102,7 +105,7 @@ class Debugging_2D_plot():
         
 
     def make_marker(self, wp_coord, rgb):
-        current_wp_position = self.nav.latlon_to_utm( wp_coord[0], wp_coord[1])
+        current_wp_position = self.nav.latlon_to_utm(wp_coord[0], wp_coord[1])
         current_wp = Marker()
 
         current_wp.header.frame_id = "map"
@@ -131,6 +134,9 @@ class Debugging_2D_plot():
         self.position_gps = msg
         self.gps_fix_lock = False
 
+    def update_remote_control(self, msg):
+        self.remote_control = msg.data
+
     def marker_publish(self):
 
         while not rospy.is_shutdown():
@@ -142,7 +148,12 @@ class Debugging_2D_plot():
             marker.scale.y = 2
             marker.scale.z = 2
 
-            if self.sailing_state == 'tack_to_port_tack':
+            if self.remote_control:
+                marker.color.a = 0.8
+                marker.color.r = 0.5
+                marker.color.g = 0.5
+                marker.color.b = 0.5
+            elif self.sailing_state == 'tack_to_port_tack':
                 marker.color.a = 1.0
                 marker.color.r = 1.0
                 marker.color.g = 0.0

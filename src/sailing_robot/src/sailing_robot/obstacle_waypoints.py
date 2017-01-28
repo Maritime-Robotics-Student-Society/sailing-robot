@@ -27,9 +27,9 @@ class ObstacleWaypoints(TaskBase):
         self.obstacle_detected = False
 
     debug_topics = [
-        ('heading_to_waypoint', 'Float32'),
-        ('distance_to_waypoint', 'Float32'),
-        ('goal_wind_angle', 'Float32'),
+        ('dbg_heading_to_waypoint', 'Float32'),
+        ('dbg_distance_to_waypoint', 'Float32'),
+        ('dbg_goal_wind_angle', 'Float32'),
     ]
 
     def receive_detection(self, msg):
@@ -58,5 +58,5 @@ class ObstacleWaypoints(TaskBase):
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
         """
-        self.debug_pub('latest_waypoint_id', self.active_plan.waypoint_id)
+        self.debug_pub('dbg_latest_waypoint_id', self.active_plan.waypoint_id)
         return self.active_plan.calculate_state_and_goal()

@@ -44,3 +44,29 @@ class SailTable(object):
         
         # We ran past the end of the table
         return last_sail_setting
+
+class SailData(object):
+    def __init__(self, sail_table, sheet_out_to_jibe=True, jibe_sheet_setting=0.75):
+        self.wind_direction_apparent = 0
+        self.sailing_state = 'normal'
+        self.sail_table = sail_table
+        self.sheet_out_to_jibe = sheet_out_to_jibe
+        self.jibe_sheet_setting = jibe_sheet_setting
+
+    def update_wind(self, msg):
+        self.wind_direction_apparent = msg.data
+
+    def update_sailing_state(self, msg):
+        self.sailing_state = msg.data
+
+    def calculate_sheet_setting(self):
+        if self.sheet_out_to_jibe and \
+                self.sailing_state in ('jibe_to_stbd_tack', 'jibe_to_port_tack'):
+            # Sheet mostly out for jibe
+            return self.jibe_sheet_setting
+
+        windDirection = self.wind_direction_apparent
+        if windDirection > 180:
+            windDirection = 360 - windDirection
+
+        return self.sail_table.interpolate_sail_setting(windDirection)

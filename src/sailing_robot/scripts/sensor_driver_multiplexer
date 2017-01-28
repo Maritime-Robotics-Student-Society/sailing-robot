@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+"""
+Node looks up correct sail setting from table
+Subscribes: wind direction apparent
+Sets sail actuator to correct PWM value
+"""
+import rospy
+from std_msgs.msg import Bool
+import pigpio
+import time
+
+# GPIO 22/RPi PIN 15 as multiplexer connection
+GPIO = rospy.get_param('multiplexer/gpio', default=22)
+
+# Reading PWMs: we set up callbacks for the edges of the pulse (tick and tock).
+# The time between when they are called, in microseconds, is the pulse width.
+
+last_tick = 0
+last_interval = 0
+last_pulse_time = 0
+
+def tick(gpio, level, tick):
+    global last_tick
+    last_tick = tick
+
+def tock(gpio, level, tick):
+    global last_interval, last_pulse_time
+    last_interval = tick - last_tick
+    last_pulse_time = time.time()
+
+if __name__ == '__main__':
+    pi = pigpio.pi();
+    pi.set_mode(GPIO, pigpio.INPUT)
+    try:
+        rospy.init_node("sensor_driver_multiplexer", anonymous=True)
+        pub = rospy.Publisher('remote_control', Bool, queue_size=10)
+        rate = rospy.Rate(rospy.get_param("config/rate"))
+
+        pi.callback(GPIO, pigpio.RISING_EDGE, tick)
+        pi.callback(GPIO, pigpio.FALLING_EDGE, tock)
+
+        while True:
+            if time.time() - last_pulse_time > 0.1:
+                # No recent pulse: RC off or connection lost
+                pub.publish(False)
+            else:
+                # Long pulse means RC overrides raspberry pi. 1500 us cutoff
+                pub.publish(last_interval > 1500)
+            rate.sleep()
+
+    except rospy.ROSInterruptException:
+        pass
