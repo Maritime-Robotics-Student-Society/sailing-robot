@@ -61,4 +61,4 @@ CATKIN_IGNORE
 /src/sailing_robot/doc/*
 
 # Ignore recorded data from tests
-/recorded_data/
+/recorded_data/*.*
