@@ -41,7 +41,6 @@ class Rosbag(DataFile):
     def read_info(self):
         """Read some metadata from inside this rosbag."""
         from rosbag import Bag, ROSBagUnindexedException, ROSBagException
-        print(self.filename)
         try:
             b = Bag(self.path)
         except ROSBagUnindexedException:
@@ -53,8 +52,8 @@ class Rosbag(DataFile):
             self.duration = b.get_end_time() - b.get_start_time()
         except ROSBagException:
             self.duration = 0
-        self.topic_info = b.get_type_and_topic_info()[1]
-        print(self.topic_info)
+        self.topic_list = b.get_type_and_topic_info()[1].keys()
+        print(self.topic_list)
 
 class GPSTrace(DataFile):
     file_type = GPS_TRACE
