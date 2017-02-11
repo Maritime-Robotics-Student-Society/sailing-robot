@@ -1,4 +1,12 @@
 #!/bin/bash
+# This script checks if ROS is currently running
+# If ros is running the LEDs on the boat will blink green
+# If ros is not running the script will run ros momentanously to blink the LEDs in red
+#                 (Note that at the moment I am writing this, I don't think the red 
+#         blinking would actually work since the node for blinking is not launched...)
+#
+# This is done via publishing a /led_blink message, see Naming-conventions in the wiki 
+# for more detail on this
 
 
 publish_led() {
@@ -10,7 +18,6 @@ publish_led() {
   rostopic pub -1 /led_blink std_msgs/Int32 --  $intcolor &> /dev/null &
 }
 
-  publish_led 255 0 0 # green
 
 rostopic list &> /dev/null
 

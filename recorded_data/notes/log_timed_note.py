@@ -18,10 +18,8 @@ import sys
 if sys.version_info[0] < 3:
     input = raw_input
 
-ISO8601 = "%Y-%m-%dT%H:%M:%SZ"
-
 # Not using .isoformat() because we don't need milliseconds
-now = datetime.utcnow().strftime(ISO8601)
+now = datetime.utcnow().strftime("%Y-%m-%dT%H.%M.%SZ")
 print("Logging note at", now)
 
 this_dir = os.path.dirname(os.path.realpath(__file__))
