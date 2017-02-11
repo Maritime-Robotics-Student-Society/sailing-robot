@@ -34,6 +34,27 @@ PARAM_DUMP = 'param_dump'
 
 class Rosbag(DataFile):
     file_type = ROSBAG
+    n_messages = None
+    duration = None
+    topic_info = None
+    
+    def read_info(self):
+        """Read some metadata from inside this rosbag."""
+        from rosbag import Bag, ROSBagUnindexedException, ROSBagException
+        print(self.filename)
+        try:
+            b = Bag(self.path)
+        except ROSBagUnindexedException:
+            b = Bag(self.path, allow_unindexed=True)
+            print('Reindexing', self.filename)
+            b.reindex()
+        self.n_messages = b.get_message_count()
+        try:
+            self.duration = b.get_end_time() - b.get_start_time()
+        except ROSBagException:
+            self.duration = 0
+        self.topic_info = b.get_type_and_topic_info()[1]
+        print(self.topic_info)
 
 class GPSTrace(DataFile):
     file_type = GPS_TRACE
@@ -93,6 +114,7 @@ def scan_recorded_data_files():
     # 10 seconds.
     groups = []
     for bag in by_type[ROSBAG]:
+        bag.read_info()
         group = FileGroup(bag)
         for file_type in [GPS_TRACE, PARAM_DUMP]:
             for file in by_type[file_type]:

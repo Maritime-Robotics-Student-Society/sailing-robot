@@ -26,10 +26,12 @@ body {
     <h2>{{day.strftime('%a %d %B %Y')}}</h2>
     {% for run in batch %}
     <div class="run">
-      {{run.rosbag.start.strftime('%H:%M:%S')}} [{{run.rosbag.test_name.strip('_')}}] :
+      <p>{{run.rosbag.start.strftime('%H:%M:%S')}} [{{run.rosbag.test_name.strip('_')}}] :
       {% for file in run %}
         <a href="file://{{file.path}}">{{file.file_type}}</a> ·
       {% endfor %}
+      </p>
+      <p>{{run.rosbag.duration // 60}} minutes, {{run.rosbag.n_messages}} messages</p>
     </div>
     {% endfor %}
   </div>
