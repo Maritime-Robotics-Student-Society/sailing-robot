@@ -8,10 +8,19 @@
 <style>
 body {
   font-family: sans-serif;
+  background-color: #ddd;
+  margin: 0;
+}
+#container {
+  max-width: 1000px;
+  margin: 0 auto; /* Centred */
+  padding: 10px;
+  background-color: #fff;
 }
 </style>
 </head>
 <body>
+<div id="container">
 {% for day, batch in days %}
   <div class="day">
     <h2>{{day.strftime('%a %d %B %Y')}}</h2>
@@ -25,6 +34,6 @@ body {
     {% endfor %}
   </div>
 {% endfor %}
-
+</div>
 </body>
 </html>
