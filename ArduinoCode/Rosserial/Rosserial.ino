@@ -1,4 +1,8 @@
 /*
+ * Licence: BSD
+ * From: http://wiki.ros.org/rosserial_arduino
+ *       http://wiki.ros.org/rosserial_arduino/Tutorials/Servo%20Controller  
+ *
  * rosserial Servo Control Example
  *
  * This sketch demonstrates the control of hobby R/C servos
