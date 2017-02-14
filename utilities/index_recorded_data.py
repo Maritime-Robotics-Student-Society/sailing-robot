@@ -4,6 +4,7 @@ from datetime import datetime
 import io
 from itertools import groupby
 from jinja2 import Environment, FileSystemLoader
+import json
 import os
 from os.path import dirname, realpath
 
@@ -36,9 +37,26 @@ class Rosbag(DataFile):
     file_type = ROSBAG
     n_messages = None
     duration = None
-    topic_info = None
+    topic_list = None
     
     def read_info(self):
+        """Get some metadata about this rosbag.
+        
+        Uses a JSON metadata file as a cache."""
+        md_file = self.path + '.metadata'
+        if os.path.exists(md_file):
+            with open(md_file) as f:
+                d = json.load(f)
+        else:
+            d = self._read_info()
+            with open(md_file, 'w') as f:
+                json.dump(d, f)
+
+        self.n_messages = d['n_messages']
+        self.duration = d['duration']
+        self.topic_list = d['topic_list']
+    
+    def _read_info(self):
         """Read some metadata from inside this rosbag."""
         from rosbag import Bag, ROSBagUnindexedException, ROSBagException
         try:
@@ -47,13 +65,16 @@ class Rosbag(DataFile):
             b = Bag(self.path, allow_unindexed=True)
             print('Reindexing', self.filename)
             b.reindex()
-        self.n_messages = b.get_message_count()
+
         try:
-            self.duration = b.get_end_time() - b.get_start_time()
+            duration = b.get_end_time() - b.get_start_time()
         except ROSBagException:
-            self.duration = 0
-        self.topic_list = b.get_type_and_topic_info()[1].keys()
-        print(self.topic_list)
+            duration = 0
+        return {
+            'n_messages': b.get_message_count(),
+            'duration': duration,
+            'topic_list': b.get_type_and_topic_info()[1].keys()
+        }
 
 class GPSTrace(DataFile):
     file_type = GPS_TRACE
