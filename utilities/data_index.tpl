@@ -25,7 +25,6 @@ body {
 }
 .meter-bar-outer {
   display: inline-block;
-  border: 1px solid black;
   width: 100px;
   height: 0.8em;
 }
