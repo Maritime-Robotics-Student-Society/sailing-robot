@@ -109,6 +109,7 @@ def parse_filename(name):
         return GPSTrace(name, test, dt)
 
 class FileGroup(object):
+    prop_size = 0
     def __init__(self, rosbag):
         self.rosbag = rosbag
         self.others = []
@@ -141,6 +142,10 @@ def scan_recorded_data_files():
                 if abs((file.start - bag.start).total_seconds()) < 10:
                     group.others.append(file)
         groups.append(group)
+    
+    max_duration = max(g.rosbag.duration for g in groups)
+    for g in groups:
+        g.prop_size = int(100 * (g.rosbag.duration / max_duration))
     
     groups.sort(key=lambda g: g.rosbag.start)
     return groups

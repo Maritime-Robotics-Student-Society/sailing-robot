@@ -17,8 +17,21 @@ body {
   padding: 10px;
   background-color: #fff;
 }
+.run {
+  margin-bottom: 0.5em;
+}
 .bag-line {
   padding-left: 10px;
+}
+.meter-bar-outer {
+  display: inline-block;
+  border: 1px solid black;
+  width: 100px;
+  height: 0.8em;
+}
+.meter-bar-inner {
+  background-color: #494;
+  height: 100%
 }
 </style>
 </head>
@@ -34,7 +47,10 @@ body {
         <a href="file://{{file.path}}">{{file.file_type}}</a> ·
       {% endfor %}
       </div>
-      <div class="bag-line">{{run.rosbag.duration // 60}} minutes, {{run.rosbag.n_messages}} messages</div>
+      <div class="bag-line">
+        <div class="meter-bar-outer"><div class="meter-bar-inner" style="width:{{run.prop_size}}px;"></div></div>
+        {{run.rosbag.duration // 60}} minutes, {{run.rosbag.n_messages}} messages
+      </div>
     </div>
     {% endfor %}
   </div>
