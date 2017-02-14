@@ -49,7 +49,7 @@ body {
       </div>
       <div class="bag-line">
         <div class="meter-bar-outer"><div class="meter-bar-inner" style="width:{{run.prop_size}}px;"></div></div>
-        {{run.rosbag.duration // 60}} minutes, {{run.rosbag.n_messages}} messages
+        {{run.rosbag.duration | seconds_to_mins}} minutes, {{run.rosbag.n_messages}} messages
       </div>
     </div>
     {% endfor %}

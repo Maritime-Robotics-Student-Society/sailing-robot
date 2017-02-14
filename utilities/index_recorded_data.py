@@ -150,9 +150,13 @@ def scan_recorded_data_files():
     groups.sort(key=lambda g: g.rosbag.start)
     return groups
 
+def seconds_to_mins(s):
+    return int(s/60)
+
 def generate_html(data_groups):
     jinja_env = Environment(loader=FileSystemLoader(utils_dir),
                             autoescape=True)
+    jinja_env.filters['seconds_to_mins'] = seconds_to_mins
     template = jinja_env.get_template('data_index.tpl')
     
     data_by_days = groupby(data_groups, key=lambda g: g.rosbag.start.date())
