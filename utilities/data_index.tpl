@@ -44,7 +44,7 @@ body {
     <div class="run">
       <div class="run-line">{{run.rosbag.start.strftime('%H:%M:%S')}} [{{run.rosbag.test_name.strip('_')}}] :
       {% for file in run %}
-        <a href="file://{{file.path}}">{{file.file_type}}</a> ·
+        <a href="{{file.filename}}">{{file.file_type}}</a> ·
       {% endfor %}
       </div>
       <div class="bag-line">
