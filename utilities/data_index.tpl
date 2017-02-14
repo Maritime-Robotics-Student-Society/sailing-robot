@@ -17,6 +17,9 @@ body {
   padding: 10px;
   background-color: #fff;
 }
+.bag-line {
+  padding-left: 10px;
+}
 </style>
 </head>
 <body>
@@ -26,12 +29,12 @@ body {
     <h2>{{day.strftime('%a %d %B %Y')}}</h2>
     {% for run in batch %}
     <div class="run">
-      <p>{{run.rosbag.start.strftime('%H:%M:%S')}} [{{run.rosbag.test_name.strip('_')}}] :
+      <div class="run-line">{{run.rosbag.start.strftime('%H:%M:%S')}} [{{run.rosbag.test_name.strip('_')}}] :
       {% for file in run %}
         <a href="file://{{file.path}}">{{file.file_type}}</a> ·
       {% endfor %}
-      </p>
-      <p>{{run.rosbag.duration // 60}} minutes, {{run.rosbag.n_messages}} messages</p>
+      </div>
+      <div class="bag-line">{{run.rosbag.duration // 60}} minutes, {{run.rosbag.n_messages}} messages</div>
     </div>
     {% endfor %}
   </div>
