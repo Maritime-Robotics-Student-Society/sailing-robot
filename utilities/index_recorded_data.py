@@ -150,7 +150,7 @@ def scan_recorded_data_files():
     for g in groups:
         g.prop_size = int(100 * (g.rosbag.duration / max_duration))
     
-    groups.sort(key=lambda g: g.rosbag.start)
+    groups.sort(key=lambda g: g.rosbag.start, reverse=True)
     return groups
 
 def seconds_to_mins(s):
