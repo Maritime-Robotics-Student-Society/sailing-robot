@@ -1,5 +1,7 @@
 #!/usr/bin/python
 from __future__ import print_function
+
+import argparse
 from datetime import datetime
 import io
 from itertools import groupby
@@ -7,6 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 import json
 import os
 from os.path import dirname, realpath
+import sys
 
 ISO8601 = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -164,7 +167,22 @@ def generate_html(data_groups):
     with io.open(output_file, 'w', encoding='utf-8') as f:
         template.stream(days=data_by_days).dump(f)
     print('Index written to', output_file)
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--docker', action='store_true',
+                    help='Launch a docker container with ROS to run this script')
+    args = ap.parse_args()
     
-if __name__ == '__main__':
+    if args.docker:
+        from subprocess import call
+        rc = call(['docker', 'run', '-v', repo_dir+':/home/pi/sailing-robot',
+                '--rm', 'jamak9/sailing-robot:indigo', 'python', '/home/pi/sailing-robot/utilities/index_recorded_data.py'])
+        sys.exit(rc)
+    
     groups = scan_recorded_data_files()
     generate_html(groups)
+
+
+if __name__ == '__main__':
+    main()
