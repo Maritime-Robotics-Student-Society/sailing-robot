@@ -39,7 +39,7 @@ if __name__ == '__main__':
         pi.callback(GPIO, pigpio.RISING_EDGE, tick)
         pi.callback(GPIO, pigpio.FALLING_EDGE, tock)
 
-        while True:
+        while not rospy.is_shutdown():
             if time.time() - last_pulse_time > 0.1:
                 # No recent pulse: RC off or connection lost
                 pub.publish(False)
