@@ -25,8 +25,6 @@ class Force_jibe():
         self.rate = rospy.Rate(rospy.get_param("config/rate"))
         
         self.time_tack = rospy.get_param("force_jibe/time_tack")
-#         self.distance_new_wp = rospy.get_param("force_jibe/distance_new_wp")
-
         self.looper()
 
     def update_sailing_state(self, msg):
@@ -40,12 +38,17 @@ class Force_jibe():
 
         while not rospy.is_shutdown():
            
-            # check tacking issue
+            # check tacking issue based on time
             if self.sailing_state != 'normal' and \
+                    not self.sailing_state.startswith('force_') and \
                     (time.time() - self.timer) > self.time_tack:
-                self.timer = time.time()
                 rospy.logerr("Issue with tacking/jibing")
                 self.jibe_tack_now_pub.publish('auto')
+
+                # wait untill the sailing state comes back to normal
+                while self.sailing_state != 'normal' and not rospy.is_shutdown():
+                    self.rate.sleep()
+                self.timer = time.time()
 
 
             self.rate.sleep()

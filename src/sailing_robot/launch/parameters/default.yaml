@@ -119,8 +119,6 @@ wind/trend_average_time: 40.0
 #
 # Time spent trying to tack before trying to jibe
 force_jibe/time_tack: 7 # [s]
-# Distance of the newly generated waypoing use to jibe
-force_jibe/distance_new_wp: 3 # [m]
 
 
 #

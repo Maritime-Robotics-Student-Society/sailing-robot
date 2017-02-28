@@ -140,7 +140,7 @@ class TasksRunner(object):
             task = StartTimer(self.nav, seconds=taskdict['seconds'],
                       jump_to=taskdict['jump_to'], jump_callback=self.set_jump)
         elif kind == 'jibe_tack_now':
-            task = JibeTackNow(self.nav, action=tackdict['action'])
+            task = JibeTackNow(nav=self.nav, action=taskdict['action'])
         else:
             raise ValueError("Unknown task type: {}".format(kind))
         

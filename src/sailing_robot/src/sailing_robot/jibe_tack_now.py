@@ -34,54 +34,60 @@ class JibeTackNow(TaskBase):
         """Are we there yet?"""
         return not self.continue_tack
 
+    debug_topics = [
+        ('dbg_goal_wind_angle', 'Float32'),
+    ]
+
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
         """
         boat_wind_angle = self.nav.angle_to_wind()
 
+
         if self.sailing_state != 'normal':
             # A tack/jibe is in progress
-            if self.sailing_state == 'force_jibe_to_port_tack':
+            if self.sailing_state == 'jibe_to_port_tack':
                 goal_angle = 120
                 self.continue_tack = boat_wind_angle < 0 or boat_wind_angle > 120
-            elif self.sailing_state == 'force_jibe_to_stbd_tack':
+            elif self.sailing_state == 'jibe_to_stbd_tack':
                 goal_angle = -120
                 self.continue_tack = boat_wind_angle > 0 or boat_wind_angle < -120
-            elif self.sailing_state == 'force_tack_to_port_tack':
+            elif self.sailing_state == 'tack_to_port_tack':
                 goal_angle = self.nav.beating_angle
                 self.continue_tack = boat_wind_angle < goal_angle
-            else:  # 'tack_to_stbd_tack'
+            else:  # 'force_tack_to_stbd_tack'
                 goal_angle = -self.nav.beating_angle
                 self.continue_tack = boat_wind_angle > goal_angle
 
-            if self.continue_tack:
-                return self.sailing_state, self.nav.wind_angle_to_heading(goal_angle)
-            else:
+            if not self.continue_tack:
                 # Tack completed
                 self.log('info', 'Finished tack (%s)', self.sailing_state)
                 self.sailing_state = 'normal'
-                return self.sailing_state, self.nav.wind_angle_to_heading(goal_angle)
+
+            return self.sailing_state, self.nav.wind_angle_to_heading(goal_angle)
 
 
         on_port_tack = boat_wind_angle > 0
         # Ready about!
         if on_port_tack:
             if self.action == 'jibe' or \
-                    (self.action == 'auto' and self.nav.jibe_to_turn):
-                state = 'force_jibe_to_stbd_tack'
-                goal_wind_angle = 180
+                    (self.action == 'auto' and not self.nav.jibe_to_turn):
+                state = 'jibe_to_stbd_tack'
+                goal_wind_angle = 120
             else:
-                state = 'force_tack_to_stbd_tack'
+                state = 'tack_to_stbd_tack'
                 goal_wind_angle = -self.nav.beating_angle
         else:
             if self.action == 'jibe' or \
-                    (self.action == 'auto' and self.nav.jibe_to_turn):
-                state = 'force_jibe_to_port_tack'
-                goal_wind_angle = -180
+                    (self.action == 'auto' and not self.nav.jibe_to_turn):
+                state = 'jibe_to_port_tack'
+                goal_wind_angle = -120
             else:
-                state = 'force_tack_to_port_tack'
+                state = 'tack_to_port_tack'
                 goal_wind_angle = self.nav.beating_angle
         self.sailing_state = state
         self.log('info', 'Starting tack/jibe (%s)', state)
            
+        self.debug_pub('dbg_goal_wind_angle', goal_wind_angle)
+        
         return state, self.nav.wind_angle_to_heading(goal_wind_angle)
