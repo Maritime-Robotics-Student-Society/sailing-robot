@@ -7,14 +7,12 @@ from .navigation import angleSum
 from .taskbase import TaskBase
 from .heading_planning import TackVoting
 
-# For calculations, lay lines don't extend to infinity.
-# This is in m; 10km should be plenty for our purposes.
 
 class JibeTackNow(TaskBase):
     def __init__(self, nav,
                  action='auto',
             ):
-        """Jibe or tack now
+        """Jibe or tack now (used if a tack/jibe is failing)
 
         *nav* is a sailing_robot.navigation.Navigation instance.
         
@@ -73,7 +71,7 @@ class JibeTackNow(TaskBase):
             if self.action == 'jibe' or \
                     (self.action == 'auto' and not self.nav.jibe_to_turn):
                 state = 'jibe_to_stbd_tack'
-                goal_wind_angle = 120
+                goal_wind_angle = -120
             else:
                 state = 'tack_to_stbd_tack'
                 goal_wind_angle = -self.nav.beating_angle
@@ -81,7 +79,7 @@ class JibeTackNow(TaskBase):
             if self.action == 'jibe' or \
                     (self.action == 'auto' and not self.nav.jibe_to_turn):
                 state = 'jibe_to_port_tack'
-                goal_wind_angle = -120
+                goal_wind_angle = 120
             else:
                 state = 'tack_to_port_tack'
                 goal_wind_angle = self.nav.beating_angle

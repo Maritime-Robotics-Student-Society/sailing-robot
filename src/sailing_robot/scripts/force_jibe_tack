@@ -1,6 +1,4 @@
 #!/usr/bin/python
-# READY FOR MIT
-# STILL A WORK IN PROGRESS, DO NOT USE
 
 import rospy
 from std_msgs.msg import Float32, Float64, String
@@ -11,6 +9,8 @@ import time, math
 class Force_jibe():
     def __init__(self):
         """
+            This node detect if a tack or a jibe fails (taking too much time) 
+            and triggers a jibe/tack  
         """
         self.jibe_tack_now_pub = rospy.Publisher('jibe_tack_now', String, queue_size=10)
 
@@ -29,6 +29,8 @@ class Force_jibe():
 
     def update_sailing_state(self, msg):
         self.sailing_state = msg.data
+
+        # reset timer when the sailing state changes
         if msg.data == 'normal' or \
                 self.previous_sailing_state != self.sailing_state:
             self.timer = time.time()
@@ -38,11 +40,12 @@ class Force_jibe():
 
         while not rospy.is_shutdown():
            
-            # check tacking issue based on time
+            # check tacking issue based on its duration
             if self.sailing_state != 'normal' and \
-                    not self.sailing_state.startswith('force_') and \
                     (time.time() - self.timer) > self.time_tack:
                 rospy.logerr("Issue with tacking/jibing")
+                
+                # "auto" is set, hence the boat will tack if it was jibing and jibe if it was tacking
                 self.jibe_tack_now_pub.publish('auto')
 
                 # wait untill the sailing state comes back to normal
