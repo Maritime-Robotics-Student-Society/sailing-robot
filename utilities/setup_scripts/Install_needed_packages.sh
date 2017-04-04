@@ -10,8 +10,6 @@ yes | sudo pip install Latlon shapely pynmea2
 # Needed for serial
 yes | sudo pip install spidev
 
-# Wiringpi2 needed for hardware pwm
-yes | sudo pip install wiringpi2
 
 # Install pyproj (cartographic projections)
 yes | sudo pip install pyproj
