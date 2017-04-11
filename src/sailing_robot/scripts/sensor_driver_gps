@@ -11,7 +11,7 @@ from std_msgs.msg import Int16
 from sensor_msgs.msg import NavSatFix
 from sailing_robot.msg import gpswtime
 
-serial_port = serial.Serial("/dev/ttyAMA0", 9600, timeout=0.5)
+serial_port = serial.Serial("/dev/serial0", 9600, timeout=0.5)
 
 def decimal_degrees(d_m, hemisphere):
     """Convert the degrees & minutes number from the GPS to decimal degrees
