@@ -29,6 +29,13 @@ def goal_heading_publisher(tasks_runner):
         pub_state.publish(state)
         rate.sleep()
 
+def jibe_tack_now(msg):
+    tasks_runner.insert_task({
+        'kind': 'jibe_tack_now',
+        'action': msg.data,
+    })
+
+
 def insert_waypoint(msg):
     tasks_runner.insert_task({
         'kind': 'to_waypoint',
@@ -50,6 +57,7 @@ if __name__ == '__main__':
         rospy.Subscriber('wind_direction_apparent', Float64, nav.update_wind_direction)
         rospy.Subscriber('position', NavSatFix, nav.update_position)
         rospy.Subscriber('temporary_wp', NavSatFix, insert_waypoint)
+        rospy.Subscriber('jibe_tack_now', String, jibe_tack_now)
 
         goal_heading_publisher(tasks_runner)
     except rospy.ROSInterruptException:

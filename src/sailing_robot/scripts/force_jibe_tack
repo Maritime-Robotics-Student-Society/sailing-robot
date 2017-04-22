@@ -1,0 +1,65 @@
+#!/usr/bin/python
+
+import rospy
+from std_msgs.msg import Float32, Float64, String
+
+import time, math
+
+
+class Force_jibe():
+    def __init__(self):
+        """
+            This node detect if a tack or a jibe fails (taking too much time) 
+            and triggers a jibe/tack  
+        """
+        self.jibe_tack_now_pub = rospy.Publisher('jibe_tack_now', String, queue_size=10)
+
+        rospy.init_node("Force_jibe", anonymous=True)
+
+        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
+        self.sailing_state = 'normal'
+        self.previous_sailing_state = 'normal'
+        self.timer = time.time()
+
+
+        self.rate = rospy.Rate(rospy.get_param("config/rate"))
+        
+        self.time_tack = rospy.get_param("force_jibe/time_tack")
+        self.looper()
+
+    def update_sailing_state(self, msg):
+        self.sailing_state = msg.data
+
+        # reset timer when the sailing state changes
+        if msg.data == 'normal' or \
+                self.previous_sailing_state != self.sailing_state:
+            self.timer = time.time()
+        self.previous_sailing_state = self.sailing_state 
+
+    def looper(self):
+
+        while not rospy.is_shutdown():
+           
+            # check tacking issue based on its duration
+            if self.sailing_state != 'normal' and \
+                    (time.time() - self.timer) > self.time_tack:
+                rospy.logerr("Issue with tacking/jibing")
+                
+                # "auto" is set, hence the boat will tack if it was jibing and jibe if it was tacking
+                self.jibe_tack_now_pub.publish('auto')
+
+                # wait untill the sailing state comes back to normal
+                while self.sailing_state != 'normal' and not rospy.is_shutdown():
+                    self.rate.sleep()
+                self.timer = time.time()
+
+
+            self.rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        Force_jibe()
+    except rospy.ROSInterruptException:
+        pass
+

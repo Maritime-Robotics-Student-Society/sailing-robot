@@ -15,6 +15,7 @@ from .heading_planning_laylines import HeadingPlan
 from .station_keeping2 import StationKeeping
 from .return_to_safety import ReturnToSafetyZone
 from .obstacle_waypoints import ObstacleWaypoints
+from .jibe_tack_now import JibeTackNow
 from .timeout import StartTimer
 
 def tasks_from_wps(wp_params):
@@ -138,6 +139,8 @@ class TasksRunner(object):
         elif kind == 'start_timer':
             task = StartTimer(self.nav, seconds=taskdict['seconds'],
                       jump_to=taskdict['jump_to'], jump_callback=self.set_jump)
+        elif kind == 'jibe_tack_now':
+            task = JibeTackNow(nav=self.nav, action=taskdict['action'])
         else:
             raise ValueError("Unknown task type: {}".format(kind))
         

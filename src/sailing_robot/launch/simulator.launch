@@ -35,7 +35,7 @@
 
     <!--node name = "sensor_camera_detect" pkg="sailing_robot" type="sensor_camera_detect" /-->
 
-    <!--node name = "force_jibe" pkg="sailing_robot" type="force_jibe" /-->
+    <node name = "force_jibe_tack" pkg="sailing_robot" type="force_jibe_tack" />
     <node name = "sensor_processed_wind_direction" pkg="sailing_robot" type="sensor_processed_wind_direction" />
 
     <node name="debugging_2D_plot" pkg='sailing_robot' type="debugging_2D_plot"/>
@@ -44,6 +44,5 @@
     <node name = "simulation_gps_fix" pkg="sailing_robot" type="simulation_gps_fix" />
     <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/>
 
-    <!--node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" /-->
+    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
  </launch>
-
