@@ -25,6 +25,8 @@
     <node name = "sensor_driver_multiplexer" pkg='sailing_robot' type="sensor_driver_multiplexer" respawn="true"/>
     <node name = "actuator_driver_rudder" pkg="sailing_robot" type="actuator_driver_rudder"  respawn="true"/>
     <node name = "actuator_driver_sail" pkg="sailing_robot" type = "actuator_driver_sail" respawn="true"/>
+    
+    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
 
 
  </launch>
