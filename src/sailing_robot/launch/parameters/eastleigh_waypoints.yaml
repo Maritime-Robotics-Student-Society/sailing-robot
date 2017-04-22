@@ -1,7 +1,7 @@
 
 # for simplified entry of path, simply add list of waypoint names
 # starts with list entry 0, continues until end is reached
-wp/list: ["11", "8", "7", "12"]
+wp/list: ["4", "3", "5"]
 
 
 # distance within waypoint is accepted, in [m]
