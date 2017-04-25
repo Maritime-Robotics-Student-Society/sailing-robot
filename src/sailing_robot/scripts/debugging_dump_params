@@ -11,7 +11,7 @@ FILENAME_BASE = "~/sailing-robot/params-dump_{}_{}.json"
 params = rospy.get_param('/')
 
 filename = FILENAME_BASE.format(params.get('log_name', ''),
-                datetime.now().strftime('%Y-%m-%d-T%H-%M-%S'))
+                datetime.now().strftime('%Y-%m-%dT%H.%M.%S'))
 filename = os.path.expanduser(filename)
 
 with open(filename, 'w') as f:

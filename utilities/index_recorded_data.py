@@ -9,6 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 import json
 import os
 from os.path import dirname, realpath
+import re
 import sys
 
 ISO8601 = "%Y-%m-%dT%H:%M:%SZ"
@@ -85,6 +86,13 @@ class GPSTrace(DataFile):
 class ParamDump(DataFile):
     file_type = PARAM_DUMP
 
+# Different bits of code have made timestamp filenames with different patterns
+TIMESTAMP_RE = r'(\d{4})-(\d{2})-(\d{2})-?T?(\d{2})[-.](\d{2})[-.](\d{2})$'
+def parse_timestamp(filename_ts):
+    m = re.match(TIMESTAMP_RE, filename_ts)
+    norm_ts = m.expand(r'\1-\2-\3T\4.\5.\6')
+    return datetime.strptime(norm_ts, '%Y-%m-%dT%H.%M.%S')
+
 def parse_filename(name):
     """Parse the name of a file in the recorded_data directory.
     
@@ -92,7 +100,7 @@ def parse_filename(name):
     """
     if name.endswith('.bag'):
         test, _, timestamp = name[:-len('.bag')].rpartition('_')
-        dt = datetime.strptime(timestamp, '%Y-%m-%d-%H-%M-%S')
+        dt = parse_timestamp(timestamp)
         return Rosbag(name, test, dt)
     if name.startswith('params-dump_') and name.endswith('.json'):
         s = name[len('params-dump_'):-len('.json')]
@@ -100,7 +108,7 @@ def parse_filename(name):
             test, _, timestamp = s.rpartition('_')
         else:
             test, timestamp = '', s
-        dt = datetime.strptime(timestamp, '%Y-%m-%d-T%H-%M-%S')
+        dt = parse_timestamp(timestamp)
         return ParamDump(name, test, dt)
     if name.startswith('gps-trace') and name.endswith('.csv'):
         s = name[len('gps-trace_'):-len('.csv')]
@@ -108,7 +116,7 @@ def parse_filename(name):
             test, _, timestamp = s.rpartition('_')
         else:
             test, timestamp = '', s
-        dt = datetime.strptime(timestamp, '%Y-%m-%dT%H.%M.%S')
+        dt = parse_timestamp(timestamp)
         return GPSTrace(name, test, dt)
 
 class FileGroup(object):
