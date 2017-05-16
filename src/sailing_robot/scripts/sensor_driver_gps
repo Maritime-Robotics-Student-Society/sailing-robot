@@ -11,6 +11,7 @@ import rospy
 from std_msgs.msg import Int16
 from sensor_msgs.msg import NavSatFix
 from sailing_robot.msg import gpswtime
+from sailing_robot.gps_utils import UBXMessage
 
 serial_port = serial.Serial("/dev/ttyAMA0", 9600, timeout=0.5)
 
@@ -83,28 +84,33 @@ def set_gps_options():
     if not rospy.get_param('change_gps_rate', False):
         return
     
+    # GxGSA
     serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x02\x00\x00\x00\x00\x00\x01\x02\x32\x10\x13')
-    time.sleep(1)
+    time.sleep(0.1)
 
     # GxGSV off
     serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x03\x00\x00\x00\x00\x00\x01\x03\x39\x10\x13')
-    time.sleep(1)
+    time.sleep(0.1)
 
     # GxRMC off
     serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x04\x00\x00\x00\x00\x00\x01\x04\x40\x10\x13')
-    time.sleep(1)
+    time.sleep(0.1)
 
     # GxVTG off
     serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x05\x00\x00\x00\x00\x00\x01\x05\x47\x10\x13')
-    time.sleep(1)
+    time.sleep(0.1)
 
     # GxGLL off
     serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x01\x00\x00\x00\x00\x00\x01\x01\x2B\x10\x13')
-    time.sleep(1)
+    time.sleep(0.1)
 
     # NMEA rate: 5Hz
     serial_port.write(b'\xB5\x62\x06\x08\x06\x00\xC8\x00\x01\x00\x01\x00\xDE\x6A\x10\x13')
-    time.sleep(1)
+    time.sleep(0.1)
+    
+    # GxZDA on (time measurement)
+    serial_port.write(UBXMessage(b'\x06\x01', payload=b'\xF0\x08\x01').serialise())
+    time.sleep(0.1)
 
 if __name__ == '__main__':
     try:
