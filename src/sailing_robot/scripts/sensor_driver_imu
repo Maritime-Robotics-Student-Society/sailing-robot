@@ -15,6 +15,7 @@ from __future__ import division
 
 import rospy
 from std_msgs.msg import Float32
+from geometry_msgs.msg import Vector3
 import time, math
 
 
@@ -161,10 +162,9 @@ def heading_publisher():
         MagX = (MagX - XOFFSET) / XSCALE
         MagY = (MagY - YOFFSET) / YSCALE
         MagZ = (MagZ - ZOFFSET) / ZSCALE
-        
-        magx_pub.publish(MagX)
-        magy_pub.publish(MagY)
-        magz_pub.publish(MagZ)
+
+        mag_field_pub.publish(Vector3(MagX, MagY, MagZ))
+        acc_pub.publish(Vector3(AccX, AccY, AccZ))
         
         heading = math.degrees(math.atan2(-MagY, MagX))
         heading = (heading + offset_true_north) % 360
@@ -173,9 +173,9 @@ def heading_publisher():
         MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) +\
                     (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
         
-        magx_comp_pub.publish(MagX_comp)
-        magy_comp_pub.publish(MagY_comp)
-        
+        # We don't calculate a compensated Z field, so publish it as 0
+        mag_field_comp_pub.publish(Vector3(MagX_comp, MagY_comp, 0))
+
         heading_comp = math.degrees(math.atan2(-MagY_comp, MagX_comp))
         heading_comp = (heading_comp + offset_true_north) % 360
         
@@ -193,11 +193,9 @@ def heading_publisher():
 
 if __name__ == '__main__':
     try:
-        magx_pub = rospy.Publisher('mag_x', Float32, queue_size=10)
-        magy_pub = rospy.Publisher('mag_y', Float32, queue_size=10)
-        magz_pub = rospy.Publisher('mag_z', Float32, queue_size=10)
-        magx_comp_pub = rospy.Publisher('mag_x_comp', Float32, queue_size=10)
-        magy_comp_pub = rospy.Publisher('mag_y_comp', Float32, queue_size=10)
+        mag_field_pub = rospy.Publisher('mag_field', Vector3, queue_size=10)
+        mag_field_comp_pub = rospy.Publisher('mag_field_xy_compensated', Vector3, queue_size=10)
+        acc_pub = rospy.Publisher('acceleration', Vector3, queue_size=10)
         heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
         pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
         roll_pub = rospy.Publisher('roll', Float32, queue_size=10)

@@ -4,7 +4,7 @@ Supply browser view of ros topics in local network
 """
 
 import rospy
-from std_msgs.msg import Float32, Float64, Int16, UInt16, String, Bool
+from std_msgs.msg import Float32, Float64, Int16, String, Bool
 from sensor_msgs.msg import NavSatFix
 from rosgraph_msgs.msg import Log
 
@@ -21,11 +21,6 @@ STATIC_PATH = os.path.expanduser('~/sailing-robot/dashboard/static')
 simple_topics = [
     ('/heading', Float32),
     ('/heading_comp', Float32),
-    # ('/mag_x', Float32),
-    # ('/mag_y', Float32),
-    # ('/mag_x_comp', Float32),
-    # ('/mag_y_comp', Float32),
-    # ('/mag_z', Float32),
     # ('/pitch', Float32),
     # ('/roll', Float32),
     ('/goal_heading', Float32),
