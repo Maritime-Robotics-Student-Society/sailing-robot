@@ -48,6 +48,7 @@ def pos_publisher():
         line = serial_port.readline()
         if raw_log:
             raw_log.write(line)
+            raw_log.flush()
         if not line.strip():
             continue
 
