@@ -32,9 +32,11 @@ while True:
     time.sleep(SLEEP)
     if pw >= MAX_PW:
        rising = False
+       print('max', end=' ')
     elif pw <= MIN_PW:
        rising = True
-       
+       print('min', end=' ')
+
     if rising:
         pw += STEP
     else:
