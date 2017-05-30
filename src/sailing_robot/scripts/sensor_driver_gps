@@ -19,10 +19,13 @@ FILENAME_BASE = "~/sailing-robot/gps-raw-nmea_{}_{}.json"
 
 params = rospy.get_param('/')
 
-filename = FILENAME_BASE.format(params.get('log_name', ''),
-                datetime.now().strftime('%Y-%m-%dT%H.%M.%S'))
-filename = os.path.expanduser(filename)
-raw_log = open(filename, 'wb')
+if params.get('log_raw_gps', True):
+    filename = FILENAME_BASE.format(params.get('log_name', ''),
+                    datetime.now().strftime('%Y-%m-%dT%H.%M.%S'))
+    filename = os.path.expanduser(filename)
+    raw_log = open(filename, 'wb')
+else:
+    raw_log = None
 
 def decimal_degrees(d_m, hemisphere):
     """Convert the degrees & minutes number from the GPS to decimal degrees
@@ -43,7 +46,8 @@ def pos_publisher():
     serial_port.readline()  # Discard first line in case it's partial
     while not rospy.is_shutdown():
         line = serial_port.readline()
-        raw_log.write(line)
+        if raw_log:
+            raw_log.write(line)
         if not line.strip():
             continue
 
@@ -123,4 +127,5 @@ if __name__ == '__main__':
     except rospy.ROSInterruptException:
         pass
 
-raw_log.close()
+if raw_log:
+    raw_log.close()
