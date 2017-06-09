@@ -1,4 +1,9 @@
 #!/usr/bin/python
+"""Set the clock from the GPS unit.
+
+Run this at the start of a test to update the RPi's clock before starting ROS,
+so that timestamps are correct.
+"""
 from __future__ import print_function
 
 import os
