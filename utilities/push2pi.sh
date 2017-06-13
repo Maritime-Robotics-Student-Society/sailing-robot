@@ -1,9 +1,15 @@
 #!/bin/bash
 set -e
 
-echo pushing to the pi
-git push pi@192.168.42.1:sailing-robot-bare 
+PIIP="192.168.42.1"
+if [ "$1" = "pi3" ]
+then
+  PIIP="192.168.12.1"
+fi
+
+echo "Pushing to the pi at $PIIP..."
+git push pi@$PIIP:sailing-robot-bare
 
 
-echo pulling from the pi
-ssh pi@192.168.42.1 'cd ~/sailing-robot; git pull bareclone master'
+echo "Pulling from the pi..."
+ssh pi@$PIIP 'cd ~/sailing-robot; git pull bareclone master'
