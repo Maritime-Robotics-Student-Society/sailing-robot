@@ -34,7 +34,7 @@ def get_gps_time(serial_port):
         print(repr(line))
 
         try:
-            batch = streamreader.next(line)
+            batch = list(streamreader.next(line))
         except (pynmea2.ParseError, pynmea2.ChecksumError, UnicodeError):
             s = "Error parsing GPS data.\nbuffer={!r}\nline={!r}\n{}\n".format(
                         streamreader.buffer, line, traceback.format_exc()
