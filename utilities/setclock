@@ -1,20 +1,33 @@
 #!/usr/bin/python
+"""Set the clock from the GPS unit.
+
+Run this at the start of a test to update the RPi's clock before starting ROS,
+so that timestamps are correct.
+"""
 from __future__ import print_function
 
 import os
-import re
 import serial
 import subprocess
 import sys
+import time
 import traceback
 
 import pynmea2
 
-date = raw_input("Date [YYYY-MM-DD]> ").strip()
-if not re.match("\d{4}-\d{2}-\d{2}", date):
-    sys.exit("Date didn't match required format")
+SERIAL_PORT = "/dev/ttyAMA0"
+
+my_dir = os.path.dirname(__file__)
+robot_src_dir = os.path.abspath(os.path.join(my_dir, '../../src/sailing_robot/src'))
+sys.path.append(robot_src_dir)
+
+from sailing_robot.gps_utils import UBXMessage
 
 def get_gps_time(serial_port):
+    # Enable GxZDA (time stamp) messages
+    serial_port.write(UBXMessage(b'\x06\x01', payload=b'\xF0\x08\x01').serialise())
+    time.sleep(0.1)
+
     streamreader = pynmea2.NMEAStreamReader()
     while True:
         line = serial_port.readline()
@@ -34,15 +47,14 @@ def get_gps_time(serial_port):
             continue
 
         for msg in batch:
-            if (msg.sentence_type == 'GGA') and (msg.timestamp is not None):
-                return msg.timestamp
+            if (msg.sentence_type == 'ZDA') and (msg.timestamp is not None):
+                return msg.datetime
 
-serial_port = serial.Serial("/dev/ttyAMA0", 9600, timeout=0.5)
+serial_port = serial.Serial(SERIAL_PORT, 9600, timeout=0.5)
 print("Getting time from GPS...")
-from datetime import time
-time = get_gps_time(serial_port)
+dtime = get_gps_time(serial_port)
 
-dts = date + 'T' + time.strftime('%H:%M:%S')
+dts = dtime.strftime("%Y-%m-%dT%H:%M:%S")
 print("Setting clock to:", dts)
 print("  (may require sudo password)")
 subprocess.check_call(["sudo", "date", "+%Y-%m-%dT%H:%M:%S", "-s", dts])
