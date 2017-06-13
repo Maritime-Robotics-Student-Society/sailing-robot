@@ -15,13 +15,11 @@ import traceback
 
 import pynmea2
 
-SERIAL_PORT = "/dev/ttyAMA0"
-
 my_dir = os.path.dirname(__file__)
 robot_src_dir = os.path.abspath(os.path.join(my_dir, '../../src/sailing_robot/src'))
 sys.path.append(robot_src_dir)
 
-from sailing_robot.gps_utils import UBXMessage
+from sailing_robot.gps_utils import UBXMessage, get_port
 
 def get_gps_time(serial_port):
     # Enable GxZDA (time stamp) messages
@@ -50,7 +48,7 @@ def get_gps_time(serial_port):
             if (msg.sentence_type == 'ZDA') and (msg.timestamp is not None):
                 return msg.datetime
 
-serial_port = serial.Serial(SERIAL_PORT, 9600, timeout=0.5)
+serial_port = serial.Serial(get_port(), 9600, timeout=0.5)
 print("Getting time from GPS...")
 dtime = get_gps_time(serial_port)
 
