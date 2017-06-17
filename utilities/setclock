@@ -19,22 +19,23 @@ my_dir = os.path.dirname(__file__)
 robot_src_dir = os.path.abspath(os.path.join(my_dir, '../../src/sailing_robot/src'))
 sys.path.append(robot_src_dir)
 
-from sailing_robot.gps_utils import UBXMessage, get_port
+from sailing_robot.gps_utils import UBXMessage, get_port, UbxNmeaParser
 
 def get_gps_time(serial_port):
     # Enable GxZDA (time stamp) messages
     serial_port.write(UBXMessage(b'\x06\x01', payload=b'\xF0\x08\x01').serialise())
     time.sleep(0.1)
 
-    streamreader = pynmea2.NMEAStreamReader()
+    streamreader = UbxNmeaParser()
     while True:
         line = serial_port.readline()
         if not line.strip():
             continue
         print(repr(line))
+        streamreader.feed(line)
 
         try:
-            batch = list(streamreader.next(line))
+            batch = list(streamreader.get_msgs())
         except (pynmea2.ParseError, pynmea2.ChecksumError, UnicodeError):
             s = "Error parsing GPS data.\nbuffer={!r}\nline={!r}\n{}\n".format(
                         streamreader.buffer, line, traceback.format_exc()
@@ -45,6 +46,8 @@ def get_gps_time(serial_port):
             continue
 
         for msg in batch:
+            if not isinstance(msg, pynmea2.NMEASentence):
+                continue
             if (msg.sentence_type == 'ZDA') and (msg.timestamp is not None):
                 return msg.datetime
 
