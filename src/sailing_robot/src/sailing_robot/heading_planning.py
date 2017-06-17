@@ -57,7 +57,7 @@ class HeadingPlan(TaskBase):
     def __init__(self, nav, tack_line_offset=0.01,
             waypoint=ll.LatLon(50.742810, 1.014469), # somewhere in the solent
             target_radius=2,
-            tack_decision_samples=100, tack_decision_threshold=0.75,
+            tack_decision_samples=200, tack_decision_threshold=0.75,
             waypoint_id=None,
             ):
         """Sail towards a waypoint.
