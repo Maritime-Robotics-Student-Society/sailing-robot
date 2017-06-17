@@ -11,7 +11,7 @@ import rospy
 from std_msgs.msg import Int16
 from sensor_msgs.msg import NavSatFix
 from sailing_robot.msg import gpswtime
-from sailing_robot.gps_utils import UBXMessage, get_port
+from sailing_robot.gps_utils import UBXMessage, get_port, UbxNmeaParser
 
 serial_port = serial.Serial(get_port(), 9600, timeout=0.5)
 
@@ -42,7 +42,7 @@ def decimal_degrees(d_m, hemisphere):
     return res
 
 def pos_publisher():
-    gps_reader = pynmea2.NMEAStreamReader()
+    gps_reader = UbxNmeaParser()
     serial_port.readline()  # Discard first line in case it's partial
     while not rospy.is_shutdown():
         line = serial_port.readline()
@@ -51,18 +51,21 @@ def pos_publisher():
             raw_log.flush()
         if not line.strip():
             continue
+        gps_reader.feed(line)
 
         try:
-            batch = list(gps_reader.next(line))
+            batch = list(gps_reader.get_msgs())
         except (pynmea2.ParseError, pynmea2.ChecksumError, UnicodeError):
             s = "Error parsing GPS data.\nbuffer={!r}\nline={!r}\n{}".format(
-                        gps_reader.buffer, line, traceback.format_exc()
+                        gps_reader.buf, line, traceback.format_exc()
             )
             rospy.logerr(s)
             gps_reader.stream = b''
             continue
 
         for sentence in batch:
+            if not isinstance(sentence, pynmea2.NMEASentence):
+                continue
             if sentence.sentence_type != 'GGA':
                 continue
 
