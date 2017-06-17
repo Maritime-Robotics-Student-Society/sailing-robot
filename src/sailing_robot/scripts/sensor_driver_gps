@@ -53,6 +53,8 @@ def pos_publisher():
             continue
         gps_reader.feed(line)
 
+        rospy.logwarn("GPS reader buffer {!r}".format(gps_reader.buf))
+
         try:
             batch = list(gps_reader.get_msgs())
         except (pynmea2.ParseError, pynmea2.ChecksumError, UnicodeError):
