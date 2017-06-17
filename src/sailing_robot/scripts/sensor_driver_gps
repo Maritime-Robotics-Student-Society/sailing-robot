@@ -53,8 +53,6 @@ def pos_publisher():
             continue
         gps_reader.feed(line)
 
-        rospy.logwarn("GPS reader buffer {!r}".format(gps_reader.buf))
-
         try:
             batch = list(gps_reader.get_msgs())
         except (pynmea2.ParseError, pynmea2.ChecksumError, UnicodeError):
@@ -66,7 +64,7 @@ def pos_publisher():
             continue
 
         for sentence in batch:
-            rospy.logwarn("GPS received {!r}".format(sentence))
+            rospy.logdebug("GPS received {!r}".format(sentence))
             if not isinstance(sentence, pynmea2.NMEASentence):
                 continue
             if sentence.sentence_type != 'GGA':
