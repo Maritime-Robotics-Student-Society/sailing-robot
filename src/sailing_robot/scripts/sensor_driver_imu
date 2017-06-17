@@ -21,6 +21,8 @@ import math
 from sailing_robot.imu_utils import ImuReader
 
 IMU_BUS = 1
+LGD = 0x6b #Device I2C slave address
+LSM = 0x1d #Device I2C slave address
 
 def heading_publisher():
 
@@ -36,7 +38,7 @@ def heading_publisher():
     YSCALE = calib['YSCALE']
     ZSCALE = calib['ZSCALE']
 
-    imu = ImuReader(IMU_BUS)
+    imu = ImuReader(IMU_BUS, LSM, LGD)
     imu.check_status()
     imu.configure_for_reading()
 
