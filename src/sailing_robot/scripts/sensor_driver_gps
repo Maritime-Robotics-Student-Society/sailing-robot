@@ -64,6 +64,7 @@ def pos_publisher():
             continue
 
         for sentence in batch:
+            rospy.logwarn("GPS received {!r}".format(sentence))
             if not isinstance(sentence, pynmea2.NMEASentence):
                 continue
             if sentence.sentence_type != 'GGA':
