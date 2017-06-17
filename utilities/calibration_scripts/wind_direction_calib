@@ -30,7 +30,7 @@ data_X = []
 data_Y = []
 
 imu = ImuReader(IMU_BUS, LSM, LGD)
-imu.check_connected()
+imu.check_status()
 imu.configure_for_reading()
 
 for i in range(300):
