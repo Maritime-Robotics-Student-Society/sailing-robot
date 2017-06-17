@@ -68,7 +68,7 @@ class UbxNmeaParser(object):
         if nmea_start == 0:
             return self._take_nmea()
         elif ubx_start == 0:
-            pass
+            return self._take_ubx()
         elif (nmea_start > 0) and (ubx_start > 0):
             return self._take_chunk(min(nmea_start, ubx_start))
         elif nmea_start > 0:
