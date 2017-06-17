@@ -57,7 +57,7 @@ class UbxNmeaParser(object):
     def _take_ubx(self):
         if len(self.buf) < 6:
             return None    # Don't have the length yet
-        payload_length = struct.unpack('<H', self.buf[4:6])
+        payload_length = struct.unpack('<H', self.buf[4:6])[0]
         msg_length = payload_length + 8
         if len(self.buf) >= msg_length:
             return self._take_chunk(msg_length)
