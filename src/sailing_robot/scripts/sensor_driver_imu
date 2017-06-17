@@ -37,7 +37,7 @@ def heading_publisher():
     ZSCALE = calib['ZSCALE']
 
     imu = ImuReader(IMU_BUS)
-    imu.check_connected()
+    imu.check_status()
     imu.configure_for_reading()
 
     while not rospy.is_shutdown():

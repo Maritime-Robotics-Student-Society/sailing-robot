@@ -27,7 +27,7 @@ LGD = 0x6b #Device I2C slave address
 LSM = 0x1d #Device I2C slave address
 
 imu = ImuReader(IMU_BUS, LSM, LGD)
-imu.check_connected()
+imu.check_status()
 imu.configure_for_reading()
 
 data_X = []
