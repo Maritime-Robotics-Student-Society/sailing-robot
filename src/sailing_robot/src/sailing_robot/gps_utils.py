@@ -37,6 +37,21 @@ def get_port():
     return "/dev/ttyAMA0"  # Raspi 2
 
 class UbxNmeaParser(object):
+    """Parse a mixed stream of UBX and NMEA messages
+    
+    Our u-blox GPS unit emits a mixture of messages in two formats:
+    - Binary UBX messages (Start \\xb5b, length in message)
+    - ASCII NMEA 0183 messages (Start $, end \\r\\n)
+    
+    This parser reads the two types of messages, along with any other chunks
+    (e.g. if we start reading half-way through a message). Use .feed(data) to
+    supply newly read data, and .get_msgs() to get an iterator of bytes and
+    pynmea2.NMEASentence objects representing messages already received.
+    
+    At present, we're only interested in the content of the NMEA messages, so
+    we leave the UBX messages as raw bytes rather than attempting to parse them.
+    This may change in the future.
+    """
     def __init__(self):
         self.buf = b''
 
