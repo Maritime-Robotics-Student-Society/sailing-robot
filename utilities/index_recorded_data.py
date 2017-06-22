@@ -2,7 +2,8 @@
 from __future__ import print_function
 
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
+from glob import glob
 import io
 from itertools import groupby
 from jinja2 import Environment, FileSystemLoader
@@ -17,6 +18,7 @@ ISO8601 = "%Y-%m-%dT%H:%M:%SZ"
 utils_dir = dirname(realpath(__file__))
 repo_dir = dirname(utils_dir)
 data_dir = os.path.join(repo_dir, 'recorded_data')
+notes_dir = os.path.join(data_dir, 'notes')
 
 class DataFile(object):
     def __init__(self, filename, test_name, start):
@@ -80,6 +82,10 @@ class Rosbag(DataFile):
             'topic_list': b.get_type_and_topic_info()[1].keys()
         }
 
+    @property
+    def end(self):
+        return self.start + timedelta(seconds=self.duration)
+
 class GPSTrace(DataFile):
     file_type = GPS_TRACE
 
@@ -87,7 +93,7 @@ class ParamDump(DataFile):
     file_type = PARAM_DUMP
 
 # Different bits of code have made timestamp filenames with different patterns
-TIMESTAMP_RE = r'(\d{4})-(\d{2})-(\d{2})-?T?(\d{2})[-.](\d{2})[-.](\d{2})$'
+TIMESTAMP_RE = r'(\d{4})-(\d{2})-(\d{2})-?T?(\d{2})[-.](\d{2})[-.](\d{2})Z?$'
 def parse_timestamp(filename_ts):
     m = re.match(TIMESTAMP_RE, filename_ts)
     norm_ts = m.expand(r'\1-\2-\3T\4.\5.\6')
@@ -124,6 +130,7 @@ class FileGroup(object):
     def __init__(self, rosbag):
         self.rosbag = rosbag
         self.others = []
+        self.notes = []
     
     def __iter__(self):
         yield self.rosbag
@@ -133,6 +140,18 @@ class FileGroup(object):
     def __len__(self):
         return len(self.others) + 1
 
+def load_notes():
+    notes = []
+    for path in glob(os.path.join(notes_dir, '*.json')):
+        filename_ts = os.path.splitext(os.path.basename(path))[0]
+        ts = parse_timestamp(filename_ts)
+        with open(path, 'r') as f:
+            note = json.load(f)
+        note['timestamp'] = ts
+        notes.append(note)
+    
+    return sorted(notes, key=lambda n: n['timestamp'])
+
 def scan_recorded_data_files():
     by_type = {ROSBAG: [], GPS_TRACE: [], PARAM_DUMP: []}
     for name in os.listdir(data_dir):
@@ -141,6 +160,8 @@ def scan_recorded_data_files():
             continue
         
         by_type[data_file.file_type].append(data_file)
+    
+    notes = load_notes()
     
     # Use rosbags as anchors, and group related files with start times within
     # 10 seconds.
@@ -152,6 +173,13 @@ def scan_recorded_data_files():
             for file in by_type[file_type]:
                 if abs((file.start - bag.start).total_seconds()) < 10:
                     group.others.append(file)
+        
+        # Add notes which were written during this run, or within a minute of it
+        for note in notes:
+            if (bag.start - timedelta(seconds=60)) < note['timestamp'] \
+                    < (bag.end + timedelta(seconds=60)):
+                group.notes.append(note)
+
         groups.append(group)
     
     max_duration = max(g.rosbag.duration for g in groups)
