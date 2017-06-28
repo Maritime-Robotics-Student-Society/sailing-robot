@@ -48,7 +48,7 @@ def interactive_calibration(stdscr):
     N = 300
     stdscr.addstr('   0/{}                 '.format(N))
 
-    ts = datetime.now().strftime('%Y-%m-%dT%H.%M.%S')
+    ts = datetime.utcnow().strftime('%Y-%m-%dT%H.%M.%S')
     f = open('calibration_level_{}.csv'.format(ts), 'w')
     cw = csv.writer(f)
     cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
@@ -105,7 +105,7 @@ def interactive_calibration(stdscr):
     mag_y = []
     mag_z = []
 
-    ts = datetime.now().strftime('%Y-%m-%dT%H.%M.%S')
+    ts = datetime.utcnow().strftime('%Y-%m-%dT%H.%M.%S')
     f = open('calibration_roll_{}.csv'.format(ts), 'w')
     cw = csv.writer(f)
     cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
