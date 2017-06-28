@@ -12,6 +12,7 @@ from __future__ import print_function
 
 import csv
 import curses
+from datetime import datetime
 import numpy as np
 import os.path
 from scipy.optimize import leastsq
@@ -47,7 +48,8 @@ def interactive_calibration(stdscr):
     N = 300
     stdscr.addstr('   0/{}                 '.format(N))
 
-    f = open('calibration_level.csv', 'w')
+    ts = datetime.now().strftime('%Y-%m-%dT%H.%M.%S')
+    f = open('calibration_level_{}.csv'.format(ts), 'w')
     cw = csv.writer(f)
     cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
 
@@ -103,7 +105,8 @@ def interactive_calibration(stdscr):
     mag_y = []
     mag_z = []
 
-    f = open('calibration_roll.csv', 'w')
+    ts = datetime.now().strftime('%Y-%m-%dT%H.%M.%S')
+    f = open('calibration_roll_{}.csv'.format(ts), 'w')
     cw = csv.writer(f)
     cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
 
