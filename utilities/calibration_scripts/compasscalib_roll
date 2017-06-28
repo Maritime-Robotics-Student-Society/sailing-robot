@@ -11,11 +11,12 @@
 from __future__ import print_function
 
 import csv
+import curses
 import numpy as np
 import os.path
 from scipy.optimize import leastsq
 import sys
-import time, math
+import time
 import rospy
 
 my_dir = os.path.dirname(__file__)
@@ -23,6 +24,7 @@ robot_src_dir = os.path.abspath(os.path.join(my_dir, '../../src/sailing_robot/sr
 sys.path.append(robot_src_dir)
 
 from sailing_robot.imu_utils import ImuReader
+from curses_imu import IMUDisplay, pitch_roll
 
 IMU_BUS = 1
 LGD = 0x6b #Device I2C slave address
@@ -32,140 +34,144 @@ imu = ImuReader(IMU_BUS, LSM, LGD)
 imu.check_status()
 imu.configure_for_reading()
 
-def pitch_and_roll():
-    AccX, AccY, AccZ = imu.read_acceleration()
-    pitch = math.atan2(AccX, math.sqrt(AccX**2 + AccZ**2))
-    roll = math.atan2(-AccY, -AccZ)
-    return math.degrees(pitch), math.degrees(roll)
 
-data_X = []
-data_Y = []
+def interactive_calibration(stdscr):
+    display = IMUDisplay(stdscr)
+    stdscr.addstr(curses.LINES-2, 0, '1. The minute waltz')
+    stdscr.addstr(curses.LINES-1, 0, 'Press enter to start')
+    
+    key = ''
+    while key != '\n':
+        key = curses.getkey()
 
-print('Hold the boat level and gently turn it around several times')
-raw_input('Press enter to start')
+    N = 300
+    stdscr.addstr('   0/{}                 '.format(N))
 
-f = open('calibration_level.csv', 'w')
-cw = csv.writer(f)
-cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
+    f = open('calibration_level.csv', 'w')
+    cw = csv.writer(f)
+    cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
 
-for i in range(300):
-    try:
-        #Read data from the chips ----------------------
-        time.sleep(0.1)
-        
-        magx, magy, magz = imu.read_mag_field()
-        accx, accy, accz = imu.read_acceleration()
-        cw.writerow([magx, magy, magz, accx, accy, accz])
+    data_X = []
+    data_Y = []
 
-        data_X.append(magx)
-        data_Y.append(magy)
+    for i in range(N):
+        try:
+            time.sleep(0.1)
+            
+            magx, magy, magz = imu.read_mag_field()
+            accx, accy, accz = imu.read_acceleration()
+            cw.writerow([magx, magy, magz, accx, accy, accz])
 
-        minx = min(data_X)
-        miny = min(data_Y)
-        maxx = max(data_X)
-        maxy = max(data_Y)
-        
-        print
-        print('min x', minx)
-        print('max x', maxx)
-        print('min y', miny)
-        print('max y', maxy)
-        
-    except KeyboardInterrupt:
-        print("Interrupted")
-        break
+            data_X.append(magx)
+            data_Y.append(magy)
 
-f.close()
+            display.update_mag(magx, magy, magz)
+            display.update_acc(accx, accy, accz)
+            display.update_pitch_roll(*pitch_roll(accx, accy, accz))
+            stdscr.addstr("{:>4}".format(N))
+            stdscr.refresh()
+        except KeyboardInterrupt:
+            break
 
-minx = min(data_X)
-miny = min(data_Y)
+    f.close()
 
-maxx = max(data_X)
-maxy = max(data_Y)
+    minx = min(data_X)
+    miny = min(data_Y)
 
-offset_X = (maxx + minx)/2
-offset_Y = (maxy + miny)/2
+    maxx = max(data_X)
+    maxy = max(data_Y)
 
-range_X = maxx - minx
-range_Y = maxy - miny
+    offset_X = (maxx + minx)/2
+    offset_Y = (maxy + miny)/2
 
-print('Now hold the boat at a steady heading and roll it side to side.')
-raw_input('Press enter when ready')
+    range_X = maxx - minx
+    range_Y = maxy - miny
 
-pitches = []
-rolls = []
-mag_x = []
-mag_y = []
-mag_z = []
+    stdscr.addstr(curses.LINES-2, 0, '2. Rock me baby like a wagon wheel')
+    stdscr.addstr(curses.LINES-1, 0, 'Press enter to start')
+    
+    key = ''
+    while key != '\n':
+        key = curses.getkey()
 
-f = open('calibration_roll.csv', 'w')
-cw = csv.writer(f)
-cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
+    N = 300
+    stdscr.addstr('   0/{}                 '.format(N))
+
+    pitches = []
+    rolls = []
+    mag_x = []
+    mag_y = []
+    mag_z = []
+
+    f = open('calibration_roll.csv', 'w')
+    cw = csv.writer(f)
+    cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
+
+    for i in range(N):
+        try:
+            time.sleep(0.1)
+            accx, accy, accz = imu.read_acceleration()
+            pitch, roll = pitch_roll(accx, accy, accz)
+            mag_xyz = imu.read_mag_field()
+            cw.writerow(list(mag_xyz) + [accx, accy, accz])
+            
+            pitches.append(pitch)
+            rolls.append(roll)
+            mag_x.append(mag_xyz[0])
+            mag_y.append(mag_xyz[1])
+            mag_z.append(mag_xyz[2])
+            
+            display.update_mag(*mag_xyz)
+            display.update_acc(accx, accy, accz)
+            display.update_pitch_roll(*pitch_roll(accx, accy, accz))
+            stdscr.addstr("{:>4}".format(i))
+            stdscr.refresh()
+        except KeyboardInterrupt:
+            break
+
+    f.close()
+    
+    adjusted_x = (np.array(mag_x) - offset_X) / range_X
+    adjusted_y = (np.array(mag_y) - offset_Y) / range_Y
+    raw_z = np.array(mag_z)
+
+    roll_d = np.array(rolls)
+    roll_r = np.radians(roll_d)
+    pitch_r = np.radians(pitches)
+
+    # Take our correct y field as the points where we're within 3 degrees of level.
+    y_flat = adjusted_y[(-3 < roll_d) & (roll_d < +3)].mean()
+    
+    def mag_y_comp_residuals(p):
+        MagY_comp = (adjusted_x * np.sin(roll_r) * np.sin(pitch_r)) +\
+         (adjusted_y * np.cos(roll_r)) - (((raw_z - p[0]) / p[1])* np.sin(roll_r) * np.cos(pitch_r)) 
+        return MagY_comp - y_flat
+
+    res, ier = leastsq(mag_y_comp_residuals, (1, 1))
+    # According to the docs, an integer code between 1 and 4 (inclusive) indicates
+    # success.
+    assert 1 <= ier <= 4
+
+    offset_Z, range_Z = res
+    offset_Z = offset_Z.item()
+    range_Z = range_Z.item()
+
+    rospy.set_param('/calibration/compass', {'XOFFSET': offset_X,
+                                              'YOFFSET': offset_Y,
+                                              'ZOFFSET': offset_Z,
+                                              'XSCALE': range_X,
+                                              'YSCALE': range_Y,
+                                              'ZSCALE': range_Z,
+                                              })
+
+    return (offset_X, offset_Y, offset_Z), (range_X, range_Y, range_Z)
 
 
-for i in range(300):
-    try:
-        time.sleep(0.1)
-        AccX, AccY, AccZ = imu.read_acceleration()
-        pitch_r = math.atan2(AccX, math.sqrt(AccX**2 + AccZ**2))
-        roll_r = math.atan2(-AccY, -AccZ)
-        pitch, roll = math.degrees(pitch_r), math.degrees(roll_r)
-        # pitch, roll = pitch_and_roll()
-        mag_xyz = imu.read_mag_field()
-        cw.writerow(list(mag_xyz) + [AccX, AccY, AccZ])
-        
-        pitches.append(pitch)
-        rolls.append(roll)
-        mag_x.append(mag_xyz[0])
-        mag_y.append(mag_xyz[1])
-        mag_z.append(mag_xyz[2])
-        
-        print('     / min / current / max')
-        print('pitch : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(pitches), pitch, max(pitches)))
-        print('roll  : {:>5.1f} {:>5.1f} {:>5.1f}'.format(min(rolls), roll, max(rolls)))
-    except KeyboardInterrupt:
-        print('Interrupted')
-        break
+offset_xyz, range_xyz = curses.wrapper(interactive_calibration)
 
-f.close()
-
-adjusted_x = (np.array(mag_x) - offset_X) / range_X
-adjusted_y = (np.array(mag_y) - offset_Y) / range_Y
-raw_z = np.array(mag_z)
-
-roll_d = np.array(rolls)
-roll_r = np.radians(roll_d)
-pitch_r = np.radians(pitches)
-
-# Take our correct y field as the points where we're within 3 degrees of level.
-y_flat = adjusted_y[(-3 < roll_d) & (roll_d < +3)].mean()
-
-def mag_y_comp_residuals(p):
-    MagY_comp = (adjusted_x * np.sin(roll_r) * np.sin(pitch_r)) +\
-     (adjusted_y * np.cos(roll_r)) - (((raw_z - p[0]) / p[1])* np.sin(roll_r) * np.cos(pitch_r)) 
-    return MagY_comp - y_flat
-
-res, ier = leastsq(mag_y_comp_residuals, (1, 1))
-# According to the docs, an integer code between 1 and 4 (inclusive) indicates
-# success.
-assert 1 <= ier <= 4
-
-offset_Z, range_Z = res
-offset_Z = offset_Z.item()
-range_Z = range_Z.item()
-
-rospy.set_param('/calibration/compass', {'XOFFSET': offset_X,
-                                          'YOFFSET': offset_Y,
-                                          'ZOFFSET': offset_Z,
-                                          'XSCALE': range_X,
-                                          'YSCALE': range_Y,
-                                          'ZSCALE': range_Z,
-                                          })
-
-
-print("XOFFSET = " + str(offset_X))
-print("YOFFSET = " + str(offset_Y))
-print("ZOFFSET = " + str(offset_Z))
-print("XSCALE = " + str(range_X))
-print("YSCALE = " + str(range_Y))
-print("ZSCALE = " + str(range_Z))
+print("XOFFSET = " + str(offset_xyz[0]))
+print("YOFFSET = " + str(offset_xyz[1]))
+print("ZOFFSET = " + str(offset_xyz[2]))
+print("XSCALE = " + str(range_xyz[0]))
+print("YSCALE = " + str(range_xyz[1]))
+print("ZSCALE = " + str(range_xyz[2]))
