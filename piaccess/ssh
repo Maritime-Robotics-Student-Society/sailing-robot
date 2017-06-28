@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+
+echo "SSH-ing to the pi at ${SAIL_PI_IP:=192.168.42.1}..."
+ssh pi@$SAIL_PI_IP
