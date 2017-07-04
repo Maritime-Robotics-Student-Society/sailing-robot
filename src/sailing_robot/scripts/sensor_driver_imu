@@ -15,7 +15,8 @@ from __future__ import division
 
 import rospy
 from std_msgs.msg import Float32
-from geometry_msgs.msg import Vector3
+from geometry_msgs.msg import Vector3, Quaternion
+from sensor_msgs.msg import Imu
 import math
 
 from sailing_robot.imu_utils import ImuReader
@@ -46,19 +47,25 @@ def heading_publisher():
         #Read data from the chips ----------------------
         rate.sleep()
         magx, magy, magz = imu.read_mag_field()
-        MagX = magx #*0.160
-        MagY = magy #*0.160
-        MagZ = magz #*0.160
+        MagX = magx * 0.160 / 1e9
+        MagY = magy * 0.160 / 1e9
+        MagZ = magz * 0.160 / 1e9
+
 
         accx, accy, accz = imu.read_acceleration()
-        AccX = accx #*0.061    
-        AccY = accy #*0.061
-        AccZ = accz #*0.061
-        
+        AccX = accx * 0.061 * 9.8
+        AccY = accy * 0.061 * 9.8
+        AccZ = accz * 0.061 * 9.8
+
         pitch = math.atan2(AccX, math.sqrt(AccX**2 + AccZ**2))
         roll = math.atan2(-AccY, -AccZ)
-        
-        gyrox, gyroy, gyroz = imu.read_gyro() 
+
+        gyrox, gyroy, gyroz = imu.read_gyro()
+
+        GyroX = gyrox * 8.75/1000 * math.pi /180
+        GyroY = gyroy * 8.75/1000 * math.pi /180
+        GyroZ = gyroz * 8.75/1000 * math.pi /180
+
 
         # calibration
         MagX = (MagX - XOFFSET) / XSCALE
@@ -67,14 +74,18 @@ def heading_publisher():
 
         mag_field_pub.publish(Vector3(MagX, MagY, MagZ))
         acc_pub.publish(Vector3(AccX, AccY, AccZ))
-        
+        imu_raw_pub.publish(Imu(Quaternion(0, 0, 0),
+                                Vector3(GyroX, GyroY, GyroZ),
+                                Vector3(AccX, AccY, AccZ)))
+
+
         heading = math.degrees(math.atan2(-MagY, MagX))
         heading = (heading + offset_true_north) % 360
-            
+
         MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
         MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) +\
                     (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
-        
+
         # We don't calculate a compensated Z field, so publish it as 0
         mag_field_comp_pub.publish(Vector3(MagX_comp, MagY_comp, 0))
 
@@ -92,13 +103,14 @@ def heading_publisher():
 
 if __name__ == '__main__':
     try:
-        mag_field_pub = rospy.Publisher('mag_field', Vector3, queue_size=10)
+        mag_field_pub = rospy.Publisher('imu/mag', MagneticField, queue_size=10)
+        imu_raw_pub = rospy.Publisher('imu/data_raw', Imu, queue_size=10)
         mag_field_comp_pub = rospy.Publisher('mag_field_xy_compensated', Vector3, queue_size=10)
         acc_pub = rospy.Publisher('acceleration', Vector3, queue_size=10)
         heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
         pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
         roll_pub = rospy.Publisher('roll', Float32, queue_size=10)
-        
+
         rospy.init_node("publish_heading_data", anonymous=True)
         heading_publisher()
     except rospy.ROSInterruptException:
