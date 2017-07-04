@@ -1,4 +1,4 @@
-FROM jamak9/sailing-robot:indigo-base-catkin
+FROM sotonsailbot/ros:indigo-base-catkin
 Maintainer Martin Biggs
 
 USER root

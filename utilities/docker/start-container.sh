@@ -11,4 +11,4 @@ repo=$(dirname "$utils")
 echo "Starting docker container with $repo mounted at ~/sailing-robot"
 
 docker run --name sailing-robot -h sailing-robot -v "$repo:/home/pi/sailing-robot"\
-      -p 8448:8448 --rm -it jamak9/sailing-robot:indigo
+      -p 8448:8448 --rm -it sotonsailbot/ros:indigo
