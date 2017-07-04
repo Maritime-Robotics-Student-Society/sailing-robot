@@ -212,8 +212,9 @@ def main():
     
     if args.docker:
         from subprocess import call
+        print('Running script in docker container...')
         rc = call(['docker', 'run', '-v', repo_dir+':/home/pi/sailing-robot',
-                '--rm', 'jamak9/sailing-robot:indigo', 'python', '/home/pi/sailing-robot/utilities/index_recorded_data.py'])
+                '--rm', 'sotonsailbot/ros:indigo', 'python', '/home/pi/sailing-robot/utilities/index_recorded_data.py'])
         sys.exit(rc)
     
     groups = scan_recorded_data_files()
