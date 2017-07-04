@@ -37,9 +37,9 @@ def heading_publisher():
         #Read data from the chips ----------------------
         rate.sleep()
         magx, magy, magz = imu.read_mag_field()
-        MagX = magx * 0.160 / 1e9
-        MagY = magy * 0.160 / 1e9
-        MagZ = magz * 0.160 / 1e9
+        MagX = magx * 16 / 1e9
+        MagY = magy * 16 / 1e9
+        MagZ = magz * 16 / 1e9
 
 
         accx, accy, accz = imu.read_acceleration()
