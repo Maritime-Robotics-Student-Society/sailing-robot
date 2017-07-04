@@ -57,7 +57,7 @@ def heading_publisher():
         AccY = accy * 0.061 * 9.8
         AccZ = accz * 0.061 * 9.8
 
-        pitch = math.atan2(AccX, math.sqrt(AccX**2 + AccZ**2))
+        pitch = math.atan2(AccX, math.sqrt(AccY**2 + AccZ**2))
         roll = math.atan2(-AccY, -AccZ)
 
         gyrox, gyroy, gyroz = imu.read_gyro()
