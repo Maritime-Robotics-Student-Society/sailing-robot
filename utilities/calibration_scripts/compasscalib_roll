@@ -94,10 +94,10 @@ def interactive_calibration(stdscr):
     
     key = ''
     while key != '\n':
-        key = curses.getkey()
+        key = stdscr.getkey()
 
     N = 300
-    stdscr.addstr('   0/{}                 '.format(N))
+    stdscr.addstr(curses.LINES-1, 0, '   0/{}                 '.format(N))
 
     pitches = []
     rolls = []
@@ -127,7 +127,7 @@ def interactive_calibration(stdscr):
             display.update_mag(*mag_xyz)
             display.update_acc(accx, accy, accz)
             display.update_pitch_roll(*pitch_roll(accx, accy, accz))
-            stdscr.addstr("{:>4}".format(i))
+            stdscr.addstr(curses.LINES-1, 0, "{:>4}".format(i))
             stdscr.refresh()
         except KeyboardInterrupt:
             break
