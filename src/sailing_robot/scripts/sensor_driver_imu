@@ -16,7 +16,7 @@ from __future__ import division
 import rospy
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Vector3, Quaternion
-from sensor_msgs.msg import Imu
+from sensor_msgs.msg import Imu, MagneticField
 import math
 
 from sailing_robot.imu_utils import ImuReader
