@@ -11,6 +11,6 @@
 
     <node name = "sensor_driver_imu_without_cali" pkg="sailing_robot" type="sensor_driver_imu_without_cali"  respawn="true"/>
 
-    <node name = "imu_filter_node" pkg= "mu_filter_madgwick " type="imu_filter_node">
+    <node name = "imu_filter_node" pkg= "mu_filter_madgwick " type="imu_filter_node"/>
 
 </launch>
