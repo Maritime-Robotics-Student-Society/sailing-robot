@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import csv
 from curses import wrapper
 import math
