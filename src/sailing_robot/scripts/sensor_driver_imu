@@ -197,6 +197,10 @@ def heading_publisher():
 
         mag_field_pub.publish(Vector3(MagX, MagY, MagZ))
         acc_pub.publish(Vector3(AccX, AccY, AccZ))
+
+        heading = math.degrees(math.atan2(-MagY, MagX))
+        heading = (heading + offset_true_north) % 360
+
         imu_raw_msg = Imu()
         imu_raw_msg.header.stamp = rospy.Time.now()
         imu_raw_msg.header.frame_id = "sailrobot"
@@ -204,9 +208,6 @@ def heading_publisher():
         imu_raw_msg.angular_velocity = Vector3(GyroX, GyroY, GyroZ)
         imu_raw_msg.linear_acceleration = Vector3(AccX, AccY, AccZ)
         imu_raw_pub.publish(imu_raw_msg)
-
-        heading = math.degrees(math.atan2(-MagY, MagX))
-        heading = (heading + offset_true_north) % 360
 
         MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
         MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) +\
