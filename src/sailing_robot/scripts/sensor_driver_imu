@@ -43,6 +43,7 @@ def heading_publisher():
     YSCALE = calib['YSCALE']
     ZSCALE = calib['ZSCALE']
 
+
     imu = ImuReader(IMU_BUS, LSM, LGD)
     imu.check_status()
     imu.configure_for_reading()
@@ -58,7 +59,7 @@ def heading_publisher():
     b = SMBus(busNum)
 
     ## LSM303D Registers --------------------------------------------------------------
-    LSM = 0x1d #Device I2C slave address
+    # LSM = 0x1d #Device I2C slave address # DDD
 
     LSM_WHOAMI_ADDRESS = 0x0F
     LSM_WHOAMI_CONTENTS = 0b1001001 #Device self-id
@@ -96,7 +97,7 @@ def heading_publisher():
 
     # L3GD20H registers ----------------------------------------------------
 
-    LGD = 0x6b #Device I2C slave address
+    # LGD = 0x6b #Device I2C slave address # DDD
     LGD_WHOAMI_ADDRESS = 0x0F
     LGD_WHOAMI_CONTENTS = 0b11010111 #Device self-id
 
