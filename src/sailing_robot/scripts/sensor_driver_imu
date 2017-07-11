@@ -43,11 +43,10 @@ def heading_publisher():
     YSCALE = calib['YSCALE']
     ZSCALE = calib['ZSCALE']
 
-<<<<<<< HEAD
     imu = ImuReader(IMU_BUS, LSM, LGD)
     imu.check_status()
     imu.configure_for_reading()
-=======
+
     def twos_comp_combine(msb, lsb):
         twos_comp = 256*msb + lsb
         if twos_comp >= 32768:
@@ -143,12 +142,10 @@ def heading_publisher():
 
    
     
->>>>>>> bd8112d75e5586f111d1b24b41f925378cbdbaa2
 
     while not rospy.is_shutdown():
         #Read data from the chips ----------------------
         rate.sleep()
-<<<<<<< HEAD
         magx, magy, magz = imu.read_mag_field()
         # * 16 to nanoTesla, /1e9 to Tesla
         MagX = magx * 16 / 1e9
@@ -163,7 +160,6 @@ def heading_publisher():
         AccZ = accz * 0.061 * 9.8
 
         pitch = math.atan2(AccX, math.sqrt(AccY**2 + AccZ**2))
-=======
         magx = twos_comp_combine(b.read_byte_data(LSM, LSM_MAG_X_MSB), b.read_byte_data(LSM, LSM_MAG_X_LSB))
         MagX = magx #*0.160
         
@@ -183,7 +179,6 @@ def heading_publisher():
         AccZ = accz *0.061
         
         pitch = math.atan2(AccX, math.sqrt(AccX**2 + AccZ**2))
->>>>>>> bd8112d75e5586f111d1b24b41f925378cbdbaa2
         roll = math.atan2(-AccY, -AccZ)
 
         gyrox, gyroy, gyroz = imu.read_gyro()
@@ -221,15 +216,12 @@ def heading_publisher():
 
         heading_comp = math.degrees(math.atan2(-MagY_comp, MagX_comp))
         heading_comp = (heading_comp + offset_true_north) % 360
-<<<<<<< HEAD
-=======
         
         
         data = (AccX,AccY,AccZ,MagX,MagY,MagZ,heading)
         imudata.linear_acceleration.x = AccX
 	imudata.linear_acceleration.y = - AccY
         imudata.linear_acceleration.z = - AccZ # convert from IMU to base frame
->>>>>>> bd8112d75e5586f111d1b24b41f925378cbdbaa2
 
         imudata.angular_velocity.x = gyrox
 	imudata.angular_velocity.y = - gyroy
