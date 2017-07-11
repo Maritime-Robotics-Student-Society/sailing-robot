@@ -1,0 +1,16 @@
+<launch>
+    <!--
+    For the test of imu fusion NOT for the real test!!!!
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <node name = "sensor_driver_imu_without_cali" pkg="sailing_robot" type="sensor_driver_imu_without_cali"  respawn="true"/>
+
+    <node name = "imu_filter_node" pkg= "imu_filter_madgwick " type="imu_filter_node"/>
+
+</launch>

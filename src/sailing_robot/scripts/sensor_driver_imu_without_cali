@@ -1,0 +1,75 @@
+#!/usr/bin/python
+#
+#
+
+#This Python 2 program reads the data from an LSM303D and an L3GD20H which are both attached to the I2C bus of a Raspberry Pi.
+#Both can be purchased as a unit from Pololu as their MinIMU-9 v3 Gyro, Accelerometer, and Compass  product.
+#
+#First follow the procedure to enable I2C on R-Pi.
+#1. Add the lines "ic2-bcm2708" and "i2c-dev" to the file /etc/modules
+#2. Comment out the line "blacklist ic2-bcm2708" (with a #) in the file /etc/modprobe.d/raspi-blacklist.conf
+#3. Install I2C utility (including smbus) with the command "apt-get install python-smbus i2c-tools"
+#4. Connect the I2C device to the SDA and SCL pins of the Raspberry Pi and detect it using the command "i2cdetect -y 1".  It should show up as 1D (typically) or 1E (if the jumper is set).
+
+from __future__ import division
+
+import rospy
+from std_msgs.msg import Float32
+from geometry_msgs.msg import Vector3, Quaternion
+from sensor_msgs.msg import Imu, MagneticField
+import math
+
+from sailing_robot.imu_utils import ImuReader
+
+IMU_BUS = 1
+LGD = 0x6b #Device I2C slave address
+LSM = 0x1d #Device I2C slave address
+
+def heading_publisher():
+
+    rate = rospy.Rate(20)
+
+    imu = ImuReader(IMU_BUS, LSM, LGD)
+    imu.check_status()
+    imu.configure_for_reading()
+
+    while not rospy.is_shutdown():
+        #Read data from the chips ----------------------
+        rate.sleep()
+        magx, magy, magz = imu.read_mag_field()
+        MagX = magx * 16 / 1e9
+        MagY = magy * 16 / 1e9
+        MagZ = magz * 16 / 1e9
+
+
+        accx, accy, accz = imu.read_acceleration()
+        AccX = accx * 0.061 * 9.8
+        AccY = accy * 0.061 * 9.8
+        AccZ = accz * 0.061 * 9.8
+
+        pitch = math.atan2(AccX, math.sqrt(AccX**2 + AccZ**2))
+        roll = math.atan2(-AccY, -AccZ)
+
+        gyrox, gyroy, gyroz = imu.read_gyro()
+
+        GyroX = gyrox * 8.75/1000 * math.pi /180
+        GyroY = gyroy * 8.75/1000 * math.pi /180
+        GyroZ = gyroz * 8.75/1000 * math.pi /180
+
+        mag_field_pub.publish(Vector3(MagX, MagY, MagZ))
+
+        imu_raw_pub.publish(Imu(Quaternion(0, 0, 0),
+                                Vector3(GyroX, GyroY, GyroZ),
+                                Vector3(AccX, AccY, AccZ)))
+
+
+
+if __name__ == '__main__':
+    try:
+        mag_field_pub = rospy.Publisher('imu/mag', MagneticField, queue_size=10)
+        imu_raw_pub = rospy.Publisher('imu/data_raw', Imu, queue_size=10)
+
+        rospy.init_node("publish_heading_data", anonymous=True)
+        heading_publisher()
+    except rospy.ROSInterruptException:
+        pass
