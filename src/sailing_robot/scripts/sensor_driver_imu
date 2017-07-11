@@ -78,8 +78,8 @@ def heading_publisher():
         mag_field_pub.publish(Vector3(MagX, MagY, MagZ))
         acc_pub.publish(Vector3(AccX, AccY, AccZ))
         # imu_raw_pub.publish(Imu(Quaternion(0, 0, 0, 0),
-                                Vector3(GyroX, GyroY, GyroZ),
-                                Vector3(AccX, AccY, AccZ)))
+        #                         Vector3(GyroX, GyroY, GyroZ),
+        #                        Vector3(AccX, AccY, AccZ)))
 
 
         heading = math.degrees(math.atan2(-MagY, MagX))
