@@ -1,0 +1,57 @@
+#!/usr/bin/python
+import sys, getopt
+
+sys.path.append('.')
+import RTIMU
+import os.path
+import time
+import math
+import rospy
+from sensor_msgs.msg import Imu
+
+def imu_publisher():
+    
+    SETTINGS_FILE = "../launch/parameters/RTIMULib"
+    rospy.loginfo("Using calibration profile RTIMULib.ini")
+    if not os.path.exists(SETTINGS_FILE + ".ini"):
+        rospy.loginfo("Calibration file does not exist, default profile created")
+    s = RTIMU.Settings(SETTINGS_FILE)
+    imu = RTIMU.RTIMU(s)
+    # fusion parameters TODO:use ROS parameter server to define
+    imu.setSlerpPower(0.02)
+    imu.setGyroEnable(True)
+    imu.setAccelEnable(True)
+    imu.setCompassEnable(True)
+    
+    if (not imu.IMUInit()):
+        rospy.loginfo("IMU Init failed, check connection and/or access permission")
+
+    imudata = Imu() # sensor message published in ROS
+    rate = rospy.Rate(500)
+    while not rospy.is_shutdown():
+        imu.IMURead()
+        data = imu.getIMUData()
+
+        imudata.orientation.x = data["fusionQPose"][0]
+        imudata.orientation.y = data["fusionQPose"][1]
+        imudata.orientation.z = data["fusionQPose"][2]
+        imudata.orientation.w = data["fusionQPose"][3]
+
+        imudata.linear_acceleration.x = data["accel"][0]
+        imudata.linear_acceleration.y = data["accel"][1]
+        imudata.linear_acceleration.z = data["accel"][2]
+
+        imudata.angular_velocity.x = data["gyro"][0]
+        imudata.angular_velocity.y = data["gyro"][1]
+        imudata.angular_velocity.z = data["gyro"][2]
+
+        imu_pub.publish(imudata)
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        imu_pub = rospy.Publisher('imu/data', Imu, queue_size=10)
+        rospy.init_node("publish_IMU_message", anonymous=True)
+        imu_publisher()
+    except rospy.ROSInterruptException:
+        pass
