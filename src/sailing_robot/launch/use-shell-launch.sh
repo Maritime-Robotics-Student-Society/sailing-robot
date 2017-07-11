@@ -35,7 +35,9 @@ echo ${GREEN} rosbag recording started ${NC}
 
 #
 # insert further separate ros node runs here
-#
+# move every node in the background by adding '&' at the end of line
+# save away their process ID and remember to kill in the end, before killing rosnode
+# (exception: rosbag - it is hard to kill and needs special treatment)
 
 # launch the main launch file
 # this should contain all nodes that have required="true", 
