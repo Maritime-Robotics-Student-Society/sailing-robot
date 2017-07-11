@@ -47,21 +47,24 @@ def heading_publisher():
         #Read data from the chips ----------------------
         rate.sleep()
         magx, magy, magz = imu.read_mag_field()
-        MagX = magx * 0.160 / 1e9
-        MagY = magy * 0.160 / 1e9
-        MagZ = magz * 0.160 / 1e9
+        # * 16 to nanoTesla, /1e9 to Tesla
+        MagX = magx * 16 / 1e9
+        MagY = magy * 16 / 1e9
+        MagZ = magz * 16 / 1e9
 
 
         accx, accy, accz = imu.read_acceleration()
+        # * 0.061 to g, * 9.8 to m/s^2
         AccX = accx * 0.061 * 9.8
         AccY = accy * 0.061 * 9.8
         AccZ = accz * 0.061 * 9.8
 
-        pitch = math.atan2(AccX, math.sqrt(AccX**2 + AccZ**2))
+        pitch = math.atan2(AccX, math.sqrt(AccY**2 + AccZ**2))
         roll = math.atan2(-AccY, -AccZ)
 
         gyrox, gyroy, gyroz = imu.read_gyro()
 
+        # * 8.75 to mdeg/s, /1000 to deg/s, then convert to radians/s
         GyroX = gyrox * 8.75/1000 * math.pi /180
         GyroY = gyroy * 8.75/1000 * math.pi /180
         GyroZ = gyroz * 8.75/1000 * math.pi /180

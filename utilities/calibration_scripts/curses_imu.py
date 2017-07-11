@@ -59,7 +59,7 @@ class IMUDisplay(object):
         self.stdscr.addstr(10,8, '{:6.1f} | {:6.1f} | {:6.1f}'.format(*self.roll_extreme.update(roll)))
 
 def pitch_roll(acc_x, acc_y, acc_z):
-    pitch_r = math.atan2(acc_x, math.sqrt(acc_x**2 + acc_z**2))
+    pitch_r = math.atan2(acc_x, math.sqrt(acc_y**2 + acc_z**2))
     roll_r = math.atan2(-acc_y, -acc_z)
     return math.degrees(pitch_r), math.degrees(roll_r)
 

@@ -46,7 +46,7 @@ def interactive_calibration(stdscr):
         key = stdscr.getkey()
 
     N = 300
-    stdscr.addstr('   0/{}                 '.format(N))
+    stdscr.addstr(curses.LINES-1, 0, '   0/{}                 '.format(N))
 
     ts = datetime.utcnow().strftime('%Y-%m-%dT%H.%M.%S')
     f = open('calibration_level_{}.csv'.format(ts), 'w')
@@ -70,7 +70,7 @@ def interactive_calibration(stdscr):
             display.update_mag(magx, magy, magz)
             display.update_acc(accx, accy, accz)
             display.update_pitch_roll(*pitch_roll(accx, accy, accz))
-            stdscr.addstr("{:>4}".format(N))
+            stdscr.addstr(curses.LINES-1, 0, "{:>4}".format(N))
             stdscr.refresh()
         except KeyboardInterrupt:
             break
