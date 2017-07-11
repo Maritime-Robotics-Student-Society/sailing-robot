@@ -106,7 +106,7 @@ def heading_publisher():
 
 if __name__ == '__main__':
     try:
-        mag_field_pub = rospy.Publisher('imu/mag', MagneticField, queue_size=10)
+        mag_field_pub = rospy.Publisher('imu/mag', Vector3, queue_size=10)
         imu_raw_pub = rospy.Publisher('imu/data_raw', Imu, queue_size=10)
         mag_field_comp_pub = rospy.Publisher('mag_field_xy_compensated', Vector3, queue_size=10)
         acc_pub = rospy.Publisher('acceleration', Vector3, queue_size=10)
