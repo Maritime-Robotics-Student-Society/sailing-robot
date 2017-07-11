@@ -14,6 +14,7 @@
 from __future__ import division
 
 import rospy
+import tf
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Vector3, Quaternion
 from sensor_msgs.msg import Imu, MagneticField
@@ -77,10 +78,13 @@ def heading_publisher():
 
         mag_field_pub.publish(Vector3(MagX, MagY, MagZ))
         acc_pub.publish(Vector3(AccX, AccY, AccZ))
-        # imu_raw_pub.publish(Imu(Quaternion(0, 0, 0, 0),
-        #                         Vector3(GyroX, GyroY, GyroZ),
-        #                        Vector3(AccX, AccY, AccZ)))
-
+        imu_raw_msg = Imu()
+        imu_raw_msg.header.stamp = rospy.Time.now()
+        imu_raw_msg.header.frame_id = "sailrobot"
+        imu_raw_msg.orientation = tf.transformations.quaternion_from_euler(roll, pitch, yaw)
+        imu_raw_msg.angular_velocity = Vector3(GyroX, GyroY, GyroZ)
+        imu_raw_msg.linear_acceleration = Vector3(AccX, AccY, AccZ)
+        imu_raw_pub.publish(imu_raw_msg)
 
         heading = math.degrees(math.atan2(-MagY, MagX))
         heading = (heading + offset_true_north) % 360
