@@ -30,7 +30,7 @@ LSM = 0x1d #Device I2C slave address
 
 def heading_publisher():
 
-    rate = 20
+    rate = rospy.Rate(20)
 
     imu = ImuReader(IMU_BUS, LSM, LGD)
     imu.check_status()
@@ -47,10 +47,10 @@ def heading_publisher():
 
 
         accx, accy, accz = imu.read_acceleration()
-        # * 0.061 to g, * 9.8 to m/s^2
-        AccX = accx * 0.061 * 9.8
-        AccY = accy * 0.061 * 9.8
-        AccZ = accz * 0.061 * 9.8
+        # * 0.061 to mg, /1000 to g * 9.8 to m/s^2
+        AccX = accx * 0.061 * 9.8 / 1000
+        AccY = accy * 0.061 * 9.8 / 1000
+        AccZ = accz * 0.061 * 9.8 / 1000
 
 
         gyrox, gyroy, gyroz = imu.read_gyro()
@@ -64,18 +64,22 @@ def heading_publisher():
         imu_raw_msg = Imu()
         imu_raw_msg.header.stamp = rospy.Time.now()
         imu_raw_msg.header.frame_id = "sailrobot"
-        imu_raw_msg.orientation = tf.transformations.quaternion_from_euler(0, 0, 0)
+        [imu_raw_msg.orientation.x,
+         imu_raw_msg.orientation.y,
+         imu_raw_msg.orientation.z,
+         imu_raw_msg.orientation.w] = (0, 0, 0, 0)
         imu_raw_msg.angular_velocity = Vector3(GyroX, GyroY, GyroZ)
         imu_raw_msg.linear_acceleration = Vector3(AccX, AccY, AccZ)
         imu_raw_pub.publish(imu_raw_msg)
 
-        MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
-        MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) +\
-                    (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
+        imu_mag_raw = MagneticField()
+        imu_mag_raw.header.stamp = rospy.Time.now()
+        imu_mag_raw.magnetic_field = Vector3(MagX, MagY, MagZ)
+        mag_raw_pub.publish(imu_mag_raw)
 
 if __name__ == '__main__':
     try:
-        mag_field_pub = rospy.Publisher('imu/mag', Vector3, queue_size=10)
+        mag_raw_pub = rospy.Publisher('imu/mag', MagneticField, queue_size=10)
         imu_raw_pub = rospy.Publisher('imu/data_raw', Imu, queue_size=10)
         rospy.init_node("publish_heading_data", anonymous=True)
         heading_publisher()
