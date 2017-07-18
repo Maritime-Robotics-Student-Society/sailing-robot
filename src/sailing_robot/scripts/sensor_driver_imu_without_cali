@@ -63,11 +63,8 @@ def heading_publisher():
 
         imu_raw_msg = Imu()
         imu_raw_msg.header.stamp = rospy.Time.now()
-        imu_raw_msg.header.frame_id = "sailrobot"
-        [imu_raw_msg.orientation.x,
-         imu_raw_msg.orientation.y,
-         imu_raw_msg.orientation.z,
-         imu_raw_msg.orientation.w] = (0, 0, 0, 0)
+        imu_raw_msg.header.frame_id = "imu_link_ned"
+        imu_raw_msg.orientation = Quaternion(0, 0, 0, 0)
         imu_raw_msg.angular_velocity = Vector3(GyroX, GyroY, GyroZ)
         imu_raw_msg.linear_acceleration = Vector3(AccX, AccY, AccZ)
         imu_raw_pub.publish(imu_raw_msg)
