@@ -47,10 +47,10 @@ def heading_publisher():
 
 
         accx, accy, accz = imu.read_acceleration()
-        # * 0.061 to g, * 9.8 to m/s^2
-        AccX = accx * 0.061 * 9.8
-        AccY = accy * 0.061 * 9.8
-        AccZ = accz * 0.061 * 9.8
+        # * 0.061 to mg, /1000 to g * 9.8 to m/s^2
+        AccX = accx * 0.061 * 9.8 / 1000
+        AccY = accy * 0.061 * 9.8 / 1000
+        AccZ = accz * 0.061 * 9.8 / 1000
 
 
         gyrox, gyroy, gyroz = imu.read_gyro()
