@@ -30,7 +30,7 @@ LSM = 0x1d #Device I2C slave address
 
 def heading_publisher():
 
-    rate = 20
+    rate = rospy.Rate(20)
 
     imu = ImuReader(IMU_BUS, LSM, LGD)
     imu.check_status()
