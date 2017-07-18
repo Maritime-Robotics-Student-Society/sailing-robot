@@ -79,7 +79,7 @@ def heading_publisher():
 
 if __name__ == '__main__':
     try:
-        mag_raw_pub = rospy.Publisher('imu/mag', MagneticField queue_size=10)
+        mag_raw_pub = rospy.Publisher('imu/mag', MagneticField, queue_size=10)
         imu_raw_pub = rospy.Publisher('imu/data_raw', Imu, queue_size=10)
         rospy.init_node("publish_heading_data", anonymous=True)
         heading_publisher()
