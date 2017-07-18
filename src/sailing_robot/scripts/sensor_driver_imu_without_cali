@@ -75,7 +75,7 @@ def heading_publisher():
         imu_mag_raw = MagneticField()
         imu_mag_raw.header.stamp = rospy.Time.now()
         imu_mag_raw.magnetic_field = Vector3(MagX, MagY, MagZ)
-
+        mag_raw_pub.publish(imu_mag_raw)
 
 if __name__ == '__main__':
     try:
