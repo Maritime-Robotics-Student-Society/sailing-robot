@@ -63,7 +63,7 @@ def heading_publisher():
 
         imu_raw_msg = Imu()
         imu_raw_msg.header.stamp = rospy.Time.now()
-        imu_raw_msg.header.frame_id = "sailrobot"
+        imu_raw_msg.header.frame_id = "imu_link_ned"
         [imu_raw_msg.orientation.x,
          imu_raw_msg.orientation.y,
          imu_raw_msg.orientation.z,
