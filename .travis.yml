@@ -109,7 +109,7 @@ install:
   - cd ~/catkin_ws
   - echo $PATH
   # Travis adds a non-system Python. We want to remove this from $PATH...
-  - export PATH=$(echo "$PATH" | sed -r "s|/opt/python/2.7.[0-9]+/bin||" )
+  - export PATH=$(echo "$PATH" | sed -r "s|/opt/python/2.7.[0-9]+/bin|/usr/bin:&|" )
   - echo $PATH
   - which python
   - catkin_make
