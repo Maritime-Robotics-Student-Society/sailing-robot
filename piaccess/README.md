@@ -11,3 +11,4 @@ Then run:
 - `piaccess/ssh` : SSH to the raspi
 - `piaccess/time2pi.sh` : Set the raspi's clock from your computer
 - `piaccess/push2pi.sh` : Push this git repository to the raspi
+- `piaccess/check_compass_calib.py` : Plot the latest compass calibration data
