@@ -29,7 +29,7 @@ else:
 
 def decimal_degrees(d_m, hemisphere):
     """Convert the degrees & minutes number from the GPS to decimal degrees
-    
+
     We get the degrees and minutes unseparated, i.e. (100*degrees)+minutes
     """
     m = re.match(r'(\d+)(\d{2}\.\d+)', str(d_m))
@@ -77,7 +77,7 @@ def pos_publisher():
             msg.longitude = decimal_degrees(sentence.lon, sentence.lon_dir)
             pos_pub.publish(msg)
             nsats_pub.publish(int(sentence.num_sats))
-            
+
             wtime = gpswtime()
             wtime.fix = msg
             wtime.time_h = sentence.timestamp.hour
@@ -87,12 +87,12 @@ def pos_publisher():
 
 def set_gps_options():
     '''Send ublox commands to turn off some data and change GPS rate to 5Hz.
-    
+
     Thanks to Simon of team Anemoi for info on how to do this.
     '''
     if not rospy.get_param('change_gps_rate', False):
         return
-    
+
     # GxGSA
     serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x02\x00\x00\x00\x00\x00\x01\x02\x32\x10\x13')
     time.sleep(0.1)
@@ -116,9 +116,13 @@ def set_gps_options():
     # NMEA rate: 5Hz
     serial_port.write(b'\xB5\x62\x06\x08\x06\x00\xC8\x00\x01\x00\x01\x00\xDE\x6A\x10\x13')
     time.sleep(0.1)
-    
+
     # GxZDA on (time measurement)
     serial_port.write(UBXMessage(b'\x06\x01', payload=b'\xF0\x08\x08').serialise())
+    time.sleep(0.1)
+
+    # GPVTG on speed feedback
+    serial_port.write(UBXMessage(b'\x06\x01', payload=b'\xF0\x05\x01').serialise())
     time.sleep(0.1)
 
 if __name__ == '__main__':
