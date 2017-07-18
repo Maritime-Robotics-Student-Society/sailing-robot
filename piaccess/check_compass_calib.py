@@ -30,7 +30,7 @@ def optimize_roll_compensation(df):
     # According to the docs, an integer code between 1 and 4 (inclusive) indicates
     # success.
     assert 1 <= ier <= 4
-    return res
+    return res, y_flat
 
 def make_plots(level, roll):
     fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(14, 8))
@@ -56,13 +56,17 @@ def make_plots(level, roll):
     roll.plot(y='roll', ax=axes[1, 0])
     axes[1, 0].hlines(0, 0, len(roll), linestyles='dotted')
     axes[1, 0].set_ylim(-60, 60)
-    axes[1, 0].set_title('roll')
     
     # Mag y against roll
     roll.plot(x='roll', y='mag_y', ax=axes[1, 2])
-    param = optimize_roll_compensation(roll)
+    param, y_flat = optimize_roll_compensation(roll)
     roll['mag_y_compensated'] = compensate_mag_y(param, roll)
     roll.plot(x='roll', y='mag_y_compensated', ax=axes[1, 2], xlim=(-60, 60))
+    axes[1, 2].vlines(0, roll.mag_y.min(), roll.mag_y.max(), linestyles='dotted')
+    axes[1, 2].hlines(y_flat, -60, 60, linestyles='dotted')
+
+    fig.text(0.93, 0.7, 'Waltz', rotation=270, size='x-large')
+    fig.text(0.93, 0.3, 'Rock', rotation=270, size='x-large')
 
     return fig, axes
 
