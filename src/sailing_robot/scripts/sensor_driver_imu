@@ -34,7 +34,7 @@ def heading_publisher():
     calib = rospy.get_param('calibration/compass')
     use_heading_comp = rospy.get_param('heading/compensation')
     offset_true_north = rospy.get_param('heading/offset_true_north')
-	
+
     imudata = Imu()
     XOFFSET = calib['XOFFSET']
     YOFFSET = calib['YOFFSET']
@@ -94,6 +94,14 @@ def heading_publisher():
         imu_raw_msg.linear_acceleration = Vector3(AccX, AccY, AccZ)
         imu_raw_pub.publish(imu_raw_msg)
 
+
+        mag_raw_msg = MagneticField()
+        mag_raw_msg.header.stamp = rospy.Time.now()
+        mag_raw_msg.magnetic_field = Vector3(MagX, MagY, MagZ)
+        mag_raw_pub.publish(mag_raw_msg)
+
+
+
         MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
         MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) +\
                     (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
@@ -110,7 +118,7 @@ def heading_publisher():
 
         imudata.angular_velocity.x = gyrox
         imudata.angular_velocity.y = - gyroy
-        imudata.angular_velocity.z = - gyroz 
+        imudata.angular_velocity.z = - gyroz
         # publish either the compensated heading or the raw one depending on the parameter
         if use_heading_comp:
             heading_pub.publish(heading_comp)
@@ -125,13 +133,14 @@ if __name__ == '__main__':
     try:
         mag_field_pub = rospy.Publisher('imu/mag', Vector3, queue_size=10)
         imu_raw_pub = rospy.Publisher('imu/data_raw', Imu, queue_size=10)
+        mag_raw_pub = rospy.Publisher('imu/mag', MagneticField, queue_size=10)
         mag_field_comp_pub = rospy.Publisher('mag_field_xy_compensated', Vector3, queue_size=10)
         acc_pub = rospy.Publisher('acceleration', Vector3, queue_size=10)
         heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
         pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
         roll_pub = rospy.Publisher('roll', Float32, queue_size=10)
         imu_pub = rospy.Publisher('imu/data', Imu, queue_size=10)
- 
+
         rospy.init_node("publish_heading_data", anonymous=True)
         heading_publisher()
     except rospy.ROSInterruptException:
