@@ -107,6 +107,10 @@ install:
   # Create the devel/setup.bash (run catkin_make with an empty workspace) and
   # source it to set the path variables.
   - cd ~/catkin_ws
+  - echo $PATH
+  # Travis adds a non-system Python. We want to remove this from $PATH...
+  - export PATH=$(echo "$PATH" | sed -r "s|/opt/python/2.7.[0-9]+/bin||" )
+  - echo $PATH
   - which python
   - catkin_make
   - source devel/setup.bash
