@@ -107,6 +107,10 @@ install:
   # Create the devel/setup.bash (run catkin_make with an empty workspace) and
   # source it to set the path variables.
   - cd ~/catkin_ws
+  # Travis adds a non-system Python. Put /usr/bin/python before it on PATH.
+  - export PATH=$(echo "$PATH" | sed -r "s|/opt/python/2.7.[0-9]+/bin|/usr/bin:&|" )
+  - echo $PATH
+  - which python
   - catkin_make
   - source devel/setup.bash
   # Add the package under integration to the workspace using a symlink.

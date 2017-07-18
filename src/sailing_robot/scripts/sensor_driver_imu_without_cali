@@ -14,6 +14,7 @@
 from __future__ import division
 
 import rospy
+import tf
 from std_msgs.msg import Float32
 from geometry_msgs.msg import Vector3, Quaternion
 from sensor_msgs.msg import Imu, MagneticField
@@ -25,9 +26,11 @@ IMU_BUS = 1
 LGD = 0x6b #Device I2C slave address
 LSM = 0x1d #Device I2C slave address
 
+
+
 def heading_publisher():
 
-    rate = rospy.Rate(20)
+    rate = 20
 
     imu = ImuReader(IMU_BUS, LSM, LGD)
     imu.check_status()
@@ -37,38 +40,43 @@ def heading_publisher():
         #Read data from the chips ----------------------
         rate.sleep()
         magx, magy, magz = imu.read_mag_field()
+        # * 16 to nanoTesla, /1e9 to Tesla
         MagX = magx * 16 / 1e9
         MagY = magy * 16 / 1e9
         MagZ = magz * 16 / 1e9
 
 
         accx, accy, accz = imu.read_acceleration()
+        # * 0.061 to g, * 9.8 to m/s^2
         AccX = accx * 0.061 * 9.8
         AccY = accy * 0.061 * 9.8
         AccZ = accz * 0.061 * 9.8
 
-        pitch = math.atan2(AccX, math.sqrt(AccX**2 + AccZ**2))
-        roll = math.atan2(-AccY, -AccZ)
 
         gyrox, gyroy, gyroz = imu.read_gyro()
 
+        # * 8.75 to mdeg/s, /1000 to deg/s, then convert to radians/s
         GyroX = gyrox * 8.75/1000 * math.pi /180
         GyroY = gyroy * 8.75/1000 * math.pi /180
         GyroZ = gyroz * 8.75/1000 * math.pi /180
 
-        mag_field_pub.publish(Vector3(MagX, MagY, MagZ))
 
-        imu_raw_pub.publish(Imu(Quaternion(0, 0, 0),
-                                Vector3(GyroX, GyroY, GyroZ),
-                                Vector3(AccX, AccY, AccZ)))
+        imu_raw_msg = Imu()
+        imu_raw_msg.header.stamp = rospy.Time.now()
+        imu_raw_msg.header.frame_id = "sailrobot"
+        imu_raw_msg.orientation = tf.transformations.quaternion_from_euler(0, 0, 0)
+        imu_raw_msg.angular_velocity = Vector3(GyroX, GyroY, GyroZ)
+        imu_raw_msg.linear_acceleration = Vector3(AccX, AccY, AccZ)
+        imu_raw_pub.publish(imu_raw_msg)
 
-
+        MagX_comp = (MagX*math.cos(pitch)) + (MagZ*math.sin(pitch))
+        MagY_comp = (MagX*math.sin(roll)*math.sin(pitch)) +\
+                    (MagY*math.cos(roll)) - (MagZ*math.sin(roll)*math.cos(pitch))
 
 if __name__ == '__main__':
     try:
-        mag_field_pub = rospy.Publisher('imu/mag', MagneticField, queue_size=10)
+        mag_field_pub = rospy.Publisher('imu/mag', Vector3, queue_size=10)
         imu_raw_pub = rospy.Publisher('imu/data_raw', Imu, queue_size=10)
-
         rospy.init_node("publish_heading_data", anonymous=True)
         heading_publisher()
     except rospy.ROSInterruptException:
