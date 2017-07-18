@@ -30,7 +30,15 @@ def make_plots(level, roll):
     level.plot(y='mag_z', ax=axes[0, 2], legend=False)
     axes[0, 2].set_title('mag z')
 
-    # 
+    # Pitch and roll from roll calibration
+    roll.plot(y='pitch', ax=axes[1, 0])
+    roll.plot(y='roll', ax=axes[1, 0])
+    axes[1, 0].hlines(0, 0, len(roll), linestyles='dotted')
+    axes[1, 0].set_ylim(-60, 60)
+    axes[1, 0].set_title('roll')
+    
+    # Mag y against roll
+    roll.plot(x='roll', y='mag_y', ax=axes[1, 2], xlim=(-60, 60))
 
     return fig, axes
 
