@@ -50,7 +50,8 @@ def interactive_calibration(stdscr):
 
     ts = datetime.utcnow().strftime('%Y-%m-%dT%H.%M.%S')
     filename_level = 'calibration_level_{}.csv'.format(ts)
-    os.symlink(filename_level, 'calibration_level_latest.csv')
+    with open('latest_calibration_time', 'w') as f:
+        f.write(ts)
     f = open(filename_level, 'w')
     cw = csv.writer(f)
     cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
@@ -108,7 +109,6 @@ def interactive_calibration(stdscr):
     mag_z = []
 
     filename_roll = 'calibration_roll_{}.csv'.format(ts)
-    os.symlink(filename_roll, 'calibration_roll_latest.csv')
     f = open(filename_roll, 'w')
     cw = csv.writer(f)
     cw.writerow(['mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z'])
