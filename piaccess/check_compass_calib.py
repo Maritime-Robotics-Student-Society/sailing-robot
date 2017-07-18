@@ -4,12 +4,33 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from scipy.optimize import leastsq
 from subprocess import run
 from tempfile import TemporaryDirectory
 
 def add_pitch_roll(df):
-    df['pitch'] = np.degrees(np.arctan2(df.acc_x, np.sqrt(df.acc_y**2 + df.acc_z**2)))
-    df['roll'] = np.degrees(np.arctan2(-df.acc_y, -df.acc_z))
+    df['pitch_r'] = np.arctan2(df.acc_x, np.sqrt(df.acc_y**2 + df.acc_z**2))
+    df['pitch'] = np.degrees(df['pitch_r'])
+    df['roll_r'] = np.arctan2(-df.acc_y, -df.acc_z)
+    df['roll'] = np.degrees(df['roll_r'])
+
+def compensate_mag_y(p, df):
+    return (df.mag_x * np.sin(df.roll_r) * np.sin(df.pitch_r)) \
+        + (df.mag_y * np.cos(df.roll_r)) \
+        - (((df.mag_z - p[0]) / p[1])* np.sin(df.roll_r) * np.cos(df.pitch_r))
+
+def optimize_roll_compensation(df):
+    # Take our correct y field as the points where we're within 3 degrees of level.
+    y_flat = df[(-3 < df.roll) & (df.roll < +3)].mag_y.mean()
+
+    def mag_y_comp_residuals(p):
+        return compensate_mag_y(p, df) - y_flat
+
+    res, ier = leastsq(mag_y_comp_residuals, (1, 1))
+    # According to the docs, an integer code between 1 and 4 (inclusive) indicates
+    # success.
+    assert 1 <= ier <= 4
+    return res
 
 def make_plots(level, roll):
     fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(14, 8))
@@ -38,7 +59,10 @@ def make_plots(level, roll):
     axes[1, 0].set_title('roll')
     
     # Mag y against roll
-    roll.plot(x='roll', y='mag_y', ax=axes[1, 2], xlim=(-60, 60))
+    roll.plot(x='roll', y='mag_y', ax=axes[1, 2])
+    param = optimize_roll_compensation(roll)
+    roll['mag_y_compensated'] = compensate_mag_y(param, roll)
+    roll.plot(x='roll', y='mag_y_compensated', ax=axes[1, 2], xlim=(-60, 60))
 
     return fig, axes
 
