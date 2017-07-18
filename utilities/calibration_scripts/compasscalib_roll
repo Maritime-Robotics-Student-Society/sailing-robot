@@ -73,7 +73,7 @@ def interactive_calibration(stdscr):
             display.update_mag(magx, magy, magz)
             display.update_acc(accx, accy, accz)
             display.update_pitch_roll(*pitch_roll(accx, accy, accz))
-            stdscr.addstr(curses.LINES-1, 0, "{:>4}".format(N))
+            stdscr.addstr(curses.LINES-1, 0, "{:>4}".format(i))
             stdscr.refresh()
         except KeyboardInterrupt:
             break
