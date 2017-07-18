@@ -14,6 +14,7 @@ import sailing_robot
 from sailing_robot.tasks import tasks_from_wps
 from sailing_robot.tasks_ros import RosTasksRunner
 from sailing_robot.navigation import Navigation
+from sailing_robot.cfg import TaskVotingConfig
 from sensor_msgs.msg import NavSatFix
 
 
@@ -44,6 +45,16 @@ def insert_waypoint(msg):
         'tack_voting_radius': 1 # set default value, hot fix for the force jibing node
     })
 
+def tack_voting_callback(config, level):
+    """
+    get updates for the dynamic parameters
+    """
+    radius = config.radius
+    samples = config.samples
+    threshold = config.threshold
+    return config
+
+
 if __name__ == '__main__':
     try:
         rospy.init_node("publish_goal_heading", anonymous=True)
@@ -58,6 +69,7 @@ if __name__ == '__main__':
         rospy.Subscriber('position', NavSatFix, nav.update_position)
         rospy.Subscriber('temporary_wp', NavSatFix, insert_waypoint)
         rospy.Subscriber('jibe_tack_now', String, jibe_tack_now)
+        srv = Server(TackVotingConfig, tack_voting_callback)
 
         goal_heading_publisher(tasks_runner)
     except rospy.ROSInterruptException:
