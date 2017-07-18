@@ -10,22 +10,11 @@
 
     <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
-    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython_rigA.yaml" command="load"/>
-    <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
-    <param name="do_post" value="true" />
-
-
     <!--
     Nodes
     -->
-    <node name = "sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps" respawn="true"/>
-    <node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu"  respawn="true"/>
-    <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction"  respawn="true"/>
-    <node name = "sensor_driver_multiplexer" pkg='sailing_robot' type="sensor_driver_multiplexer" respawn="true"/>
-    <node name = "actuator_driver_rudder" pkg="sailing_robot" type="actuator_driver_rudder"  respawn="true"/>
-    <node name = "actuator_driver_sail" pkg="sailing_robot" type = "actuator_driver_sail" respawn="true"/>
-    
+    <node name = "sensor_driver_imu_without_cali" pkg="sailing_robot" type="sensor_driver_imu_without_cali"  respawn="true"/>
+    <node name = "imu_filter_node" pkg="imu_filter_madgwick" type="imu_filter_node">
     <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
 
 
