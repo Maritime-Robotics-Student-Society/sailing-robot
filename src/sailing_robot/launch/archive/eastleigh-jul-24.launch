@@ -1,0 +1,42 @@
+<launch>
+    <!--
+    General test file to launch all existing nodes to talk to real hardware
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/>
+
+    <!--
+    Nodes
+    -->
+    <node name = "sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps"/>
+    <node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu" />
+    <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction" />
+
+    <node name = "tasks" pkg="sailing_robot" type = "tasks" />
+    <node name = "tack" pkg="sailing_robot" type = "tack" />
+
+    <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" />
+    <node name = "actuator_driver_sail" pkg="sailing_robot" type = "actuator_driver_sail" />
+    <node name = "actuator_driver_rudder" pkg="sailing_robot" type="actuator_driver_rudder" />
+
+    <node name = "debugging_blink_on_sailing_state" pkg="sailing_robot" type="debugging_blink_on_sailing_state" />
+
+    <node name="debugging_dump_params" pkg='sailing_robot' type="debugging_dump_params"/>
+    <!-- Rosbag records messages for later investigation -->
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-record"/>
+    <!-- Also record GPS data as required by the competition -->
+    <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/>
+
+    <!-- Serve an HTML dashboard so we can see what's going on -->
+    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
+ </launch>

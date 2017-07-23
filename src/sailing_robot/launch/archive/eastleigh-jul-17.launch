@@ -1,0 +1,40 @@
+<launch>
+    <!--
+    General test file to launch all existing nodes to talk to real hardware
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_laser.yaml" ns="/calibration" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_laser.yaml" command="load"/>
+    <!-- Sail servo PWM settings -->
+    <param name="sailsettings/minPWM"          value="965" />
+    <param name="sailsettings/maxPWM"          value="1640" />  
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/>
+
+    <!--
+    Nodes
+    -->
+    <node name="sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps"/>
+    <node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu" />
+    <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction" />
+    <node name = "tasks" pkg="sailing_robot" type = "tasks" />
+    <node name = "tack" pkg="sailing_robot" type = "tack" />
+    <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" />
+    <node name = "actuator_driver_sail" pkg="sailing_robot" type = "actuator_driver_sail" />
+    <node name = "actuator_driver_servos" pkg="sailing_robot" type="actuator_driver_servos" />
+    <node name = "debugging_blink_on_sailing_state" pkg="sailing_robot" type="debugging_blink_on_sailing_state" />
+
+    <!-- Rosbag records messages for later investigation -->
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-record"/>
+    <!-- Also record GPS data as required by the competition -->
+    <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/>
+
+    <!-- Serve an HTML dashboard so we can see what's going on -->
+    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
+ </launch>

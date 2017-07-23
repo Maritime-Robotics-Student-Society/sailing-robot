@@ -1,0 +1,40 @@
+<launch>
+    <!--
+    Water test 25.8.2016
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailingClub_waypoints.yaml" command="load"/>
+
+    <!--
+    Nodes
+    -->
+    <node name = "sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps" respawn="true"/>
+    <node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu"  respawn="true"/>
+    <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction"  respawn="true"/>
+
+    <node name = "tasks" pkg="sailing_robot" type = "tasks"  respawn="true"/>
+    <node name = "tack" pkg="sailing_robot" type = "tack"  respawn="true"/>
+
+    <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" respawn="true"/>
+    <node name = "actuator_driver_sail" pkg="sailing_robot" type = "actuator_driver_sail" respawn="true"/>
+    <node name = "actuator_driver_rudder" pkg="sailing_robot" type="actuator_driver_rudder"  respawn="true"/>
+
+    <node name="debugging_dump_params" pkg='sailing_robot' type="debugging_dump_params"/>
+    <!-- Rosbag records messages for later investigation -->
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailingclub-08-25-"/>
+    <!-- Also record GPS data as required by the competition -->
+    <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log" respawn="true"/>
+
+    <!-- Serve an HTML dashboard so we can see what's going on -->
+    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
+ </launch>
