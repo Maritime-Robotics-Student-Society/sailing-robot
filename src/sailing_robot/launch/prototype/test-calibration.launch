@@ -15,6 +15,7 @@
     -->
     <node name = "sensor_driver_imu_without_cali" pkg="sailing_robot" type="sensor_driver_imu_without_cali"  respawn="true"/>
     <node name = "imu_filter_node" pkg="imu_filter_madgwick" type="imu_filter_node"/>
+    <node name = "sensor_service_imu" pkg="sailing_robot" type="sensor_service_imu"/ >
     <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
 
 
