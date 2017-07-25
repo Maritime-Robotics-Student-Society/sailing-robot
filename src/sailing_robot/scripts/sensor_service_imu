@@ -16,7 +16,7 @@ class heading_processing(object):
         rospy.Subscriber('imu/data', Imu, self.heading_publisher)
 
     def heading_publisher(self, msg):
-        imu = msg.data
+        imu = msg
         self.heading = tf.transformations.euler_from_quaternion(
                         (imu.orientation.x, imu.orientation.y,
                          imu.orientation.z, imu.orientation.w))[2]
