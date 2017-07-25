@@ -1,3 +1,5 @@
+install/
+.idea/
 build/
 bin/
 lib/
