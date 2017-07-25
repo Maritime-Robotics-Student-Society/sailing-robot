@@ -4,6 +4,7 @@ from __future__ import division
 
 import rospy
 import tf
+import math
 
 from std_msgs.msg import Float32
 from sensor_msgs.msg import Imu
@@ -12,18 +13,28 @@ class heading_processing(object):
     def __init__(self):
         rospy.init_node('Heading_service')
         self.heading = 0
-        self.pub = rospy.Publisher('heading', Float32, queue_size=10)
+        self.heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
+        #self.pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
+        #self.roll_pub = rospy.Publisher('roll', Float32, queue_size=10)
         rospy.Subscriber('imu/data', Imu, self.heading_publisher)
 
     def heading_publisher(self, msg):
-        imu = msg
-        self.heading = tf.transformations.euler_from_quaternion(
-                        (imu.orientation.x, imu.orientation.y,
-                         imu.orientation.z, imu.orientation.w))[2]
+        imu = msg.orientation
+        self.heading = math.degrees(
+                        tf.transformations.euler_from_quaternion(
+                        (imu.x, imu.y,imu.z, imu.w))[2])
+        #self.pitch = math.degrees(
+        #                tf.transformations.euler_from_quaternion(
+        #                (imu.x, imu.y,imu.z, imu.w))[1])
+        #self.roll = math.degrees(
+        #                tf.transformations.euler_from_quaternion(
+        #                (imu.x, imu.y,imu.z, imu.w))[0])
+
+
     def run(self):
         r = rospy.Rate(20)
         while not rospy.is_shutdown():
-            self.pub.publish(self.heading)
+            self.heading_pub.publish(self.heading)
             r.sleep()
 
 if __name__ == '__main__':
