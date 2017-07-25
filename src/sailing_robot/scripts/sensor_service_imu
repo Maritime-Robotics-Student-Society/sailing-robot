@@ -22,7 +22,7 @@ class heading_processing(object):
         imu = msg.orientation
         self.heading = math.degrees(
                         tf.transformations.euler_from_quaternion(
-                        (imu.x, imu.y,imu.z, imu.w))[2])
+                        (imu.x, imu.y,imu.z, imu.w))[2]) % 360
         #self.pitch = math.degrees(
         #                tf.transformations.euler_from_quaternion(
         #                (imu.x, imu.y,imu.z, imu.w))[1])
