@@ -10,6 +10,7 @@ from sensor_msgs.msg import Imu
 
 class heading_processing(object):
     def __init__(self):
+        rospy.init_node('Heading_service')
         self.pub = rospy.Publisher('heading', Float32, queue_size=10)
         rospy.Subscriber('imu/data', Imu, self.heading_publisher)
 
