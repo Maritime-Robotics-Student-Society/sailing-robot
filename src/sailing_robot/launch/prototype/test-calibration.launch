@@ -1,0 +1,23 @@
+<launch>
+    <!--
+    Script for testing the wind sensor and compass calibration without running the whole boat
+    At the start, the rudder and sail will move to test if they are wired correctly
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <!--
+    Nodes
+    -->
+    <!--node name = "sensor_driver_imu_without_cali" pkg="sailing_robot" type="sensor_driver_imu_without_cali"  respawn="true"/-->
+    <!--node name = "imu_filter_node" pkg="imu_filter_madgwick" type="imu_filter_node"/-->
+    <include file="$(find xsens_driver)/launch/xsens_driver.launch" />
+    <node name = "sensor_service_imu" pkg="sailing_robot" type="sensor_service_imu"/>
+    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
+
+
+ </launch>
