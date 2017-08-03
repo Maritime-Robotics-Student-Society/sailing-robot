@@ -48,7 +48,7 @@ def heading_publisher():
     imu.check_status()
     imu.configure_for_reading()
 
-   while not rospy.is_shutdown():
+    while not rospy.is_shutdown():
         #Read data from the chips ----------------------
         rate.sleep()
         magx, magy, magz = imu.read_mag_field()
