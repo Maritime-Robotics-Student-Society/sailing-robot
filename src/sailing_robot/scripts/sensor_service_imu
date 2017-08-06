@@ -20,9 +20,9 @@ class heading_processing(object):
 
     def heading_publisher(self, msg):
         imu = msg.orientation
-        self.heading = math.degrees(
+        self.heading = (math.degrees(
                         tf.transformations.euler_from_quaternion(
-                        (imu.x, imu.y,imu.z, imu.w))[2]) % 360
+                        (imu.x, imu.y,imu.z, imu.w))[2]) + 180) % 360
         #self.pitch = math.degrees(
         #                tf.transformations.euler_from_quaternion(
         #                (imu.x, imu.y,imu.z, imu.w))[1])
