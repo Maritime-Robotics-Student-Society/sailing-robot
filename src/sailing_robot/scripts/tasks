@@ -10,7 +10,7 @@ import rospy
 from std_msgs.msg import Float32
 from std_msgs.msg import Float64
 from std_msgs.msg import String
-from dynamic_reconfigure import Server
+from dynamic_reconfigure.server import Server
 import sailing_robot
 from sailing_robot.tasks import tasks_from_wps
 from sailing_robot.tasks_ros import RosTasksRunner
