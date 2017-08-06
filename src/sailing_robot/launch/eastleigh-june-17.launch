@@ -20,6 +20,7 @@
     <!--
     Nodes
     -->
+    <include file="$(find xsens_driver)/launch/xsens_driver.launch" />
     <node name = "sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps" respawn="true"/>
     <node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu"  respawn="true"/>
     <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction"  respawn="true"/>
