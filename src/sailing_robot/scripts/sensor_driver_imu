@@ -134,15 +134,15 @@ def heading_publisher():
 
 if __name__ == '__main__':
     try:
-        mag_field_pub = rospy.Publisher('imu/mag', Vector3, queue_size=10)
-        imu_raw_pub = rospy.Publisher('imu/data_raw', Imu, queue_size=10)
-        mag_raw_pub = rospy.Publisher('imu/mag', MagneticField, queue_size=10)
-        mag_field_comp_pub = rospy.Publisher('mag_field_xy_compensated', Vector3, queue_size=10)
-        acc_pub = rospy.Publisher('acceleration', Vector3, queue_size=10)
-        heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
-        pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
-        roll_pub = rospy.Publisher('roll', Float32, queue_size=10)
-        imu_pub = rospy.Publisher('imu/data', Imu, queue_size=10)
+        mag_field_pub = rospy.Publisher('minimu/mag', Vector3, queue_size=10)
+        imu_raw_pub = rospy.Publisher('minimu/data_raw', Imu, queue_size=10)
+        mag_raw_pub = rospy.Publisher('minimu/mag', MagneticField, queue_size=10)
+        mag_field_comp_pub = rospy.Publisher('minimu/mag_field_xy_compensated', Vector3, queue_size=10)
+        acc_pub = rospy.Publisher('minimu/acceleration', Vector3, queue_size=10)
+        heading_pub = rospy.Publisher('minimu/heading', Float32, queue_size=10)
+        pitch_pub = rospy.Publisher('minimu/pitch', Float32, queue_size=10)
+        roll_pub = rospy.Publisher('minimu/roll', Float32, queue_size=10)
+        imu_pub = rospy.Publisher('minimu/data', Imu, queue_size=10)
 
         rospy.init_node("publish_heading_data", anonymous=True)
         heading_publisher()
