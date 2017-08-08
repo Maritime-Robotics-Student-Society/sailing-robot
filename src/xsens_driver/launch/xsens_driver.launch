@@ -9,7 +9,7 @@
     <arg name="filter_scenario" default="50" doc="Filter scenario: 50=general, 51=high_mag_dep, 52=dynamic, 53=north_reference, 54=vru_general"/>
 
     <!-- node -->
-	<node pkg="xsens_driver" type="mtnode.py" name="xsens_driver" output="screen" >
+	<node pkg="xsens_driver" type="mtnode.py" name="xsens_driver" output="screen" respawn="true">
 		<param name="device" value="$(arg device)"/>
 		<param name="baudrate" value="$(arg baudrate)"/>
 		<param name="timeout" value="$(arg timeout)"/>
