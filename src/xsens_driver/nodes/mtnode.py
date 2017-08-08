@@ -71,6 +71,9 @@ class XSensDriver(object):
 
         self.frame_local = get_param('~frame_local', 'ENU')
 
+        self.filter_scenario = get_param('~filter_scenario', 50)
+        self.mt.SetCurrentScenario(self.filter_scenario)
+
         self.diag_msg = DiagnosticArray()
         self.stest_stat = DiagnosticStatus(name='mtnode: Self Test', level=1,
                                            message='No status information')

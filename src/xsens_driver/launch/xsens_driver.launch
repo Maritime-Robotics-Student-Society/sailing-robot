@@ -6,6 +6,7 @@
     <arg name="frame_id" default="/imu" doc="frame id of the IMU"/>
     <arg name="frame_local" default="NED" doc="desired frame orientation (ENU, NED or NWU)"/>
     <arg name="no_rotation_duration" default="0" doc="duration (int in seconds) of the no-rotation calibration procedure"/>
+    <arg name="filter_scenario" default="50" doc="Filter scenario: 50=general, 51=high_mag_dep, 52=dynamic, 53=north_reference, 54=vru_general"/>
 
     <!-- node -->
 	<node pkg="xsens_driver" type="mtnode.py" name="xsens_driver" output="screen" >
@@ -15,5 +16,6 @@
 		<param name="frame_id" value="$(arg frame_id)"/>
 		<param name="frame_local" value="$(arg frame_local)"/>
 		<param name="no_rotation_duration" value="$(arg no_rotation_duration)"/>
+    <param name="filter_scenario" value="$(arg filter_scenario)"/>
 	</node>
 </launch>
