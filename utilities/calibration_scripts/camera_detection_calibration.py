@@ -15,13 +15,17 @@ print 'If working on image files, add their path as parameter'
 print 'The number at the to gives the current threshold'
 print 'Click on the buoy you want to detect untill it is entirely colored'
 print 'Press "q" to exit'
-print 'Press "n" to move to the next picture (if using files)'
 print 'Press "u" to undo the last color pick'
+print 'Press "n" to move to the next picture (if using files)'
+print 'Press "p" to move to the previous picture (if using files)'
 print
+
+# change the camera id to 1 if using a usb camera
+cameraId = 0
+
 
 colors = []
 
-cameraId = 0
 
 def on_mouse_click (event, x, y, flags, frame):
     if event == cv2.EVENT_LBUTTONUP:
@@ -39,6 +43,7 @@ Upper_hsv2 = np.array([0, 0, 0])
 if len(sys.argv)>1:
     print "Using image files"
     usingCamera = False
+    currImage = 0
     ImageFileList = sys.argv[1:]
     nbImage = len(ImageFileList)
 else:
@@ -46,7 +51,6 @@ else:
     usingCamera = True
     camera = cv2.VideoCapture(cameraId) 
 
-currImage = 0
 
 while True:
 
@@ -81,6 +85,7 @@ while True:
         else:
             Lower[0] = min(c[0] for c in colors)
             Upper[0] = max(c[0] for c in colors)
+            # if color both at a low and high H value, we are in around the "red" domain, so using 2 ranges of H values
             if Lower[0]<90 and Upper[0] >=90 and (Upper[0] - Lower[0])> 30:
                 isRed = True
 
@@ -118,6 +123,12 @@ while True:
         else:
             currImage += 1
  
+    if key == ord('p') and not usingCamera:
+        if currImage == 0:
+            currImage = nbImage-1
+        else:
+            currImage -= 1
+
     if key == ord('q'):
         break
 
