@@ -42,12 +42,14 @@ Upper_hsv2 = np.array([0, 0, 0])
 
 if len(sys.argv)>1:
     print "Using image files"
+    delay = 250
     usingCamera = False
     currImage = 0
     ImageFileList = sys.argv[1:]
     nbImage = len(ImageFileList)
 else:
     print "Using webcam " + str(cameraId)
+    delay = 30
     usingCamera = True
     camera = cv2.VideoCapture(cameraId) 
 
@@ -116,7 +118,7 @@ while True:
 #         print "Upper2      " + str(Upper_hsv2)
 
 
-    key = cv2.waitKey(1)
+    key = cv2.waitKey(delay)
     if key == ord('n') and not usingCamera:
         if currImage >= nbImage-1:
             currImage = 0
