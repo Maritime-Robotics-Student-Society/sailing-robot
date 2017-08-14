@@ -76,7 +76,7 @@ while True:
     masked_image = cv2.bitwise_and(image, image, mask=mask_hsv1 + mask_hsv2)
 
     # print of the % of the image detected at the top left
-    cv2.putText(image, "{:.4f} %".format(percent_detect), (10, 50), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
+    cv2.putText(image, "{:.4f} /1".format(percent_detect), (10, 50), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
     cv2.imshow('frame', image/2 + masked_image/2)
     cv2.setMouseCallback('frame', on_mouse_click, hsv)
 
@@ -147,13 +147,13 @@ print "copy/paste these lines in your parameter file"
 print
 print "################################################################"
 print """# Lower color 1:
-camera_detection/Lower_color_hsv1: """ + str(Lower_hsv1) + """
+camera_detection/Lower_color_hsv1: [""" + ",".join(map(str,Lower_hsv1)) + """]
 # Upper color 1:
-camera_detection/Upper_color_hsv1: """ + str(Upper_hsv1)
+camera_detection/Upper_color_hsv1: [""" +  ",".join(map(str,Upper_hsv1)) + "]"
 print
 print """# Lower color 2:
-camera_detection/Lower_color_hsv2: """ + str(Lower_hsv2) + """
+camera_detection/Lower_color_hsv2: [""" +  ",".join(map(str,Lower_hsv2)) + """]
 # Upper color 2:
-camera_detection/Upper_color_hsv2: """ + str(Upper_hsv2)
+camera_detection/Upper_color_hsv2: [""" + ",".join( map(str,Upper_hsv2)) + "]"
 print "################################################################"
 
