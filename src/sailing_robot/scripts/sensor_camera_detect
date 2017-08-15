@@ -9,6 +9,7 @@ import time
 
 import numpy as np
 import cv2
+import datetime
 
 
 class Camera_detection():
@@ -23,8 +24,12 @@ class Camera_detection():
 
         sensor_rate = rospy.get_param("camera_detection/rate")
         self.rate = rospy.Rate(sensor_rate)
-        self.Lower = np.array( rospy.get_param('camera_detection/Lower_color'))
-        self.Upper = np.array( rospy.get_param('camera_detection/Upper_color'))
+
+        self.Lower_hsv1 = np.array( rospy.get_param('camera_detection/Lower_color_hsv1'))
+        self.Upper_hsv1 = np.array( rospy.get_param('camera_detection/Upper_color_hsv1'))
+        self.Lower_hsv2 = np.array( rospy.get_param('camera_detection/Lower_color_hsv2'))
+        self.Upper_hsv2 = np.array( rospy.get_param('camera_detection/Upper_color_hsv2'))
+
         self.threshold = rospy.get_param('camera_detection/threshold')
         AVE_TIME = rospy.get_param("camera_detection/average_time")   # lengh of the averaging in seconds
         self.AVE_SIZE = int(AVE_TIME * sensor_rate)                        # size of the averaging sample
@@ -33,14 +38,8 @@ class Camera_detection():
 
     def publish(self):
 
-
-        Lower_hsv1 = np.array( rospy.get_param('camera_detection/Lower_color_hsv1'))
-        Upper_hsv1 = np.array( rospy.get_param('camera_detection/Upper_color_hsv1'))
-        Lower_hsv2 = np.array( rospy.get_param('camera_detection/Lower_color_hsv2'))
-        Upper_hsv2 = np.array( rospy.get_param('camera_detection/Upper_color_hsv2'))
-
-
         camera = cv2.VideoCapture(0) 
+        # recording 50 images at start to wait for the white balancing to be operational
         for i in range(50):
             (bool, image) = camera.read()
 
@@ -49,16 +48,18 @@ class Camera_detection():
         self.rate.sleep()
 
         while not rospy.is_shutdown():
-
             (bool, image) = camera.read()
             if bool:
                 hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-                mask_hsv1 = cv2.inRange(hsv, Lower_hsv1, Upper_hsv1)
-                mask_hsv2 = cv2.inRange(hsv, Lower_hsv2, Upper_hsv2)
-             
-                # percentage of the image that contains the expected colors
+                mask_hsv1 = cv2.inRange(hsv, self.Lower_hsv1, self.Upper_hsv1)
                 percent_detect1 = 1.0*cv2.countNonZero(mask_hsv1)  / image_size # percentage of the image that contains the expected colors
-                percent_detect2 = 1.0*cv2.countNonZero(mask_hsv2)  / image_size # percentage of the image that contains the expected colors
+
+                # if only 1 set of color is used, we compute only 1 mask
+                if self.Lower_hsv2[0] != 0 or self.Upper_color_hsv2[0] != 0:
+                    mask_hsv2 = cv2.inRange(hsv, self.Lower_hsv2, self.Upper_hsv2)
+                    percent_detect2 = 1.0*cv2.countNonZero(mask_hsv2)  / image_size # percentage of the image that contains the expected colors
+                else:
+                    percent_detect2 = 0
                 
                 if percent_detect1+percent_detect2  >= self.threshold: 
                     self.average_list.append(1)
@@ -67,9 +68,10 @@ class Camera_detection():
                 
                 if sum(self.average_list)/self.AVE_SIZE > 0.5:
                     msg = 'detected'
+                    filename = '~/camera_detected_obstacle_{:%Y-%m-%d_%H:%M:%S_%N}.jpg'.format(datetime.datetime.now()
+                    cv2.imwrite(filename, image)
                 else:
                     msg = 'nothing'
-
 
                 self.publisher.publish(msg)
 
