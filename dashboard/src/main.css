@@ -1,0 +1,39 @@
+body {
+  margin-left: auto;
+  margin-right: auto;
+  font-family: 'Menlo', 'Montserrat', sans-serif;
+  font-weight: 200;
+  /* background-image: -webkit-gradient(linear, left top, left bottom, from(white), to(blue));
+  background-image: -webkit-linear-gradient(top, white, blue);
+  background-image: -moz-linear-gradient(top, white, blue);
+  background-image: linear-gradient(to bottom, white, blue); */
+}
+
+#block-container tr {
+  vertical-align: top;
+}
+
+.zebra-table {
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-collapse: collapse;
+}
+
+.zebra-table tr:nth-child(odd) {
+  background-color: #ddd;
+}
+
+#topics-table td {
+  min-width: 3em;
+  padding: 0.5em;
+}
+
+#magic-compass {
+  text-align: center;
+  /* padding-left: 150px; */
+}
+
+.compass-hand {
+  height: 160px;
+  transform-origin: bottom center;
+}
