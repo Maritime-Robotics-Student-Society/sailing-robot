@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Run this on a laptop after a MinIMU compass calibration to visualise it.
+"""Visualise results on a laptop after calibrating the MinIMU compass.
 """
 import os
 from matplotlib import pyplot as plt

@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-"""
-Node looks up correct sail setting from table
-Subscribes: wind direction apparent
-Sets sail actuator to correct PWM value
+"""Read whether the servos are being remotely control.
+
+Publishes: remote_control (Bool)
 """
 import rospy
 from std_msgs.msg import Bool
