@@ -9,6 +9,7 @@ Two steps:
 import os.path
 import time, math
 import rospy
+import socket
 import sys
 
 my_dir = os.path.dirname(__file__)
@@ -23,6 +24,11 @@ LSM = 0x1e #Device I2C slave address
 LGD = 0x6a #Device I2C slave address
 data_X = []
 data_Y = []
+
+try:    # Check we can talk to ROS before trying to calibrate
+    rospy.get_param('/rosversion')
+except socket.error:
+    sys.exit("Can't connect to parameter server. Ensure roscore is running.")
 
 imu = ImuReader(IMU_BUS, LSM, LGD)
 imu.check_status()
