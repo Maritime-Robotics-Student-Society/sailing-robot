@@ -1,4 +1,9 @@
 #!/usr/bin/python
+"""Display raw readings from the MinIMU in a curses terminal interface.
+
+Run this as a script to play back readings stored in a CSV file.
+The curses interface defined here is also used in other scripts in this folder.
+"""
 import csv
 from curses import wrapper
 import math

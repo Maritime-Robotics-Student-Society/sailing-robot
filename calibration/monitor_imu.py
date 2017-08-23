@@ -1,11 +1,13 @@
 #!/usr/bin/python
+"""Monitor the compass MinIMU and display readings using curses.
+"""
 import curses
 import os
 import sys
 import time
 
 my_dir = os.path.dirname(__file__)
-robot_src_dir = os.path.abspath(os.path.join(my_dir, '../../src/sailing_robot/src'))
+robot_src_dir = os.path.abspath(os.path.join(my_dir, '../src/sailing_robot/src'))
 sys.path.append(robot_src_dir)
 
 from sailing_robot.imu_utils import ImuReader
