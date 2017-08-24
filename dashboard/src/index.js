@@ -1,15 +1,3 @@
-// id = document.getElementById.bind(document);
-// elem = document.createElement.bind(document);
-// text = document.createTextNode.bind(document);
-
-// function construct(tag, children) {
-//   var res = document.createElement(tag);
-//   children.forEach(function(c) {
-//     res.appendChild(c);
-//   })
-//   return res;
-// }
-
 function formatValue(msg) {
   if (msg.latitude !== undefined) {
     const latHemi = msg.latitude > 0 ? 'N' : 'S';
@@ -36,8 +24,8 @@ function updateTopicTable(msg) {
   }
 }
 
-// function rosout_handling(target_id) {
-//   var target = id(target_id);
+// function rosoutHandling(targetId) {
+//   var target = id(targetId);
 //   var output_table = target.querySelector('#rosout-display');
 //   var recent_msgs = [];
 //   var keep_n_msgs = 1000;
@@ -75,69 +63,35 @@ function updateTopicTable(msg) {
 //   return append_msg;
 // }
 
-// function updateCompassHand(name) {
-//   return function(msg){
-//     id(name+'_hand').style.transform = 'rotate('+msg.value+'deg)';
-//   }
-// }
-
-// const topicHandlers = {
-//   '/heading': [updateCompassHand('heading')],
-//   '/goal_heading': [updateCompassHand('goal')],
-//   '/dbg_heading_to_waypoint': [updateCompassHand('waypoint')],
-//   '/wind_direction_average': [updateCompassHand('wind')],
-// };
-
 
 /////////////////////////////////////////
 //          Web Socket Stuff           //
 /////////////////////////////////////////
-const ws = new WebSocket(`ws://192.168.12.1:8448/updates`);
-//var push_rosout = rosout_handling('rosout');
-ws.onopen = function (event) {
-  connectionOverlays.isDisconnected = false;
-  connectionOverlays.isConnecting = false;
-};
-ws.onmessage = function (event) {
-  const jsonMsg = JSON.parse(event.data);
-  if (jsonMsg.topic === '/rosout') {
-    //push_rosout(json_msg);
-  } else {
-    updateTopicTable(jsonMsg);
-    // (topicHandlers[jsonMsg.topic] || []).forEach(function (h) {
-    //   h(jsonMsg);
-    // });
-  }
-};
-ws.onclose = function (event) {
-  connectionOverlays.isConnecting = false;
-  connectionOverlays.isDisconnected = true;
-};
+// const ws = new WebSocket(`ws://192.168.12.1:8448/updates`);
+// const push_rosout = rosout_handling('rosout');
+// ws.onopen = function (ws, event) {
+//   connectionOverlays.isDisconnected = false;
+//   connectionOverlays.isConnecting = false;
+// };
+// ws.onmessage = function (ws, event) {
+//   const jsonMsg = JSON.parse(event.data);
+//   if (jsonMsg.topic === '/rosout') {
+//     //push_rosout(jsonMsg);
+//   } else {
+//     updateTopicTable(jsonMsg);
+//     const updateCompassHand = topicHandlers[jsonMsg.topic];
+//     if (updateCompassHand) {
+//       updateCompassHand(jsonMsg.value);
+//     }
+//   }
+// };
+// ws.onerror = function (ws, event) {
 
-const Child = Vue.component('mine-testing', {
-  props: {
-    wow: {
-      type: String,
-      default: ''
-    }
-  },
-  template: '<span>{{wow}}</span>',
-  data: function () {
-    return {
-      ech: 'Wowzers'
-    }
-  }
-});
-
-new Vue({
-  el: '#test',
-  data: {
-    ech: 'Yowza'
-  },
-  components: {
-    'mine-testing': Child
-  }
-});
+// }
+// ws.onclose = function (ws, event) {
+//   connectionOverlays.isConnecting = false;
+//   connectionOverlays.isDisconnected = true;
+// };
 
 const connectionOverlays = new Vue({
   el: '#connection-overlays',
@@ -147,48 +101,82 @@ const connectionOverlays = new Vue({
   }
 });
 
+const CompassTable = Vue.component('compass-table', {
+  props: {
+    compasses: {
+      type: Array,
+      default: []
+    }
+  },
+  template: `<table class="table table-striped table-bordered">
+              <thead class="thead-inverse">
+                <th>Hand</th>
+                <th>Bearing</th>
+              </thead>
+              <tbody>
+                <tr v-for="c of compasses">
+                  <th scope="row">{{c.name.replace(/_.+/, '')}}</th>
+                  <td>{{c.bearing}}°</td>
+                </tr>
+              </tbody>
+            </table>`
+});
+
+const CompassHand = Vue.component('compass-hand', {
+  props: {
+    compass: {
+      type: Object,
+      default: Object.create(null)
+    }
+  },
+  template: `<img :src="source"
+                  :style="spinEm"
+                  :alt="altName"
+                  class="compass-hand">`,
+  computed: {
+    source() {
+      return `static/${this.compass.name}.svg`;
+    },
+    altName() {
+      return `Why isn't ${this.compass.name} loaded`;
+    },
+    spinEm() {
+      return Object.assign(Object.create(null), {
+        transform: `rotate(${this.compass.bearing}deg)`
+      });
+    }
+  }
+});
+
 const magicCompass = new Vue({
   el: '#magic-compass',
   data: {
     compasses: [{
         name: 'goal_hand',
-        style: {},
         bearing: 0
       },
       {
         name: 'heading_hand',
-        style: {},
         bearing: 0
       },
       {
         name: 'waypoint_hand',
-        style: {},
         bearing: 0
       },
       {
         name: 'wind_hand',
-        style: {},
         bearing: 0
       },
     ]
   },
+  components: {
+    'compass-table': CompassTable,
+    'compass-hand': CompassHand
+  },
   methods: {
-    spin(compass) {
-      const deg = compass.style.transform || 10;
-      console.log(compass.style);
-      console.log(compass.style.transform);
-      compass.style.transform = `rotate(${deg}deg)`;
-      // let start;
-      // function rightRound(timestamp) {
-      //   if (start) start = timestamp;
-      //   if (timestamp - start > 200) {
-      //     start = timestamp;
-      //     const deg = n.style.transform || 0;
-      //     console.log(deg);
-      //   }
-      //   requestAnimationFrame(rightRound);
-      // }
-      // requestAnimationFrame(rightRound);
+    change(name, bearing) {
+      const c = this.compasses.find(c => c.name === name);
+      c.bearing = bearing % 360;
     }
   }
 })
@@ -200,7 +188,7 @@ const topicsTable = new Vue({
       'Topic',
       'Value'
     ],
-    topics: range(0, 10).map((_, i) => {
+    topics: fp.range(0, 10).map((_, i) => {
       return Object.assign(Object.create(null), {
         name: `Test${Math.round(10*Math.random())}`,
         value: 30 * Math.random()
@@ -210,10 +198,57 @@ const topicsTable = new Vue({
   computed: {
     sortedTopics() {
       return this.topics.sort((a, b) => {
-        return (a.name.localeCompare(b.name) > 0)? 1 :
-        (a.name.localeCompare(b.name === 0))? 0 :
-        -1
+        return (a.name.localeCompare(b.name) > 0) ? 1 :
+          (a.name.localeCompare(b.name === 0)) ? 0 :
+          -1
       });
     }
   }
 });
+
+const RosoutTable = Vue.component('rosout-table', {
+  props: ['displayLevel'],
+  template: `<table>
+    <tr>
+      <td>{{displayLevel}}</td>
+    </tr>
+  </table>`,
+  data: {
+
+  }
+});
+
+const rosout = new Vue({
+  el: '#rosout',
+  data: {
+    levels: [
+      'Debug',
+      'Info',
+      'Warn',
+      'Error',
+      'Fatal'
+    ],
+    activeLevel: 'Debug'
+  },
+  methods: {
+    levelClass(currentLevel) {
+      const r = [];
+      // r.push(`rosout-${currentLevel.toLowerCase()}`);
+      r.push((this.activeLevel === currentLevel) ? 'active' : '');
+      return r.join(' ');
+    },
+    switchLevel(level) {
+      this.activeLevel = level;
+    }
+  },
+  components: {
+    'rosout-table': RosoutTable
+  }
+});
+
+const topicHandlers = {
+  '/heading': fp.curry(magicCompass.change, 'heading'),
+  '/goal_heading': fp.curry(magicCompass.change, 'goal'),
+  '/dbg_heading_to_waypoint': fp.curry(magicCompass.change, 'waypoint'),
+  '/wind_direction_average': fp.curry(magicCompass.change, 'wind')
+};

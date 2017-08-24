@@ -1,0 +1,14 @@
+@charset "utf-8";
+
+// variables.less
+$theme-primary: /*#33CCFF*/#336699;
+$theme-secondary: #33CC99;
+$theme-light: /*white*/#FFFF33;
+// $theme-dark: #222;
+$theme-dark: /*#336666*/#003333;
+// Mine variables
+$header-background-color: rgba(0, 0, 0, 0.7);
+$header-padding: 50px 15px;
+$sponsor-anchors: #33CCFF;
+
+@import "base";

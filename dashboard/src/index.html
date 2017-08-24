@@ -18,14 +18,10 @@
 
 <body role="document">
 
+  <audio src="static/Crisp_Ocean_Waves-Mike_Koenig-1486046376.wav" autoplay loop></audio>
+  <audio src="static/flock-of-seagulls_daniel-simion.wav" autoplay loop></audio>
+
   <div class="container">
-    <div class="row" style="display: none">
-      <div class="col-md-12">
-        <div id="test">
-          <mine-testing :wow="ech"></mine-testing>
-        </div>
-      </div>
-    </div>
 
     <div class="row">
       <div class="col-md-12">
@@ -45,6 +41,7 @@
 
     <div class="row">
       <div class="col-md-4">
+        <h2>ROS Topics⛵️</h2>
         <table id="topics-table" class="table table-striped table-bordered">
           <thead class="thead-inverse">
             <th v-for="h in headers">{{h}}</th>
@@ -61,45 +58,30 @@
       <div class="col-md-8" id='magic-compass'>
         <div class="row">
           <div class="col-md-12">
-            <table class="table table-striped">
-              <thead class="thead-inverse">
-                <th>Hand</th>
-                <th>Bearing</th>
-              </thead>
-              <tbody>
-                <tr v-for="c of compasses">
-                  <th scope="row">{{c.name.replace(/_.+/, '')}}</th>
-                  <td>{{c.bearing}}°</td>
-                </tr>
-              </tbody>
-            </table>
+            <h2>Compass🌊</h2>
+            <compass-table :compasses="compasses"></compass-table>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-3" v-for="n of compasses">
-            <img :src="`static/${n.name}.svg`"
-                 :alt="`Why isn't ${n.name} loaded`"
-                 class="compass-hand"
-                 :style="n.style"
-                 v-on:click="spin(n)">
+          <div class="col-md-3" v-for="c of compasses">
+            <compass-hand :compass="c"></compass-hand>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="row">
+      <div class="col-md-12" id="rosout">
+        <h2>/rosout🤖</h2>
+        <ul class="nav nav-tabs">
+          <li class="nav-item" v-for="(l, index) of levels" :id="`rosout-level-${l.toLowerCase()}`" @click="switchLevel(l)">
+            <a class="nav-link" :class="levelClass(l)" href="#rosout-display">{{l}}</a>
+          </li>
+        </ul>
+        <rosout-table id="rosout-display" class="table table-striped" :display-level="activeLevel"></rosout-table>
+      </div>
+    </div>
   </div>
-
-
-      <!-- <h2>/rosout</h2>
-  <div id='rosout'>
-    <a id='rosout-level-debug' href='#'>Debug</a> -
-    <a id='rosout-level-info' href='#'>Info</a> -
-    <a id='rosout-level-warn' href='#'>Warn</a> -
-    <a id='rosout-level-error' href='#'>Error</a> -
-    <a id='rosout-level-fatal' href='#'>Fatal</a>
-    <table id='rosout-display' class='zebra_table'><tbody></tbody></table>
-  </div> -->
-
-      <!-- <h2>Compass</h2> -->
 
   <!-- My scripts -->
   <script src="lib/fp.js"></script>

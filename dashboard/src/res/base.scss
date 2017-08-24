@@ -1,0 +1,66 @@
+body {
+  margin-left: auto;
+  margin-right: auto;
+  font-family: 'Menlo', 'Montserrat', sans-serif;
+  font-weight: 200;
+  background: white; // background-image: -webkit-gradient(linear, left top, left bottom, from($sponsor-anchors), to($theme-primary));
+  // background-image: -webkit-linear-gradient(top, $sponsor-anchors, $theme-primary);
+  // background-image: -moz-linear-gradient(top, $sponsor-anchors, $theme-primary);
+  // background-image: linear-gradient(to bottom, $sponsor-anchors, $theme-primary);
+}
+
+.zebra-table {
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-collapse: collapse;
+  thead {
+    background-color: $theme-dark;
+    color: white;
+  }
+  tbody {
+    tr:nth-child(odd) {
+      background-color: $theme-secondary;
+    }
+    th {
+      color: $theme-light;
+    }
+    td {
+      min-width: 3em;
+      padding: 0.5em;
+    }
+  }
+}
+
+#magic-compass {
+  td {
+    text-align: center;
+  }
+  /* padding-left: 150px; */
+}
+
+.compass-hand {
+  height: 160px;
+  transform-origin: bottom center;
+}
+
+#rosout {
+  .nav-item {
+    .nav-link {
+      &.rosout-debug {
+        background: blue;
+      }
+      &.rosout-info {
+        background: yellow;
+      }
+      &.rosout-warn {
+        background: orange;
+      }
+      &.rosout-error {
+        background: red;
+      }
+      &.rosout-fatal {
+        background: darkorchid;
+      }
+    }
+  }
+}
