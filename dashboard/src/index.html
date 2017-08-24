@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>The Dread Pirate Robot's Dashboard++ Sorta</title>
+  <link rel="stylesheet" href="lib/bootstrap-v4.0.0-alpha.6.min.css">
+  <link rel="stylesheet" href="main.css">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <script type="text/javascript" src="lib/eventemitter2.min.js"></script>
+  <script type="text/javascript" src="lib/roslib.min.js"></script>
+  <script src="lib/vue@2.4.2.min.js"></script>
+  <script type='text/javascript' src="lib/d3.v3.min.js"></script>
+  <script type='text/javascript' src="lib/micropolar-v0.2.2.min.js"></script>
+</head>
+
+<body>
+
+  <audio src="static/Crisp_Ocean_Waves-Mike_Koenig-1486046376.wav" autoplay loop></audio>
+  <audio src="static/flock-of-seagulls_daniel-simion.wav" autoplay loop></audio>
+
+  <div class="container">
+
+    <div class="row">
+      <div class="col-md-12">
+        <div id="connection-overlays">
+          <div id="disconnected" class="alert alert-warning" role="alert" v-if="isDisconnected">
+            Disconnected - refresh page when ROS is running to reconnect
+          </div>
+          <div id="connecting" class="alert alert-info" role="alert" v-if="isConnecting">
+            Connecting...
+          </div>
+          <div id="connected" class="alert alert-success" role="alert" v-if="!(isDisconnected || isConnecting)">
+            We're connected!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <h2>ROS Topics⛵️</h2>
+        <table id="topics-table" class="table table-striped table-bordered">
+          <thead class="thead-inverse">
+            <th v-for="h in headers">{{h}}</th>
+          </thead>
+          <tbody>
+            <tr v-for="t in sortedTopics">
+              <th scope="row">{{t.name}}</th>
+              <td class="text-right">{{t.value.toFixed(2)}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-md-8" id='magic-compass'>
+        <div class="row">
+          <div class="col-md-12">
+            <h2>Compass🌊</h2>
+            <compass-table :compasses="compasses"></compass-table>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3" v-for="c of compasses">
+            <compass-hand :compass="c"></compass-hand>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12" id="rosout">
+        <h2>/rosout🤖</h2>
+        <ul class="nav nav-tabs">
+          <li class="nav-item" v-for="(l, index) of levels" :id="`rosout-level-${l.toLowerCase()}`" @click="switchLevel(l)">
+            <a class="nav-link" :class="levelClass(l)" href="#rosout-display">{{l}}</a>
+          </li>
+        </ul>
+        <rosout-table id="rosout-display" class="table table-striped" :display-level="activeLevel"></rosout-table>
+      </div>
+    </div>
+  </div>
+
+  <!-- My scripts -->
+  <script src="lib/fp.js"></script>
+  <script src="index.js"></script>
+  <!-- Bootstrap scripts -->
+  <script src="lib/jquery-v3.1.1.min.js"></script>
+  <script src="lib/tether-v1.4.0.min.js"></script>
+  <script src="lib/bootstrap-v4.0.0-alpha.6.min.js"></script>
+</body>
+
+</html>
