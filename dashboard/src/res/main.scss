@@ -1,0 +1,20 @@
+@charset "utf-8";
+
+// variables.less
+$theme-primary: /*#33CCFF*/#336699;
+$theme-secondary: #33CC99;
+$theme-light: /*white*/#FFFF33;
+// $theme-dark: #222;
+$theme-dark: /*#336666*/#003333;
+// Mine variables
+$header-background-color: rgba(0, 0, 0, 0.7);
+$header-padding: 50px 15px;
+$sponsor-anchors: #33CCFF;
+
+$log-level-debug: rgb(2, 117, 216);
+$log-level-info: rgb(91, 192, 222);
+$log-level-warn: rgb(240, 173, 78);
+$log-level-error: rgb(217, 83, 79);
+$log-level-fatal: black;
+
+@import "base";

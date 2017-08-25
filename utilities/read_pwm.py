@@ -1,3 +1,7 @@
+"""Experimentation with reading PWM signal on Raspberry Pi.
+
+This technique is used in sensor_driver_multiplexer
+"""
 import pigpio
 import time
 

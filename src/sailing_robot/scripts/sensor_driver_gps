@@ -1,4 +1,11 @@
 #!/usr/bin/python
+"""Read from the GPS receiver.
+
+Publishes:
+- position (NavSatFix)
+- gps_fix (gpswtime) - includes timestamp from GPS signal
+- gps_satellites (Int16) - number of satellites visible
+"""
 from datetime import datetime
 import os.path
 import serial
