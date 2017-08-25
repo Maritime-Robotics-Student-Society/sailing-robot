@@ -46,7 +46,7 @@ class MID:
     # Baudrate, 1 byte
     SetBaudrate = 0x18
     # Run the built-in self test (MTi-1/10/100 series)
-    RunSelftest = 0x24
+    RunSelfTest = 0x24
     # Self test results, 2 bytes
     SelftestAck = 0x25
     # Error mode, 2 bytes, 0000, 0001, 0002, 0003 (default 0001)
