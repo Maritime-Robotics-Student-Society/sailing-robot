@@ -1,3 +1,25 @@
+const sounds = [
+  'static/Crisp_Ocean_Waves-Mike_Koenig-1486046376.wav',
+  'static/flock-of-seagulls_daniel-simion.wav'
+];
+const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+let konamiCount = 0;
+document.body.addEventListener('keydown', function (ev) {
+  if (konamiCode[konamiCount] === ev.keyCode) {
+    konamiCount += 1;
+  } else {
+    konamiCount = 0;
+  }
+  if (konamiCount === konamiCode.length) {
+    sounds.forEach((s, i) => {
+      const a = new Audio(s);
+      a.loop = true;
+      a.volume = i? 0.3 : 0.5;
+      a.play();
+    });
+  }
+});
+
 /////////////////////////////////////////
 //          Web Socket Stuff           //
 /////////////////////////////////////////
@@ -19,7 +41,8 @@ ws.onmessage = function (ws, event) {
   }
 };
 ws.onerror = function (ws, event) {
-
+  connectionOverlays.isConnecting = false;
+  connectionOverlays.isDisconnected = true;
 }
 ws.onclose = function (ws, event) {
   connectionOverlays.isConnecting = false;
@@ -56,7 +79,7 @@ const topicsTable = new Vue({
       return this.topics.sort((a, b) => {
         return (a.name.localeCompare(b.name) > 0) ? 1 :
           (a.name.localeCompare(b.name === 0)) ? 0 :
-            -1
+          -1
       });
     }
   },
