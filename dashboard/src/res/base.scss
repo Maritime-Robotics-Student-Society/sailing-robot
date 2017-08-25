@@ -63,4 +63,27 @@ body {
       }
     }
   }
+  #rosout-display {
+    height: 500px;
+    overflow-y: scroll;
+    color: white;
+    padding: 1em;
+    p {
+      &.debug {
+        color: $log-level-debug;
+      }
+      &.info {
+        color: $log-level-info;
+      }
+      &.warn {
+        color: $log-level-warn;
+      }
+      &.error {
+        color: $log-level-error;
+      }
+      &.fatal {
+        color: $log-level-fatal;
+      }
+    }
+  }
 }

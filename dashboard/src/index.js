@@ -24,46 +24,6 @@ function updateTopicTable(msg) {
   }
 }
 
-// function rosoutHandling(targetId) {
-//   var target = id(targetId);
-//   var output_table = target.querySelector('#rosout-display');
-//   var recent_msgs = [];
-//   var keep_n_msgs = 1000;
-//   var trim_at_n_msgs = 1500;
-//   var show_n_msgs = 20;
-//   var current_level = 4;  // 4: warning
-
-//   function rerender() {
-//     var new_tbody = construct('tbody', recent_msgs
-//           .filter(function(m) {return m.level >= current_level;})
-//           .slice(-show_n_msgs)
-//           .map(function(m) {return construct('tr', [construct('td', [text(m.msg)])])})
-//         );
-//     output_table.replaceChild(new_tbody, output_table.firstChild);
-//   }
-
-//   function switch_level(level) {
-//     current_level = level;
-//     rerender();
-//   }
-//   target.querySelector('#rosout-level-debug').addEventListener('click', function() {switch_level(1);});
-//   target.querySelector('#rosout-level-info').addEventListener('click', function() {switch_level(2);});
-//   target.querySelector('#rosout-level-warn').addEventListener('click', function() {switch_level(4);});
-//   target.querySelector('#rosout-level-error').addEventListener('click', function() {switch_level(8);});
-//   target.querySelector('#rosout-level-fatal').addEventListener('click', function() {switch_level(16);});
-
-//   function append_msg(m) {
-//     recent_msgs.push(m);
-//     if (recent_msgs.length > trim_at_n_msgs) {
-//       var n_discard = trim_at_n_msgs - recent_msgs.length;
-//       recent_msgs = recent_msgs.slice(n_discard, n_discard + keep_n_msgs);
-//     }
-//     rerender();
-//   }
-//   return append_msg;
-// }
-
-
 /////////////////////////////////////////
 //          Web Socket Stuff           //
 /////////////////////////////////////////
@@ -170,8 +130,8 @@ const magicCompass = new Vue({
     ]
   },
   components: {
-    'compass-table': CompassTable,
-    'compass-hand': CompassHand
+    compassTable: CompassTable,
+    compassHand: CompassHand
   },
   methods: {
     change(name, bearing) {
@@ -207,14 +167,44 @@ const topicsTable = new Vue({
 });
 
 const RosoutTable = Vue.component('rosout-table', {
-  props: ['displayLevel'],
-  template: `<table>
-    <tr>
-      <td>{{displayLevel}}</td>
-    </tr>
-  </table>`,
-  data: {
-
+  props: ['displayLevel', 'newMessage'],
+  template: `<div>
+    <p v-for="m of getMessagesAt(displayLevel)" :class="logLevel(m)">
+      {{m.msg}}
+    </p>
+  </div>`,
+  data() {
+    return {
+      recentMessages: [],
+      recentMessagesMax: 1000, // Maximum number of messages to store in memory
+      showCount: 20, // Maximum number of messages at <currentLevel> to show
+    }
+  },
+  methods: {
+    logLevel(m) {
+      return {
+        debug: 1  & m.level,
+        info:  2  & m.level,
+        warn:  4  & m.level,
+        error: 8  & m.level,
+        fatal: 16 & m.level,
+      }
+    },
+    getMessagesAt(currentLevel) {
+      if (this.newMessage !== this.recentMessages[this.recentMessages.length-1]) {
+        this.appendMsg(this.newMessage);
+      }
+      return this.recentMessages
+        .filter(m => m.level >= currentLevel)
+        .slice(-this.showCount);
+    },
+    appendMsg(m) {
+      if (this.recentMessages.length > this.recentMessagesMax) {
+        const discard = this.recentMessages.length - this.recentMessagesMax;
+        this.recentMessages = this.recentMessages.slice(discard+1);
+      }
+      this.recentMessages.push(m);
+    }
   }
 });
 
@@ -222,27 +212,29 @@ const rosout = new Vue({
   el: '#rosout',
   data: {
     levels: [
-      'Debug',
-      'Info',
-      'Warn',
-      'Error',
-      'Fatal'
+      'Debug', // 1
+      'Info',  // 2
+      'Warn',  // 4
+      'Error', // 8
+      'Fatal'  // 16
     ],
-    activeLevel: 'Debug'
+    activeLevel: 1,
+    newMessage: Object.create(null),
+    debugTestAddMessage: true // Test adding new logging message
   },
   methods: {
     levelClass(currentLevel) {
-      const r = [];
-      // r.push(`rosout-${currentLevel.toLowerCase()}`);
-      r.push((this.activeLevel === currentLevel) ? 'active' : '');
-      return r.join(' ');
+      return (this.activeLevel === currentLevel) ? 'active' : '';
     },
-    switchLevel(level) {
-      this.activeLevel = level;
+    addNew(message) {
+      this.newMessage = message || {
+        level: 1 << ~~(5 * Math.random()),
+        msg: (20 * Math.random()).toFixed(2)
+      };
     }
   },
   components: {
-    'rosout-table': RosoutTable
+    rosoutTable: RosoutTable
   }
 });
 

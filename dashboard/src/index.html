@@ -18,8 +18,8 @@
 
 <body>
 
-  <audio src="static/Crisp_Ocean_Waves-Mike_Koenig-1486046376.wav" autoplay loop></audio>
-  <audio src="static/flock-of-seagulls_daniel-simion.wav" autoplay loop></audio>
+  <audio src="static/Crisp_Ocean_Waves-Mike_Koenig-1486046376.wav" volume="0.1" loop></audio>
+  <audio src="static/flock-of-seagulls_daniel-simion.wav" volume="0.1" loop></audio>
 
   <div class="container">
 
@@ -73,12 +73,13 @@
     <div class="row">
       <div class="col-md-12" id="rosout">
         <h2>/rosout🤖</h2>
+        <button v-if="debugTestAddMessage" @click="addNew()">Add new message</button>
         <ul class="nav nav-tabs">
-          <li class="nav-item" v-for="(l, index) of levels" :id="`rosout-level-${l.toLowerCase()}`" @click="switchLevel(l)">
-            <a class="nav-link" :class="levelClass(l)" href="#rosout-display">{{l}}</a>
+          <li class="nav-item" v-for="(l, index) of levels" :id="`rosout-level-${l.toLowerCase()}`" @click.prevent="activeLevel = (1 << index)">
+            <a class="nav-link" :class="levelClass(1 << index)" href="/">{{l}}</a>
           </li>
         </ul>
-        <rosout-table id="rosout-display" class="table table-striped" :display-level="activeLevel"></rosout-table>
+        <rosout-table id="rosout-display" :display-level="activeLevel" :new-message="newMessage"></rosout-table>
       </div>
     </div>
   </div>

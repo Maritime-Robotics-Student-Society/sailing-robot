@@ -39,5 +39,20 @@ body {
   background: red; }
 #rosout .nav-item .nav-link.rosout-fatal {
   background: darkorchid; }
+#rosout #rosout-display {
+  height: 500px;
+  overflow-y: scroll;
+  color: white;
+  padding: 1em; }
+  #rosout #rosout-display p.debug {
+    color: #0275d8; }
+  #rosout #rosout-display p.info {
+    color: #5bc0de; }
+  #rosout #rosout-display p.warn {
+    color: #f0ad4e; }
+  #rosout #rosout-display p.error {
+    color: #d9534f; }
+  #rosout #rosout-display p.fatal {
+    color: black; }
 
 /*# sourceMappingURL=main.css.map */
