@@ -53,7 +53,7 @@ class MessageForwarder(object):
             self.simple_forwarding(topic, rostype)
         for topic in geo_topics:
             self.geo_forwarding(topic)
-            
+        self.rosout_forwarding()
     
     def broadcast(self, content):
         for s in self.sockets:
