@@ -60,7 +60,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-md-3" v-for="c of compasses">
+          <div class="p-3 mx-auto" v-for="c of compasses">
             <compass-hand :compass="c"></compass-hand>
           </div>
         </div>
@@ -70,7 +70,7 @@
     <div class="row">
       <div class="col-md-12" id="rosout">
         <h2>/rosout🤖</h2>
-        <button v-if="debugTestAddMessage" @click="addNew()">Add new message</button>
+        <button class="btn btn-info" @click="togglePause">{{pauseLoggingText}}</button>
         <ul class="nav nav-tabs">
           <li class="nav-item" v-for="(l, index) of levels" :id="`rosout-level-${l.toLowerCase()}`" @click.prevent="activeLevel = (1 << index)">
             <a class="nav-link" :class="levelClass(1 << index)" href="/">{{l}}</a>

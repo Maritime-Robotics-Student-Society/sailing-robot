@@ -25,8 +25,7 @@ body {
 
 .compass-hand {
   height: 160px;
-  transform-origin: bottom center;
-  padding-left: 50px; }
+  transform-origin: bottom center; }
 
 #rosout .nav-item .nav-link.rosout-debug {
   background: blue; }
