@@ -19,7 +19,6 @@ ws.onmessage = function (ws, event) {
   }
 };
 ws.onerror = function (error) {
-  console.log('Error:', arguments);
   connectionOverlays.isConnecting = false;
   connectionOverlays.isDisconnected = true;
 }
