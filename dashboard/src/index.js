@@ -179,7 +179,7 @@ const magicCompass = new Vue({
      * @param {number} bearing The new bearing to update `name` with
      */
     change(name, bearing) {
-      const c = this.compasses.find(c => c.name.replace('_.*$', '') === name);
+      const c = this.compasses.find(c => c.name.replace(/_.*$/, '') === name);
       if (!c) {
         console.log(`Can't find compass! Name: ${name}`);
       } else {
