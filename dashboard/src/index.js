@@ -269,7 +269,7 @@ const rosout = new Vue({
     },
     addNew(message) {
       // Feed new message to 'new-message' prop if pauseLogging is false
-      if (!pauseLogging) this.newMessage = message;
+      if (!this.pauseLogging) this.newMessage = message;
     },
     togglePause() {
       this.pauseLogging = !this.pauseLogging;
