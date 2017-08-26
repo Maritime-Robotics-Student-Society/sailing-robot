@@ -16,7 +16,7 @@ import tornado.web
 import tornado.websocket
 
 PORT = 8448
-STATIC_PATH = os.path.expanduser('~/sailing-robot/dashboard/static')
+STATIC_PATH = os.path.expanduser('~/sailing-robot/dashboard/src')
 
 simple_topics = [
     ('/heading', Float32),
