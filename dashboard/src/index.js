@@ -18,15 +18,19 @@ ws.onmessage = function (ws, event) {
     }
   }
 };
-ws.onerror = function (ws, event) {
+ws.onerror = function (error) {
+  console.log('Error:', arguments);
   connectionOverlays.isConnecting = false;
   connectionOverlays.isDisconnected = true;
 }
-ws.onclose = function (ws, event) {
+ws.onclose = function (event) {
   connectionOverlays.isConnecting = false;
   connectionOverlays.isDisconnected = true;
 };
 
+/////////////////////////////////////////
+//          Connection Alerts          //
+/////////////////////////////////////////
 const connectionOverlays = new Vue({
   el: '#connection-overlays',
   data: {
@@ -191,7 +195,7 @@ const magicCompass = new Vue({
 const RosoutTable = Vue.component('rosout-table', {
   props: ['displayLevel', 'newMessage'],
   template: `<div>
-    <p v-for="m of getMessagesAt(displayLevel)" :class="logLevel(m)">
+    <p v-for="m of getMessages" :class="logLevel(m)">
       {{m.msg}}
     </p>
   </div>`,
@@ -199,11 +203,21 @@ const RosoutTable = Vue.component('rosout-table', {
     return {
       recentMessages: [],
       recentMessagesMax: 1000, // Maximum number of messages to store in memory
-      showCount: 20, // Maximum number of messages at <currentLevel> to show
+    }
+  },
+  computed: {
+    getMessages() {
+      // Check if message contained in 'new-message' prop is a new message
+      if (this.newMessage !== this.recentMessages[this.recentMessages.length - 1]) {
+        this.appendMsg(this.newMessage);
+      }
+      return this.recentMessages
+        .filter(m => m.level >= this.displayLevel);
     }
   },
   methods: {
     logLevel(m) {
+      // Apply the appropriate colour to the log message
       return {
         debug: 1 & m.level,
         info: 2 & m.level,
@@ -212,20 +226,19 @@ const RosoutTable = Vue.component('rosout-table', {
         fatal: 16 & m.level,
       }
     },
-    getMessagesAt(currentLevel) {
-      if (this.newMessage !== this.recentMessages[this.recentMessages.length - 1]) {
-        this.appendMsg(this.newMessage);
-      }
-      return this.recentMessages
-        .filter(m => m.level >= currentLevel)
-        .slice(-this.showCount);
-    },
     appendMsg(m) {
+      // Trim off the excess fats, plus an extra layer as we're about to add a
+      // fresh new piece
       if (this.recentMessages.length > this.recentMessagesMax) {
         const discard = this.recentMessages.length - this.recentMessagesMax;
         this.recentMessages = this.recentMessages.slice(discard + 1);
       }
+      // Apply the new layer on top
       this.recentMessages.push(m);
+      // Allow the flavours to rise to the top
+      if (this.$el) {
+        this.$el.scrollTop = this.$el.scrollHeight;
+      }
     }
   }
 });
@@ -242,17 +255,21 @@ const rosout = new Vue({
     ],
     activeLevel: 1,
     newMessage: Object.create(null),
-    debugTestAddMessage: false // Test adding new logging message
+    pauseLogging: false, // If true, stop auto-scrolling of log table
+    pauseLoggingText: 'Pause logging'
   },
   methods: {
     levelClass(currentLevel) {
       return (this.activeLevel === currentLevel) ? 'active' : '';
     },
     addNew(message) {
-      this.newMessage = message || {
-        level: 1 << ~~(5 * Math.random()),
-        msg: (20 * Math.random()).toFixed(2)
-      };
+      // Feed new message to 'new-message' prop if pauseLogging is false
+      if (!pauseLogging) this.newMessage = message;
+    },
+    togglePause() {
+      this.pauseLogging = !this.pauseLogging;
+      this.pauseLoggingText = (this.pauseLogging === true) ? 'Resume logging' :
+          'Pause logging';
     }
   },
   components: {
