@@ -1,37 +1,3 @@
-const easter = {
-  sounds: [
-    'static/Crisp_Ocean_Waves-Mike_Koenig-1486046376.wav',
-    'static/flock-of-seagulls_daniel-simion.wav'
-  ].map(s => new Audio(s)),
-  konamiCode: [38, 38, 40, 40, 37, 39, 37, 39, 66, 65],
-  konamiCount: 0,
-  toggle: false,
-  advance(event) {
-    if (this.konamiCode[this.konamiCount] === event.keyCode) {
-      this.konamiCount += 1;
-    } else {
-      this.konamiCount = 0;
-    }
-    if (this.konamiCount === this.konamiCode.length) {
-      this.toggle = !this.toggle;
-      this.konamiCount = 0;
-      if (!this.toggle) {
-        this.sounds.forEach(s => {
-          s.pause();
-        });
-      } else {
-        this.sounds.forEach((s, i) => {
-          s.loop = true;
-          s.volume = i? 0.3 : 0.5;
-          s.play();
-        });
-      }
-    }
-  }
-}
-
-document.body.addEventListener('keydown', easter.advance.bind(easter));
-
 /////////////////////////////////////////
 //          Web Socket Stuff           //
 /////////////////////////////////////////
