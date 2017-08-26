@@ -107,6 +107,7 @@ def dashboard_server():
             {"forwarder": forwarder}),
     ],
     static_path=STATIC_PATH,
+    static_url_prefix="/",
     compiled_template_cache=False,
     )
     app.listen(PORT, address='0.0.0.0')
