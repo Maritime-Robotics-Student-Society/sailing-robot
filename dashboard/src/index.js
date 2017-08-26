@@ -6,7 +6,7 @@ ws.onopen = function (ws, event) {
   connectionOverlays.isDisconnected = false;
   connectionOverlays.isConnecting = false;
 };
-ws.onmessage = function (ws, event) {
+ws.onmessage = function (event) {
   const jsonMsg = JSON.parse(event.data);
   if (jsonMsg.topic === '/rosout') {
     rosout.addNew(jsonMsg);
@@ -48,12 +48,13 @@ const topicsTable = new Vue({
       'Topic',
       'Value'
     ],
-    topics: fp.range(0, 10).map((_, i) => {
-      return Object.assign(Object.create(null), {
-        name: `Test${Math.round(10 * Math.random())}`,
-        value: 30 * Math.random()
-      });
-    })
+    // topics: fp.range(0, 10).map((_, i) => {
+    //   return Object.assign(Object.create(null), {
+    //     name: `Test${Math.round(10 * Math.random())}`,
+    //     value: 30 * Math.random()
+    //   });
+    // })
+    topics: []
   },
   computed: {
     sortedTopics() {
@@ -61,6 +62,11 @@ const topicsTable = new Vue({
         return (a.name.localeCompare(b.name) > 0) ? 1 :
           (a.name.localeCompare(b.name === 0)) ? 0 :
           -1
+      }).map(t => {
+        if (t.value) {
+          t.value = parseInt(t.value, 10).toFixed(2);
+        }
+        return t;
       });
     }
   },
@@ -178,8 +184,12 @@ const magicCompass = new Vue({
      * @param {number} bearing The new bearing to update `name` with
      */
     change(name, bearing) {
-      const c = this.compasses.find(c => c.name === name);
-      c.bearing = bearing % 360;
+      const c = this.compasses.find(c => c.name.replace(/_.*$/, '') === name);
+      if (!c) {
+        console.log(`Can't find compass! Name: ${name}`);
+      } else {
+        c.bearing = bearing % 360;
+      }
     }
   },
   components: {
