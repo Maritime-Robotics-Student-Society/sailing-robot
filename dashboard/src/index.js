@@ -6,7 +6,7 @@ ws.onopen = function (ws, event) {
   connectionOverlays.isDisconnected = false;
   connectionOverlays.isConnecting = false;
 };
-ws.onmessage = function (ws, event) {
+ws.onmessage = function (event) {
   const jsonMsg = JSON.parse(event.data);
   if (jsonMsg.topic === '/rosout') {
     rosout.addNew(jsonMsg);
