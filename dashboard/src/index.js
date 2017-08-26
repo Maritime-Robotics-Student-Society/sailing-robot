@@ -6,7 +6,7 @@ ws.onopen = function (ws, event) {
   connectionOverlays.isDisconnected = false;
   connectionOverlays.isConnecting = false;
 };
-ws.onmessage = function (ws, event) {
+ws.onmessage = function (event) {
   const jsonMsg = JSON.parse(event.data);
   if (jsonMsg.topic === '/rosout') {
     rosout.addNew(jsonMsg);
@@ -62,7 +62,7 @@ const topicsTable = new Vue({
         return (a.name.localeCompare(b.name) > 0) ? 1 :
           (a.name.localeCompare(b.name === 0)) ? 0 :
           -1
-      });
+      })
     }
   },
   methods: {
@@ -77,7 +77,8 @@ const topicsTable = new Vue({
         return `${Math.abs(msg.latitude)}° ${latHemi} / ${Math.abs(msg.longitude)}°
        ${lonHemi}}`;
       } else {
-        return msg.value;
+        return (typeof msg.value === 'number')?
+          msg.value.toFixed(2) : `${msg.value}`;
       }
     },
     /**
@@ -179,8 +180,12 @@ const magicCompass = new Vue({
      * @param {number} bearing The new bearing to update `name` with
      */
     change(name, bearing) {
-      const c = this.compasses.find(c => c.name === name);
-      c.bearing = bearing % 360;
+      const c = this.compasses.find(c => c.name.replace(/_.*$/, '') === name);
+      if (!c) {
+        console.log(`Can't find compass! Name: ${name}`);
+      } else {
+        c.bearing = (bearing % 360).toFixed(2);
+      }
     }
   },
   components: {
