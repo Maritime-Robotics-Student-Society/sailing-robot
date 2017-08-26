@@ -48,12 +48,13 @@ const topicsTable = new Vue({
       'Topic',
       'Value'
     ],
-    topics: fp.range(0, 10).map((_, i) => {
-      return Object.assign(Object.create(null), {
-        name: `Test${Math.round(10 * Math.random())}`,
-        value: 30 * Math.random()
-      });
-    })
+    // topics: fp.range(0, 10).map((_, i) => {
+    //   return Object.assign(Object.create(null), {
+    //     name: `Test${Math.round(10 * Math.random())}`,
+    //     value: 30 * Math.random()
+    //   });
+    // })
+    topics: []
   },
   computed: {
     sortedTopics() {
