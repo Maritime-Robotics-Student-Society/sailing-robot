@@ -62,12 +62,7 @@ const topicsTable = new Vue({
         return (a.name.localeCompare(b.name) > 0) ? 1 :
           (a.name.localeCompare(b.name === 0)) ? 0 :
           -1
-      }).map(t => {
-        if (t.value && (typeof t.value === 'number')) {
-          t.value = parseInt(t.value, 10).toFixed(2);
-        }
-        return t;
-      });
+      })
     }
   },
   methods: {
@@ -82,7 +77,8 @@ const topicsTable = new Vue({
         return `${Math.abs(msg.latitude)}° ${latHemi} / ${Math.abs(msg.longitude)}°
        ${lonHemi}}`;
       } else {
-        return `${msg.value}`;
+        return (typeof msg.value === 'number')?
+          msg.value.toFixed(2) : `${msg.value}`;
       }
     },
     /**
