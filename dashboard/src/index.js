@@ -82,7 +82,7 @@ const topicsTable = new Vue({
         return `${Math.abs(msg.latitude)}° ${latHemi} / ${Math.abs(msg.longitude)}°
        ${lonHemi}}`;
       } else {
-        return msg.value;
+        return `${msg.value}`;
       }
     },
     /**
@@ -188,7 +188,7 @@ const magicCompass = new Vue({
       if (!c) {
         console.log(`Can't find compass! Name: ${name}`);
       } else {
-        c.bearing = bearing % 360;
+        c.bearing = (bearing % 360).toFixed(2);
       }
     }
   },
