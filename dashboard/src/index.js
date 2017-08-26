@@ -180,6 +180,9 @@ const magicCompass = new Vue({
      */
     change(name, bearing) {
       const c = this.compasses.find(c => c.name === name);
+      if (!c) {
+        console.log(`Can't find compass! Name: ${name}`);
+      }
       c.bearing = bearing % 360;
     }
   },
