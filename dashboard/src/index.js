@@ -62,6 +62,11 @@ const topicsTable = new Vue({
         return (a.name.localeCompare(b.name) > 0) ? 1 :
           (a.name.localeCompare(b.name === 0)) ? 0 :
           -1
+      }).map(t => {
+        if (t.value) {
+          t.value = parseInt(t.value, 10).toFixed(2);
+        }
+        return t;
       });
     }
   },
