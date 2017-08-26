@@ -16,7 +16,7 @@ import tornado.web
 import tornado.websocket
 
 PORT = 8448
-STATIC_PATH = os.path.expanduser('~/sailing-robot/dashboard/static')
+STATIC_PATH = os.path.expanduser('~/sailing-robot/dashboard/src')
 
 simple_topics = [
     ('/heading', Float32),
@@ -101,12 +101,12 @@ def dashboard_server():
     tornado.log.enable_pretty_logging()
     forwarder = MessageForwarder()
     app = tornado.web.Application([
-        (r"/()", tornado.web.StaticFileHandler,
-            {"path": STATIC_PATH, "default_filename": "index.html"}),
         (r"/updates", UpdateHandler,
             {"forwarder": forwarder}),
+        (r"/(.*)", tornado.web.StaticFileHandler,
+            {"path": STATIC_PATH, "default_filename": "index.html"}),
+        
     ],
-    static_path=STATIC_PATH,
     compiled_template_cache=False,
     )
     app.listen(PORT, address='0.0.0.0')
