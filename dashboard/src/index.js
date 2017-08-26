@@ -63,7 +63,7 @@ const topicsTable = new Vue({
           (a.name.localeCompare(b.name === 0)) ? 0 :
           -1
       }).map(t => {
-        if (t.value) {
+        if (t.value && (typeof t.value === 'number')) {
           t.value = parseInt(t.value, 10).toFixed(2);
         }
         return t;
