@@ -20,14 +20,13 @@ body {
     min-width: 3em;
     padding: 0.5em; }
 
-#magic-compass {
-  /* padding-left: 150px; */ }
-  #magic-compass td {
-    text-align: center; }
+#magic-compass td {
+  text-align: center; }
 
 .compass-hand {
   height: 160px;
-  transform-origin: bottom center; }
+  transform-origin: bottom center;
+  padding-left: 50px; }
 
 #rosout .nav-item .nav-link.rosout-debug {
   background: blue; }
