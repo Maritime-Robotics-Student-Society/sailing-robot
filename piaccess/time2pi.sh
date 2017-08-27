@@ -11,7 +11,7 @@
 
 set -e
 
-echo "Sending time to the pi at ${SAIL_PI_IP:=192.168.42.1}..."
+echo "Sending time to the pi at ${SAIL_PI_IP:=192.168.12.1}..."
 TIMESTAMP=$(date --utc +%Y-%m-%dT%H:%M:%S)
 
 set -x

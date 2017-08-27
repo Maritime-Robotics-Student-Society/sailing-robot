@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
 
-echo "SFTP-ing to the pi at ${SAIL_PI_IP:=192.168.42.1}..."
+echo "SFTP-ing to the pi at ${SAIL_PI_IP:=192.168.12.1}..."
 sftp pi@$SAIL_PI_IP

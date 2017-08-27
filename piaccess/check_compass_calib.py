@@ -72,7 +72,7 @@ def make_plots(level, roll):
 
     return fig, axes
 
-pi_addr = "pi@{}".format(os.environ.get('SAIL_PI_IP', '192.168.42.1'))
+pi_addr = "pi@{}".format(os.environ.get('SAIL_PI_IP', '192.168.12.1'))
 print('Getting data from', pi_addr)
 pi_folder = pi_addr + ":sailing-robot/utilities/"
 

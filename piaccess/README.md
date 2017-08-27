@@ -4,7 +4,7 @@ First, source one of the pi identity files, which set $SAIL_PI_IP:
 
     source piaccess/magellan
     # OR
-    source piaccess/car
+    source piaccess/zhenghe
 
 Then run:
 
