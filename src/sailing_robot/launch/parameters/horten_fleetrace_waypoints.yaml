@@ -1,0 +1,22 @@
+# Order to go to waypoints
+wp/tasks: [
+  {"kind": "to_waypoint", "waypoint": "start_c"},
+  {"kind": "to_waypoint", "waypoint": "wp1"},
+  {"kind": "to_waypoint", "waypoint": "wp2"},
+  {"kind": "to_waypoint", "waypoint": "start_c"},
+]
+
+# distance within waypoint is accepted, in [m]
+wp/acceptRadius: 2
+wp/tackVotingRadius: 20
+
+
+# Dictionary for looking up waypoints, using [lat, lon] format of NavSatFix
+#
+wp/table: {"start_c" : [59.427706, 10.468471],
+            "wp2" : [59.429058, 10.470314],
+            "wp1" : [59.429385, 10.46864],
+            "start_l" : [ 59.427722, 10.468278],
+            "start_r" : [ 59.427667, 10.468694], 
+
+}

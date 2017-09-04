@@ -1,3 +1,5 @@
+# Sail position settings for sail sets 2 and 3 (medium & smaller sails)
+
 # format: wind angle (as read from wind sensor), wind speed (m/s), scaled servo PWM
 # scaled servo PWM: 0 = sail fully sheeted in, min PWM; 1 = sail fully out, max PWM
 # linearly scaled inbetween
