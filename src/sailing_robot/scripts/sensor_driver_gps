@@ -50,6 +50,7 @@ def decimal_degrees(d_m, hemisphere):
 
 def pos_publisher():
     serial_port = serial.Serial(get_port(), BAUD_RATE, timeout=READ_TIMEOUT)
+    set_gps_options(serial_port)
     gps_reader = UbxNmeaParser()
 
     while not rospy.is_shutdown():
@@ -102,7 +103,7 @@ def pos_publisher():
             wtime.time_s = sentence.timestamp.second
             gps_pub.publish(wtime)
 
-def set_gps_options():
+def set_gps_options(serial_port):
     '''Send ublox commands to turn off some data and change GPS rate to 5Hz.
 
     Thanks to Simon of team Anemoi for info on how to do this.
@@ -144,7 +145,6 @@ def set_gps_options():
 
 if __name__ == '__main__':
     try:
-        set_gps_options()
         pos_pub = rospy.Publisher('position', NavSatFix, queue_size=10)
         gps_pub = rospy.Publisher('gps_fix', gpswtime, queue_size=10)
         nsats_pub = rospy.Publisher('gps_satellites', Int16, queue_size=10)
