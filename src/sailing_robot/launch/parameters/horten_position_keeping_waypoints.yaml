@@ -11,5 +11,5 @@ wp/tackVotingRadius: 20
 
 # Dictionary for looking up waypoints, using [lat, lon] format of NavSatFix
 #
-wp/table: {"mark" : [59.425784 10.4731249],
+wp/table: {"mark" : [59.425784, 10.4731249],
 }
