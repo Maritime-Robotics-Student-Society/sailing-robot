@@ -59,13 +59,13 @@ def pos_publisher():
             raw_log.write(data)
             raw_log.flush()
 
-        gps_reader.feed(line)
+        gps_reader.feed(data)
 
         try:
             batch = list(gps_reader.get_msgs())
         except (pynmea2.ParseError, pynmea2.ChecksumError, UnicodeError):
-            s = "Error parsing GPS data.\nbuffer={!r}\nline={!r}\n{}".format(
-                        gps_reader.buf, line, traceback.format_exc()
+            s = "Error parsing GPS data.\nbuffer={!r}\ndata={!r}\n{}".format(
+                        gps_reader.buf, data, traceback.format_exc()
             )
             rospy.logerr(s)
             gps_reader.buf = b''
@@ -76,7 +76,7 @@ def pos_publisher():
             # gibberish which makes no sense. If it seems like this is happening,
             # shut it down and reopen it. 512 bytes is hopefully larger than any
             # message we want.
-            rospy.logwarn("512 bytes unprocessed in GPS serial buffer; resetting")
+            rospy.logwarn("512 bytes unprocessed in GPS serial buffer - resetting serial port")
             serial_port.close()
             serial_port = serial.Serial(get_port(), BAUD_RATE, timeout=READ_TIMEOUT)
             gps_reader = UbxNmeaParser()
