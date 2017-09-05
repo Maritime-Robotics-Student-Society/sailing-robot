@@ -20,8 +20,8 @@ from sensor_msgs.msg import NavSatFix
 from sailing_robot.msg import gpswtime
 from sailing_robot.gps_utils import UBXMessage, get_port, UbxNmeaParser
 
-serial_port = serial.Serial(get_port(), 9600, timeout=0.5)
-
+BAUD_RATE = 9600
+READ_TIMEOUT = 0.5
 FILENAME_BASE = "~/sailing-robot/gps-raw-nmea_{}_{}"
 
 params = rospy.get_param('/')
@@ -49,15 +49,15 @@ def decimal_degrees(d_m, hemisphere):
     return res
 
 def pos_publisher():
+    serial_port = serial.Serial(get_port(), BAUD_RATE, timeout=READ_TIMEOUT)
     gps_reader = UbxNmeaParser()
-    serial_port.readline()  # Discard first line in case it's partial
+
     while not rospy.is_shutdown():
-        line = serial_port.readline()
+        data = serial_port.read(64)
         if raw_log:
-            raw_log.write(line)
+            raw_log.write(data)
             raw_log.flush()
-        if not line.strip():
-            continue
+
         gps_reader.feed(line)
 
         try:
@@ -67,8 +67,18 @@ def pos_publisher():
                         gps_reader.buf, line, traceback.format_exc()
             )
             rospy.logerr(s)
-            gps_reader.stream = b''
+            gps_reader.buf = b''
             continue
+
+        if len(gps_reader.buf) > 512:
+            # I don't really understand this, but sometimes the data is
+            # gibberish which makes no sense. If it seems like this is happening,
+            # shut it down and reopen it. 512 bytes is hopefully larger than any
+            # message we want.
+            rospy.logwarn("512 bytes unprocessed in GPS serial buffer; resetting")
+            serial_port.close()
+            serial_port = serial.Serial(get_port(), BAUD_RATE, timeout=READ_TIMEOUT)
+            gps_reader = UbxNmeaParser()
 
         for sentence in batch:
             rospy.logdebug("GPS received {!r}".format(sentence))
