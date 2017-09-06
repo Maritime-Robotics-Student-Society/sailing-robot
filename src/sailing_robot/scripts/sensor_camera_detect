@@ -11,6 +11,8 @@ import numpy as np
 import cv2
 import datetime
 
+import os
+
 
 class Camera_detection():
     """
@@ -75,7 +77,8 @@ class Camera_detection():
                 
                 if sum(self.average_list)/self.AVE_SIZE > 0.5:
                     msg = 'detected'
-                    filename = '~/camera_detected_obstacle_{:%Y-%m-%d_%H:%M:%S_%N}.jpg'.format(datetime.datetime.now())
+                    filename = os.path.expanduser('~/camera_detected_obstacle_{:%Y-%m-%d_%H:%M:%S_%N}.jpg'.format(datetime.datetime.now()))
+                    print(filename)
                     cv2.imwrite(filename, image)
                 else:
                     msg = 'nothing'
