@@ -19,8 +19,10 @@ class Camera_detection():
         Node that publishes the string 'detected' every time an obstacle is detected;
         otherwise, the string 'nothing' is published.
 
-        An obstacle is detected when an area above the detection limit is covered
-        by a colour within the given colour range
+        An obstacle is detected when the average of the detection area over the given averaging time 
+        is larger than the threshold. 
+        The detection area is the fraction of the total frame that is covered
+        by a colour within the given colour range.
         both the color range and the minimum needed area for obstacle detection come from ROS param.
 
         All photos taken for the obstacle detection are saved in ~/camera_detect_obstacle_$datetime
