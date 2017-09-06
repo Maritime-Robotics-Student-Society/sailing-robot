@@ -5,17 +5,12 @@ from .taskbase import TaskBase
 
 class StartTimer(TaskBase):
     def __init__(self, nav, seconds, jump_to, jump_callback):
-        """Machinery to stay near a given point.
-        
-        This is meant to be started when we're already close to the marker; we'll
-        normally put it immediately after a to_waypoint task to go to the marker.
+        """Machinery to jump to a waypoint after a set amount of time.
 
         nav : a Navigation object for common machinery.
-        marker_ll : a (lat, lon) point marking where we'll try to stay close to.
-        linger : time in seconds to stay there
-        radius : distance in metres which we'll try to bounce around the marker
-        wind_angle : the absolute wind angle to sail (in degrees) when inside
-           radius. This will automatically be flipped according to the tack.
+        seconds : time in seconds to jump after task is started
+        jump_to : Waypoint ID to jump to.
+        jump_callback : Function to do jump. Provided in tasks.py
         """
         self.nav = nav
         self.seconds = seconds
