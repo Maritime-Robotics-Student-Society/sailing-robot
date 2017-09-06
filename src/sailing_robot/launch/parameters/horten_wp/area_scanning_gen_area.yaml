@@ -1,3 +1,7 @@
+# distance within waypoint is accepted, in [m]
+wp/acceptRadius: 8
+wp/tackVotingRadius: 12
+
 wp/table:
   '1': [59.42687775062412, 10.470995815475106]
   '10': [59.428300504639935, 10.471204043692552]
