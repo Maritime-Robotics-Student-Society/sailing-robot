@@ -11,10 +11,21 @@ import numpy as np
 import cv2
 import datetime
 
+import os
+
 
 class Camera_detection():
     """
-        Node that publish event when the obstacle is detected
+        Node that publishes the string 'detected' every time an obstacle is detected;
+        otherwise, the string 'nothing' is published.
+
+        An obstacle is detected when more than half of the images within the given averaging time 
+        have a detection area larger than the threshold. 
+        The detection area is the fraction of the total frame that is covered
+        by a colour within the given colour range.
+        both the color range and the minimum needed area for obstacle detection come from ROS param.
+
+        All photos taken for the obstacle detection are saved in ~/camera_detect_obstacle_$datetime
     """
     def __init__(self):
         
@@ -34,6 +45,7 @@ class Camera_detection():
         AVE_TIME = rospy.get_param("camera_detection/average_time")   # lengh of the averaging in seconds
         self.AVE_SIZE = int(AVE_TIME * sensor_rate)                        # size of the averaging sample
         self.average_list = collections.deque(maxlen = self.AVE_SIZE)
+        self.empty_image_counter = 0   # only save every 20th empty image or so
         self.publish()
 
     def publish(self):
@@ -68,10 +80,16 @@ class Camera_detection():
                 
                 if sum(self.average_list)/self.AVE_SIZE > 0.5:
                     msg = 'detected'
-                    filename = '~/camera_detected_obstacle_{:%Y-%m-%d_%H:%M:%S_%N}.jpg'.format(datetime.datetime.now()
+                    filename = os.path.expanduser('~/camera_detected_obstacle_{:%Y-%m-%d_%H:%M:%S_%f}.jpg'.format(datetime.datetime.now()))
                     cv2.imwrite(filename, image)
                 else:
                     msg = 'nothing'
+                    self.empty_image_counter +=1
+                    if self.empty_image_counter > 20:
+                        filename = os.path.expanduser('~/camera_detected_obstacle_{:%Y-%m-%d_%H:%M:%S_%f}_nothing.jpg'.format(datetime.datetime.now()))
+                        cv2.imwrite(filename, image)
+                        self.empty_image_counter = 0
+    
 
                 self.publisher.publish(msg)
 
