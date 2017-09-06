@@ -5,7 +5,13 @@
 #   waypoint_generator path/to/waypoint.yaml
 from __future__ import print_function
 
+import os
 import sys
+
+my_dir = os.path.dirname(__file__)
+robot_src_dir = os.path.abspath(os.path.join(my_dir, '../../src/sailing_robot/src'))
+sys.path.append(robot_src_dir)
+
 import yaml
 import numpy as np
 from sailing_robot.navigation import Navigation
