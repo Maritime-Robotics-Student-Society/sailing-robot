@@ -1,6 +1,6 @@
 <launch>
     <!--
-    Station keeping in Horten, 2017-09-04
+    Area scanning in Horten, 2017-09-06
     -->
 
     <!--
@@ -13,9 +13,9 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/horten_position_keeping_waypoints.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/horten_wp/area_scanning_gen_area.yaml" command="load"/>
     
-    <param name="log_name" value="horten_station_keeping" />
+    <param name="log_name" value="horten_area_scanning" />
 
     <!--
     Nodes
@@ -39,7 +39,7 @@
 
     <node name="debugging_dump_params" pkg='sailing_robot' type="debugging_dump_params"/>
     <!-- Rosbag records messages for later investigation -->
-    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-robot/horten_station_keeping"/>
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-robot/horten_area_scanning"/>
     <!-- Also record GPS data as required by the competition -->
     <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log" respawn="true"/>
 
