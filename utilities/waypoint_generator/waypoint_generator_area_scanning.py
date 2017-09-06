@@ -63,8 +63,8 @@ wp_list_top.pop(0) # to remove the first wp (only there because it was easier to
 
 
 #### BOTTOM 4x4 part
-wp_list_bot = [wpA_utm + vAB*3.5 + vAB_orth*7.5]
-dir = -1
+wp_list_bot = [wpA_utm + vAB*3.5 + vAB_orth*4.5]
+dir = 1
 for wp_idx_vert in range(4):
     wp_list_bot.append(wp_list_bot[-1] + vAB)
     for wp_idx_hor in range(3):
