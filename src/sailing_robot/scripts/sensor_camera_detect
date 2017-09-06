@@ -77,8 +77,7 @@ class Camera_detection():
                 
                 if sum(self.average_list)/self.AVE_SIZE > 0.5:
                     msg = 'detected'
-                    filename = os.path.expanduser('~/camera_detected_obstacle_{:%Y-%m-%d_%H:%M:%S_%N}.jpg'.format(datetime.datetime.now()))
-                    print(filename)
+                    filename = os.path.expanduser('~/camera_detected_obstacle_{:%Y-%m-%d_%H:%M:%S_%f}.jpg'.format(datetime.datetime.now()))
                     cv2.imwrite(filename, image)
                 else:
                     msg = 'nothing'
