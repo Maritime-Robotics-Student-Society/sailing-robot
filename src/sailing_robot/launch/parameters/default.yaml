@@ -131,8 +131,11 @@ camera_detection/threshold: 0.04
 # Rate at wich picture are taken 
 camera_detection/rate: 5  # [Hz]
 
+# If more than 50% of the photos within this average time are above threshold, a detection is published
 camera_detection/average_time: 1  # [s]
 
+
+# Two colors are needed because red is in the upper and lower end of the HSV colour space
 # Lower color:
 camera_detection/Lower_color_hsv1: [0, 90, 30] # /!\ HSV colorspace
 # Upper color:
