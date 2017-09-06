@@ -60,6 +60,7 @@ wp/table:
   E: [59.428332, 10.471762]
 wp/tasks:
 - {kind: to_waypoint, waypoint: '1'}
+- {kind: start_timer, seconds: 1500, jump_to: finish_line}  # 25 minute timeout
 - {kind: to_waypoint, waypoint: '2'}
 - {kind: to_waypoint, waypoint: '3'}
 - {kind: to_waypoint, waypoint: '4'}
@@ -108,5 +109,5 @@ wp/tasks:
 - {kind: to_waypoint, waypoint: '47'}
 - {kind: to_waypoint, waypoint: '48'}
 - {kind: to_waypoint, waypoint: '49'}
-- {kind: to_waypoint, waypoint: '50'}
+- {kind: to_waypoint, waypoint: '50', jump_label: finish_line}
 - {kind: to_waypoint, waypoint: '51'}
