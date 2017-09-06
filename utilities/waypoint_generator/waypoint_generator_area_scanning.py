@@ -24,11 +24,11 @@ with open(input_file, 'r') as f:
 output_file = input_file[:-5] + "_gen_area.yaml"
 
 
-wpA = yaml_data['wp/table']['A'] # top left (start line)
-wpB = yaml_data['wp/table']['B'] # start line (second point)
+wpA = yaml_data['wp/table']['p1'] # top left (start line)
+wpB = yaml_data['wp/table']['p6'] # start line (second point)
 #wpC = yaml_data['wp/table']['C'] #finish line (top)
-wpD = yaml_data['wp/table']['D'] # finish line (second point)
-wpE = yaml_data['wp/table']['E'] # top right corner
+wpD = yaml_data['wp/table']['finish1'] # finish line (second point)
+wpE = yaml_data['wp/table']['p2'] # top right corner
 
 
 nav = Navigation()
@@ -40,11 +40,11 @@ wpE_utm = nav.latlon_to_utm(wpE[0], wpE[1])
 
 
 # Unit vector AB
-vAB = np.array([wpB_utm[0] - wpA_utm[0], wpB_utm[1] - wpA_utm[1]])/3.0
+vAB = np.array([wpB_utm[0] - wpA_utm[0], wpB_utm[1] - wpA_utm[1]])/4.0
 
 # Unit vector orth to AB
 vAB_orth = np.array([-vAB[1], vAB[0]])
-vAE = np.array([wpE_utm[0] - wpA_utm[0], wpE_utm[1] - wpA_utm[1]])/6.0
+vAE = np.array([wpE_utm[0] - wpA_utm[0], wpE_utm[1] - wpA_utm[1]])/8.0
 vAB_orth = vAE
 
 #### Start line
@@ -54,20 +54,20 @@ wp_start = [wpA_utm +vAB/2 - vAB_orth/2]
 #### TOP 8x4 part
 wp_list_top = [wpA_utm - vAB/2 + vAB_orth/2]
 dir = 1
-for wp_idx_vert in range(3):
+for wp_idx_vert in range(4):
     wp_list_top.append(wp_list_top[-1] + vAB)
-    for wp_idx_hor in range(5):
+    for wp_idx_hor in range(7):
         wp_list_top.append(wp_list_top[-1] + dir*vAB_orth)
     dir = -dir
 wp_list_top.pop(0) # to remove the first wp (only there because it was easier to loop like that...)
 
 
 #### BOTTOM 4x4 part
-wp_list_bot = [wpA_utm + vAB*2.5 + vAB_orth*5.5]
+wp_list_bot = [wpA_utm + vAB*3.5 + vAB_orth*7.5]
 dir = -1
-for wp_idx_vert in range(3):
+for wp_idx_vert in range(4):
     wp_list_bot.append(wp_list_bot[-1] + vAB)
-    for wp_idx_hor in range(2):
+    for wp_idx_hor in range(3):
         wp_list_bot.append(wp_list_bot[-1] + dir*vAB_orth)
     dir = -dir
 wp_list_bot.pop(0) # to remove the first wp (only there because it was easier to loop like that...)
