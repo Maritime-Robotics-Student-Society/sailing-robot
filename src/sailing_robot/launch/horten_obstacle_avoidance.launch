@@ -27,7 +27,7 @@
     <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction"  respawn="true"/>
     <node name = "sensor_driver_multiplexer" pkg="sailing_robot" type="sensor_driver_multiplexer" respawn="true"/>
     <node name = "sensor_processed_wind_direction" pkg="sailing_robot" type="sensor_processed_wind_direction"/>
-    <node name = "sensor_camera_detect" pkg="sailing_robot" type="sensor_camera_detect"/>
+    <node name = "sensor_camera_detect" pkg="sailing_robot" type="sensor_camera_detect" respawn="true"/>
 
     <node name = "tasks" pkg="sailing_robot" type = "tasks"  respawn="true"/>
     <node name = "tack" pkg="sailing_robot" type = "tack"  respawn="true"/>
