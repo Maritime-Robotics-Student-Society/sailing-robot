@@ -4,6 +4,8 @@
 # man:
 #   waypoint_generator path/to/waypoint.yaml
 
+from __future__ import print_function
+
 import sys
 import yaml
 import numpy as np
@@ -11,7 +13,8 @@ from sailing_robot.navigation import Navigation
 
 # Load yaml file given in argument
 input_file = sys.argv[1]
-yaml_data = yaml.load(file(input_file, 'r'), Loader=yaml.Loader)
+with open(input_file, 'r') as f:
+    yaml_data = yaml.safe_load(f)
 
 output_file = input_file[:-5] + "_gen_obstacle.yaml"
 
@@ -31,7 +34,7 @@ wp0_utm = nav.latlon_to_utm(wp0[0], wp0[1])
 v10 = np.array([wp0_utm[0] - wp1_utm[0], wp0_utm[1] - wp1_utm[1]])
 d10 = np.linalg.norm(v10)
 v10_unit = v10 / d10
-print d10
+print(d10)
 
 
 # Unit vector orth to 10
@@ -51,5 +54,5 @@ def to_wp(wp):
 f1 = to_wp(f1)
 f2 = to_wp(f2)
 
-print "f1: "  + str(f1) + ","
-print "f2: "  + str(f2) + ","
+print("f1:", f1, ",")
+print("f2:", f2, ",")
