@@ -4,6 +4,8 @@
 # man:
 #   waypoint_generator path/to/waypoint.yaml
 
+from __future__ import print_function
+
 import sys
 import yaml
 import numpy as np
@@ -16,7 +18,8 @@ CLOCKWISE = False
 
 # Load yaml file given in argument
 input_file = sys.argv[1]
-yaml_data = yaml.load(file(input_file, 'r'), Loader=yaml.Loader)
+with open(input_file, 'r') as f:
+    yaml_data = yaml.safe_load(f)
 
 output_file = input_file[:-5] + "_gen_round.yaml"
 
@@ -78,8 +81,9 @@ wp_list = [ str(i+1) for i in range(idx-1)]
 yaml_data['wp/list'] = wp_list
 yaml_data['wp/table'] = wp_table
 
+with open(output_file, 'w') as f:
+    yaml.dump(yaml_data, f)
 
-yaml.dump(yaml_data, file(output_file, 'w'))
-print output_file
-print
-print yaml.dump(yaml_data)
+print(yaml.dump(yaml_data))
+print()
+print('Written to:', output_file)
