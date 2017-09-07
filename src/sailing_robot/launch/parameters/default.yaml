@@ -39,10 +39,10 @@ config/rate: 10
 # in [degrees]
 navigation/beating_angle: 50
 # Zone number of the UTM system to use. Southampton is in zone 30,
-# Portugal in zone 29. http://www.dmap.co.uk/utmworld.htm
+# Oslo in zone 32. http://www.dmap.co.uk/utmworld.htm
 # Distance calculations will be less accurate the further from the specified
 # zone you are.
-navigation/utm_zone: 30
+navigation/utm_zone: 32
 # True to turn by jibing instead of tacking:
 navigation/jibe_to_turn: true
 
