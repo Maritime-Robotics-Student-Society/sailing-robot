@@ -45,7 +45,8 @@ class Camera_detection():
         AVE_TIME = rospy.get_param("camera_detection/average_time")   # lengh of the averaging in seconds
         self.AVE_SIZE = int(AVE_TIME * sensor_rate)                        # size of the averaging sample
         self.average_list = collections.deque(maxlen = self.AVE_SIZE)
-        self.empty_image_counter = 0   # only save every 20th empty image or so
+        self.empty_image_counter = 0   # only save every empty_image_ignore-th empty image
+        self.empty_image_ignore = 5
         self.publish()
 
     def publish(self):
@@ -85,7 +86,7 @@ class Camera_detection():
                 else:
                     msg = 'nothing'
                     self.empty_image_counter +=1
-                    if self.empty_image_counter > 20:
+                    if self.empty_image_counter > self.empty_image_ignore:
                         filename = os.path.expanduser('~/camera_detected_obstacle_{:%Y-%m-%d_%H:%M:%S_%f}_nothing.jpg'.format(datetime.datetime.now()))
                         cv2.imwrite(filename, image)
                         self.empty_image_counter = 0
