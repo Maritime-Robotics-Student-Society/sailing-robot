@@ -15,7 +15,7 @@
 
     <rosparam file="$(find sailing_robot)/launch/parameters/horten_wp/obstacle_avoidance_gen_obstacle.yaml" command="load"/>
     
-    <param name="log_name" value="horten_obstacle_avoidance" />
+    <param name="log_name" value="horten_obstacle_avoidance2" />
 
     <!--
     Nodes

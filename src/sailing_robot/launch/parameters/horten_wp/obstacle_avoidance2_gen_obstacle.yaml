@@ -1,0 +1,34 @@
+wp/acceptRadius: 8
+wp/tackVotingRadius: 12
+
+wp/table:
+  A: [59.42693032012717, 10.470490123255757]
+  B: [59.427012001570425, 10.470049168082966]
+  B1: [59.42670000092252, 10.46983517226954]
+  C: [59.42706300255131, 10.469773835454163]
+  C1: [59.42675100144588, 10.469559841838787]
+  D: [59.42711400295451, 10.469498501989335]
+  D1: [59.42680200139158, 10.46928451057201]
+  E: [59.427165002780086, 10.469223167688426]
+  E1: [59.42685300075961, 10.469009178469207]
+  F: [59.42721600202796, 10.468947832551521]
+  F1: [59.42690399954999, 10.468733845530409]
+  G: [59.42729767828894, 10.468506869878524]
+  wp1: [59.426883, 10.470271]
+  wp2: [59.427189, 10.468619]
+  wp3: [59.427353, 10.46878]
+  wp4: [59.427039, 10.470378]
+wp/tasks:
+- {kind: to_waypoint, waypoint: A}
+- {kind: to_waypoint, waypoint: B}
+- {kind: obstacle_waypoints, normal: C, obstacle: B1}
+- {kind: obstacle_waypoints, normal: D, obstacle: C1}
+- {kind: obstacle_waypoints, normal: E, obstacle: D1}
+- {kind: obstacle_waypoints, normal: F, obstacle: E1}
+- {kind: to_waypoint, waypoint: G}
+- {kind: to_waypoint, waypoint: F}
+- {kind: obstacle_waypoints, normal: E, obstacle: F1}
+- {kind: obstacle_waypoints, normal: D, obstacle: E1}
+- {kind: obstacle_waypoints, normal: C, obstacle: D1}
+- {kind: obstacle_waypoints, normal: B, obstacle: C1}
+- {kind: to_waypoint, waypoint: A}
