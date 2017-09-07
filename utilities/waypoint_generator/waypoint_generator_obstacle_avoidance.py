@@ -91,7 +91,7 @@ yaml_data['wp/tasks'] = [{'kind': 'to_waypoint', 'waypoint': 'A'},
                         {'kind': 'to_waypoint', 'waypoint': 'Bx'},
                         ]
 
-yaml_data['wp/list'] = ['A', 'Bx', 'B', 'B1', 'C0', 'C1', 'D', 'D1', 'Dx', 'E']
+#yaml_data['wp/list'] = ['A', 'Bx', 'B', 'B1', 'C0', 'C1', 'D', 'D1', 'Dx', 'E']
 
 #yaml_data['wp/table'] = {}
 yaml_data['wp/table']['A'] = wpA
