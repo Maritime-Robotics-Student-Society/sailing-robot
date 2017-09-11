@@ -17,6 +17,9 @@ body {
   padding: 10px;
   background-color: #fff;
 }
+.day-notes-switch {
+  margin-bottom: 1em;
+}
 .run {
   margin-bottom: 0.5em;
 }
@@ -56,18 +59,39 @@ function toggle_hidden(id) {
 </head>
 <body>
 <div id="container">
-{% for day, batch in days %}
+{% for date, day_data in days %}
   <div class="day">
-    <h2>{{day.strftime('%a %d %B %Y')}}</h2>
-    {% for run in batch %}
+    <h2>{{date.strftime('%a %d %B %Y')}}</h2>
+
+    <!-- First, list all notes from this day (if there are any) -->
+    {% set day_notes_id = date.strftime('day-notes-%Y-%m-%d') %}
+    {%- if day_data.notes -%}
+    <div class="day-notes-switch">
+      <a href="#" onclick="toggle_hidden('{{day_notes_id}}'); return false;">
+        {{ day_data.notes | length }} notes</a> made on this day.
+    </div>
+    <div class="day-notes hidden" id="{{day_notes_id}}">
+      <ul>
+      {% for note in day_data.notes %}
+      <li>{{note['timestamp'].strftime('%H:%M:%S')}} – {{note['message']}}</li>
+      {% endfor %}
+      </ul>
+    </div>
+    {%- endif -%}
+
+    <!-- Now show the runs themselves -->
+    {% for run in day_data.runs %}
     {% set topics_id = run.rosbag.start.strftime('topics-%Y-%m-%d-T%H-%M-%S') %}
     {% set notes_id = run.rosbag.start.strftime('notes-%Y-%m-%d-T%H-%M-%S') %}
     <div class="run">
+      <!-- Start time, log name, links to data files -->
       <div class="run-line">{{run.rosbag.start.strftime('%H:%M:%S')}} [{{run.rosbag.test_name.strip('_')}}] :
       {% for file in run %}
         <a href="{{file.filename}}">{{file.file_type}}</a> ·
       {% endfor %}
       </div>
+
+      <!-- Show run length, number of topics and notes -->
       <div class="bag-line">
         <div class="meter-bar-outer"><div class="meter-bar-inner" style="width:{{run.prop_size}}px;"></div></div>
         {{run.rosbag.duration | seconds_to_mins}} minutes, {{run.rosbag.n_messages}} messages
@@ -76,6 +100,8 @@ function toggle_hidden(id) {
         , with <a href="#" onclick="toggle_hidden('{{notes_id}}'); return false;">{{ run.notes|length }} notes</a>
         {%- endif -%}
       </div>
+      
+      <!-- List ROS message topics, and any notes made during this run. -->
       <div class="topics-line hidden" id="{{topics_id}}">
         {% for topic in run.rosbag.topic_list | sort %}
         <span class="topic-name">{{topic}}</span> ·
@@ -90,6 +116,7 @@ function toggle_hidden(id) {
       </div>
     </div>
     {% endfor %}
+
   </div>
 {% endfor %}
 </div>
