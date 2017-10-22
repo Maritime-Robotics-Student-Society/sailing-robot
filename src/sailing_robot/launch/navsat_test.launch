@@ -1,0 +1,15 @@
+<launch>
+
+  <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true">
+
+    <param name="magnetic_declination_radians" value="0"/>
+
+    <param name="yaw_offset" value="0"/>
+
+    <remap from="/imu/data" to="/your/imu/topic" />
+    <remap from="/gps/fix" to="/your/gps/fix/topic" />
+    <remap from="/odometry/filtered" to="/your/robot_localization/output/topic" />
+
+ </node>
+
+</launch>

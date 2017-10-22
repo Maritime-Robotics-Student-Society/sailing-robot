@@ -1,7 +1,7 @@
 
 wp/tasks: [
   {"kind": "to_waypoint", "waypoint": "mark"},
-  {"kind": "keep_station", "waypoint": "mark", "linger": 3000, "wind_angle": 45, "radius": 5},
+  {"kind": "keep_station", "waypoint": "mark", "linger": 3000, "wind_angle": 45, "radius": 1.5},
 ]
 
 # distance within waypoint is accepted, in [m]
