@@ -2,6 +2,7 @@
 from __future__ import print_function
 
 import argparse
+from collections import defaultdict
 from datetime import datetime, timedelta
 from glob import glob
 import io
@@ -13,8 +14,9 @@ from os.path import dirname, realpath
 import re
 import sys
 
-ISO8601 = "%Y-%m-%dT%H:%M:%SZ"
+ISO8601 = "%Y-%m-%dT%H:%M:%SZ"  # Standard format for date+time
 
+# Some directories we'll use
 utils_dir = dirname(realpath(__file__))
 repo_dir = dirname(utils_dir)
 data_dir = os.path.join(repo_dir, 'recorded_data')
@@ -126,6 +128,7 @@ def parse_filename(name):
         return GPSTrace(name, test, dt)
 
 class FileGroup(object):
+    """A set of data files from one ROS run"""
     prop_size = 0
     def __init__(self, rosbag):
         self.rosbag = rosbag
@@ -140,6 +143,12 @@ class FileGroup(object):
     def __len__(self):
         return len(self.others) + 1
 
+class DayData(object):
+    """Data collected on one day"""
+    def __init__(self):
+        self.runs = []
+        self.notes = []
+
 def load_notes():
     notes = []
     for path in glob(os.path.join(notes_dir, '*.json')):
@@ -150,7 +159,7 @@ def load_notes():
         note['timestamp'] = ts
         notes.append(note)
     
-    return sorted(notes, key=lambda n: n['timestamp'])
+    return sorted(notes, key=lambda n: n['timestamp'], reverse=True)
 
 def scan_recorded_data_files():
     by_type = {ROSBAG: [], GPS_TRACE: [], PARAM_DUMP: []}
@@ -165,7 +174,7 @@ def scan_recorded_data_files():
     
     # Use rosbags as anchors, and group related files with start times within
     # 10 seconds.
-    groups = []
+    runs = []
     for bag in by_type[ROSBAG]:
         bag.read_info()
         group = FileGroup(bag)
@@ -180,28 +189,36 @@ def scan_recorded_data_files():
                     < (bag.end + timedelta(seconds=60)):
                 group.notes.append(note)
 
-        groups.append(group)
+        runs.append(group)
     
-    max_duration = max(g.rosbag.duration for g in groups)
-    for g in groups:
+    # Calculate the length of each run as a percentage of the maximum.
+    max_duration = max(g.rosbag.duration for g in runs)
+    for g in runs:
         g.prop_size = int(100 * (g.rosbag.duration / max_duration))
     
-    groups.sort(key=lambda g: g.rosbag.start, reverse=True)
-    return groups
+    runs.sort(key=lambda g: g.rosbag.start, reverse=True)
+    
+    # Group runs & notes into days
+    days = defaultdict(DayData)
+    for r in runs:
+        days[r.rosbag.start.date()].runs.append(r)
+    for n in notes:
+        days[n['timestamp'].date()].notes.append(n)
 
-def seconds_to_mins(s):
+    return days
+
+def seconds_to_mins(s):  # Used as a filter in the template
     return int(s/60)
 
-def generate_html(data_groups):
+def generate_html(data_days):
     jinja_env = Environment(loader=FileSystemLoader(utils_dir),
                             autoescape=True)
     jinja_env.filters['seconds_to_mins'] = seconds_to_mins
     template = jinja_env.get_template('data_index.tpl')
-    
-    data_by_days = groupby(data_groups, key=lambda g: g.rosbag.start.date())
+
     output_file = os.path.join(data_dir, 'index.html')
     with io.open(output_file, 'w', encoding='utf-8') as f:
-        template.stream(days=data_by_days).dump(f)
+        template.stream(days=sorted(data_days.items(), reverse=True)).dump(f)
     print('Index written to', output_file)
 
 def main():
@@ -217,8 +234,8 @@ def main():
                 '--rm', 'sotonsailbot/ros:indigo', 'python', '/home/pi/sailing-robot/utilities/index_recorded_data.py'])
         sys.exit(rc)
     
-    groups = scan_recorded_data_files()
-    generate_html(groups)
+    data_by_days = scan_recorded_data_files()
+    generate_html(data_by_days)
 
 
 if __name__ == '__main__':

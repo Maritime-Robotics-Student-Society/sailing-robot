@@ -27,7 +27,7 @@ def imu_publisher():
         rospy.loginfo("IMU Init failed, check connection and/or access permission")
 
     imudata = Imu() # sensor message published in ROS
-    rate = rospy.Rate(500)
+    rate = rospy.Rate(30)
     while not rospy.is_shutdown():
         imu.IMURead()
         data = imu.getIMUData()
