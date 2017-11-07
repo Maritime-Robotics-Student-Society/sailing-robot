@@ -14,7 +14,7 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/viana_test_waypoints.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/archive/Viana/viana_test_waypoints.yaml" command="load"/>
     <!--rosparam file="$(find sailing_robot)/launch/parameters/boldrewood_waypoints.yaml" command="load"/-->
     <!--rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/-->
 
