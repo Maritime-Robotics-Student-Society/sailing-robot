@@ -14,6 +14,8 @@ echo
 echo "Now use Xsens on this computer. Press return here to disconnect."
 read
 
+echo "Detaching"
 sudo usbip detach -p 0
 
+echo "SSHing to Pi to unbind Xsens"
 ssh -t pi@${SAIL_PI_IP} bash sailing-robot/piaccess/usbip-stop-export.sh
