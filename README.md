@@ -21,14 +21,14 @@
          .NMM. +/  NMMMMMMMMMMm`          Timfkmiller
          dMMM. +/  MMMMMMMMMMMMd`         Matt Brown
         yMMMM. +/ `MMMMMMMMMMMMMh         schneider
-       oMMMMM- +/ -MMMMMMMMMMMMMMo        Soon Sun Gan
+       oMMMMM- +/ -MMMMMMMMMMMMMMo        Alex Ziang
       +MMMMMM: +/ +MMMMMMMMMMMMMMM:       arnaud_wiertz
      +MMMMMMM+ ++ sMMMMMMMMMMMMMMMN`      Kerrine Lee
     /MNNmmNNMs /+ dMMMMMMMMMMMMMMMMh      Alessandro Romano
     .`      `` -: yso/::-....--:/+oy.     Lee Kwong Yong
   `southamptonuniversitysailingrobot-     andybs
    .odMMMMMMMMMMMMMMMMMMMMMMMMMMMMms-     Simone Provenzano
-     `-:////////////////////////-         Alex Ziang 
+     `-:////////////////////////-          
                                           
                                           and many anonymous donors who support us silently.
                                           Thank you for your support!
