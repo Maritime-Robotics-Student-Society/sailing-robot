@@ -34,7 +34,7 @@ msg/_*.py
 
 # Dumped parameter
 *.json
-
+gps-raw*
 
 # qcreator stuff
 CMakeLists.txt.user
