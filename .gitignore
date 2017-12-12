@@ -32,6 +32,10 @@ msg/_*.py
 # Jupyter notebook stuff
 .ipynb_checkpoints/
 
+# Dumped parameter
+*.json
+
+
 # qcreator stuff
 CMakeLists.txt.user
 
