@@ -7,6 +7,7 @@
 import rospy
 from std_msgs.msg import Float64, Float32, String
 from sailing_robot.msg import velocity
+from sailing_robot.sail_table import SailTable
 import scipy.interpolate
 import time, math
 
@@ -32,12 +33,20 @@ class Velocity_simu():
         rospy.Subscriber('sailing_state', String, self.update_sailing_state)
         self.sailing_state = 'normal'
 
+        rospy.Subscriber('sailsheet_normalized', Float32, self.update_sailsheet_normalized)
+        self.sailsheet_normalized = 0 # actual normalized setting of the sheet
+
+        self.sail_table_dict = rospy.get_param('sailsettings/table')
+        self.sail_table = SailTable(self.sail_table_dict)
+
         self.punishment = 1
         self.tacking_punishment_time = rospy.get_param("simulation/velocity/tacking_punishment_time")
         self.tacking_punishment_coef = rospy.get_param("simulation/velocity/tacking_punishment_coefficient")
 
         self.velocity_coefficient = rospy.get_param("simulation/velocity/coefficient")
         self.velocity_minimum = rospy.get_param("simulation/velocity/minimum")
+
+        self.coef_sailsheet_error = rospy.get_param("simulation/vecolity/coef_sailsheet_error")
 
         self.freq = rospy.get_param("config/rate")
         self.rate = rospy.Rate(self.freq)
@@ -62,6 +71,9 @@ class Velocity_simu():
                 self.start_punishment()
             else:
                 self.decr_punishment()
+
+    def update_sailsheet_normalized(self, msg):
+        self.sailsheet_normalized = msg.data
         
     def start_punishment(self):
         self.punishment = self.tacking_punishment_coef
@@ -123,15 +135,17 @@ class Velocity_simu():
         
         self.polar = scipy.interpolate.interp1d(ang_pol, speed_pol)
 
-
     def velocity_publisher(self):
 
         while not rospy.is_shutdown():
             # wind direction between 0 and 180 degree
-            wind_direction_180 =  180 - abs(self.wind_direction - 180) 
+            wind_direction_180 =  180 - abs(self.wind_direction - 180)
 
+            sheet_normalized_ideal = self.sail_table.interpolate_sail_setting(wind_direction_180) # ideal setting
+            sailsheet_error_norm = abs(self.sailsheet_normalized - sheet_normalized_ideal) # calculate error between actual and ideal
+            # rospy.logwarn(sailsheet_error_norm)
 
-            velx = self.polar( wind_direction_180 ) * self.wind_speed * self.velocity_coefficient
+            velx = self.polar( wind_direction_180 )*self.wind_speed*self.velocity_coefficient*(1-sailsheet_error_norm*self.coef_sailsheet_error)
             if velx < self.velocity_minimum:
                 velx = self.velocity_minimum
             

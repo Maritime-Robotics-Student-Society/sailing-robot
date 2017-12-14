@@ -30,6 +30,9 @@ simulation/velocity/tacking_punishment_coefficient: 0.2
 simulation/velocity/water_stream_speed: 0.0     # [m/s]
 simulation/velocity/water_stream_direction: 180   # [degree]
 
+# sailsheet error normalized (sailsheet_error_norm) in simulator is multiplied by this coef. to simulate influence of not-ideal setting of sailsheet
+simulation/vecolity/coef_sailsheet_error: 1
+
 
 simulation/heading_init: 270.0
 
