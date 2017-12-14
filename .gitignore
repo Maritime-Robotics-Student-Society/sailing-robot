@@ -67,3 +67,4 @@ CATKIN_IGNORE
 # Ignore recorded data from tests
 /recorded_data/*.*
 /recorded_data/shared_pics/
+src/sailing_robot/.DS_Store
