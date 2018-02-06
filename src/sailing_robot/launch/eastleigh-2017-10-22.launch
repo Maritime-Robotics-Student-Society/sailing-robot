@@ -15,7 +15,8 @@
 
     <rosparam file="$(find sailing_robot)/launch/parameters/eastleigh_waypoints.yaml" command="load"/>
     
-    <param name="log_name" value="eastleigh_tests" />
+    <arg name="log_name" value="eastleigh_tests" />
+    <param name="log_name" value="$(arg log_name)" />
 
     <!--
     Nodes
@@ -39,7 +40,7 @@
 
     <node name="debugging_dump_params" pkg='sailing_robot' type="debugging_dump_params"/>
     <!-- Rosbag records messages for later investigation -->
-    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-robot/eastleigh_tests"/>
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-robot/$(arg log_name)"/>
     <!-- Also record GPS data as required by the competition -->
     <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log" respawn="true"/>
 
