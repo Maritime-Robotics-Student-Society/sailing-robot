@@ -200,7 +200,7 @@ def scan_recorded_data_files():
         g.prop_size = int(100 * (g.rosbag.duration / max_duration))
 
         # Generate a map per run
-        g.osm_map = MapGen(g)
+        g.osm_map = save_map(g)
 
     runs.sort(key=lambda g: g.rosbag.start, reverse=True)
     
@@ -214,9 +214,9 @@ def scan_recorded_data_files():
     return days
 
 
-def MapGen(run):
+def save_map(run):
     """
-        Generate the html for the map
+        Generates the html for the map and returns its filename
     """
     for file in run.others:
         if file.file_type == GPS_TRACE:
@@ -232,8 +232,10 @@ def MapGen(run):
     osm_map = folium.Map(location=latlons[0], zoom_start=16)
     osm_map.add_child(folium.features.PolyLine(latlons))
 
-    # returns the html as a string
-    return osm_map.get_root().render()
+    filename = 'map-' + os.path.splitext(os.path.basename(gps_trace_path))[0] + '.html'
+    path_html = os.path.join(os.path.dirname(gps_trace_path), filename)
+    osm_map.save(path_html)
+    return os.path.basename(path_html)
 
 
 def seconds_to_mins(s):  # Used as a filter in the template

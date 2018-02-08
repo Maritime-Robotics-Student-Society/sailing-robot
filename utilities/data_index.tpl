@@ -123,7 +123,7 @@ function toggle_hidden(id) {
     </div>
         {%- if run.osm_map -%}
           <div class="map hidden" id="{{map_id}}">
-              <iframe srcdoc="{{run.osm_map}}" frameBorder="0" width="50%" height="200"></iframe>
+              <iframe src="{{run.osm_map}}" frameBorder="0" width="50%" height="200"></iframe>
           </div>
         {%- endif -%}
 
