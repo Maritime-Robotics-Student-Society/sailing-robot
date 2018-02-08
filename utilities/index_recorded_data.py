@@ -216,21 +216,34 @@ def scan_recorded_data_files():
 
 def save_map(run):
     """
-        Generates the html for the map and returns its filename
+        Generates the .html for the map and returns its filename
     """
     for file in run.others:
         if file.file_type == GPS_TRACE:
             gps_trace_path = file.path
-            break
+        if file.file_type == PARAM_DUMP:
+            param_dump_path = file.path
+            
+    if gps_trace_path:
+        boat_trace = pandas.read_csv(gps_trace_path, names=['time', 'lat', 'long'])
+        latlons = [(row.lat / 1e7, row.long / 1e7) for row in boat_trace.itertuples()]
 
-    if not gps_trace_path:
+        osm_map = folium.Map(location=latlons[0], zoom_start=16)
+        osm_map.add_child(folium.features.PolyLine(latlons))
+
+        if param_dump_path:
+            with open(param_dump_path) as f:
+                param_dict = json.load(f)
+
+            for name, latlon in param_dict['wp']['table'].items():
+                folium.Marker(latlon, popup=name).add_to(osm_map)
+                # folium.CircleMarker(latlon,
+                #                     popup=name, 
+                #                     radius=3, 
+                #                     color='#E93333',
+                #                     fill_color='#E93333').add_to(osm_map)
+    else:
         return None
-
-    boat_trace = pandas.read_csv(gps_trace_path, names=['time', 'lat', 'long'])
-    latlons = [(row.lat / 1e7, row.long / 1e7) for row in boat_trace.itertuples()]
-
-    osm_map = folium.Map(location=latlons[0], zoom_start=16)
-    osm_map.add_child(folium.features.PolyLine(latlons))
 
     filename = 'map-' + os.path.splitext(os.path.basename(gps_trace_path))[0] + '.html'
     path_html = os.path.join(os.path.dirname(gps_trace_path), filename)
