@@ -13,6 +13,8 @@ import os
 from os.path import dirname, realpath
 import re
 import sys
+import folium
+import pandas
 
 ISO8601 = "%Y-%m-%dT%H:%M:%SZ"  # Standard format for date+time
 
@@ -134,6 +136,7 @@ class FileGroup(object):
         self.rosbag = rosbag
         self.others = []
         self.notes = []
+        self.osm_map = None
     
     def __iter__(self):
         yield self.rosbag
@@ -195,7 +198,10 @@ def scan_recorded_data_files():
     max_duration = max(g.rosbag.duration for g in runs)
     for g in runs:
         g.prop_size = int(100 * (g.rosbag.duration / max_duration))
-    
+
+        # Generate a map per run
+        g.osm_map = MapGen(g)
+
     runs.sort(key=lambda g: g.rosbag.start, reverse=True)
     
     # Group runs & notes into days
@@ -206,6 +212,29 @@ def scan_recorded_data_files():
         days[n['timestamp'].date()].notes.append(n)
 
     return days
+
+
+def MapGen(run):
+    """
+        Generate the html for the map
+    """
+    for file in run.others:
+        if file.file_type == GPS_TRACE:
+            gps_trace_path = file.path
+            break
+
+    if not gps_trace_path:
+        return None
+
+    boat_trace = pandas.read_csv(gps_trace_path, names=['time', 'lat', 'long'])
+    latlons = [(row.lat / 1e7, row.long / 1e7) for row in boat_trace.itertuples()]
+
+    osm_map = folium.Map(location=latlons[0], zoom_start=16)
+    osm_map.add_child(folium.features.PolyLine(latlons))
+
+    # returns the html as a string
+    return osm_map.get_root().render()
+
 
 def seconds_to_mins(s):  # Used as a filter in the template
     return int(s/60)

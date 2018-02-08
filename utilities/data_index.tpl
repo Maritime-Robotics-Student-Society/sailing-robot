@@ -83,6 +83,7 @@ function toggle_hidden(id) {
     {% for run in day_data.runs %}
     {% set topics_id = run.rosbag.start.strftime('topics-%Y-%m-%d-T%H-%M-%S') %}
     {% set notes_id = run.rosbag.start.strftime('notes-%Y-%m-%d-T%H-%M-%S') %}
+    {% set map_id = run.rosbag.start.strftime('map-%Y-%m-%d-T%H-%M-%S') %}
     <div class="run">
       <!-- Start time, log name, links to data files -->
       <div class="run-line">{{run.rosbag.start.strftime('%H:%M:%S')}} [{{run.rosbag.test_name.strip('_')}}] :
@@ -99,8 +100,13 @@ function toggle_hidden(id) {
         {%- if run.notes -%}
         , with <a href="#" onclick="toggle_hidden('{{notes_id}}'); return false;">{{ run.notes|length }} notes</a>
         {%- endif -%}
+        {%- if run.osm_map -%}
+        , <a href="#" onclick="toggle_hidden('{{map_id}}'); return false;">display map</a>
+        {%- endif -%}
       </div>
-      
+
+
+
       <!-- List ROS message topics, and any notes made during this run. -->
       <div class="topics-line hidden" id="{{topics_id}}">
         {% for topic in run.rosbag.topic_list | sort %}
@@ -115,6 +121,13 @@ function toggle_hidden(id) {
         </ul>
       </div>
     </div>
+        {%- if run.osm_map -%}
+          <div class="map hidden" id="{{map_id}}">
+              <iframe srcdoc="{{run.osm_map}}" frameBorder="0" width="50%" height="200"></iframe>
+          </div>
+        {%- endif -%}
+
+
     {% endfor %}
 
   </div>
