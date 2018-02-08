@@ -73,35 +73,6 @@ rudder/initialAngle: 0
 
 
 #
-# Sail Parameters
-#
-
-# PID values for sail control
-sail/control/Kp: 0
-sail/control/Ki: 0
-sail/control/Kd: 0
-
-# maximum angle
-# in [degrees]
-sail/maxAngle: 90
-  
-# Safe value for the boat sail to be set at
-# in [degrees]
-sail/initialAngle: 90
-
-# Length over which the sheet can be varied
-# (EXAMPLE, PROBABLY NOT ACTUALLY USED)
-# in [m]
-/sail/boomsheetDistance: 0.31
-/sail/heightofboom: 0.05
-/sail/pullypivotDistance: 0.38
-
-# Diameter of the sail winch
-# in [mm]
-sail/winchDiameter: 50
-
-
-#
 # Wind Direction Parameters
 #
 # To avoid noise of the wind sensor, we average it over a time
