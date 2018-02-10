@@ -1,0 +1,26 @@
+Outdated tutorials:
+https://www.howtoforge.com/how-to-set-up-a-usb-over-ip-server-and-client-with-ubuntu-10.04
+https://raspberrypi.stackexchange.com/questions/4433/how-do-i-make-my-raspberry-pi-act-as-a-wireless-usb-controller
+
+Don't use the usbip package:
+https://bugs.launchpad.net/ubuntu/+source/linux/+bug/900384
+
+# Raspi
+
+- Load module usbip-host
+- Compile usbip in Linux source tree matching kernel
+
+lsusb
+./usbip list -l  # -l = local
+sudo ./usbipd
+# bus id looks like 1-1.4
+sudo ./usbip bind -b 1-1.4
+
+# On Tabarly
+sudo usbip attach -r 192.168.12.1 -b 1-1.4
+#...use usb device
+sudo usbip detach -p 00  # this uses a 'port', not the bus id
+
+# Back on raspi
+sudo ./usbip unbind -b 1-1.4 
+
