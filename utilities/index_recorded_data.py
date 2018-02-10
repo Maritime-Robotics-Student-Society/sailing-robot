@@ -217,7 +217,7 @@ def scan_recorded_data_files():
 def save_map(run):
     """
         Generates the .html for the map and returns its filename
-    """
+    """    
     gps_trace_path = None
     param_dump_path = None
     for file in run.others:
@@ -225,34 +225,33 @@ def save_map(run):
             gps_trace_path = file.path
         if file.file_type == PARAM_DUMP:
             param_dump_path = file.path
-            
-    if gps_trace_path:
-        boat_trace = pandas.read_csv(gps_trace_path, names=['time', 'lat', 'long'])
-        latlons = [(row.lat / 1e7, row.long / 1e7) for row in boat_trace.itertuples()]
-        if not latlons:
-            return None  # Some runs have a file with no data
-
-        osm_map = folium.Map(location=latlons[0], zoom_start=16)
-        osm_map.add_child(folium.features.PolyLine(latlons))
-
-        if param_dump_path:
-            with open(param_dump_path) as f:
-                param_dict = json.load(f)
-
-            for name, latlon in param_dict['wp']['table'].items():
-                folium.Marker(latlon, popup=name).add_to(osm_map)
-                # folium.CircleMarker(latlon,
-                #                     popup=name, 
-                #                     radius=3, 
-                #                     color='#E93333',
-                #                     fill_color='#E93333').add_to(osm_map)
-    else:
+    
+    if not gps_trace_path:
         return None
 
-    filename = 'map-' + os.path.splitext(os.path.basename(gps_trace_path))[0] + '.html'
-    path_html = os.path.join(os.path.dirname(gps_trace_path), filename)
-    osm_map.save(path_html)
-    return os.path.basename(path_html)
+    map_filename = 'map-' + os.path.splitext(os.path.basename(gps_trace_path))[0] + '.html'
+    map_path = os.path.join(data_dir, map_filename)
+    if os.path.isfile(map_path):
+        # Use a file previously generated
+        return map_filename
+
+    boat_trace = pandas.read_csv(gps_trace_path, names=['time', 'lat', 'long'])
+    latlons = [(row.lat / 1e7, row.long / 1e7) for row in boat_trace.itertuples()]
+    if not latlons:
+        return None  # Some runs have a file with no data
+
+    osm_map = folium.Map(location=latlons[0], zoom_start=16)
+    osm_map.add_child(folium.features.PolyLine(latlons))
+
+    if param_dump_path:
+        with open(param_dump_path) as f:
+            param_dict = json.load(f)
+
+        for name, latlon in param_dict['wp']['table'].items():
+            folium.Marker(latlon, popup=name).add_to(osm_map)
+
+    osm_map.save(map_path)
+    return map_filename
 
 
 def seconds_to_mins(s):  # Used as a filter in the template
