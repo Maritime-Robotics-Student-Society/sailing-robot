@@ -218,6 +218,8 @@ def save_map(run):
     """
         Generates the .html for the map and returns its filename
     """
+    gps_trace_path = None
+    param_dump_path = None
     for file in run.others:
         if file.file_type == GPS_TRACE:
             gps_trace_path = file.path
@@ -227,6 +229,8 @@ def save_map(run):
     if gps_trace_path:
         boat_trace = pandas.read_csv(gps_trace_path, names=['time', 'lat', 'long'])
         latlons = [(row.lat / 1e7, row.long / 1e7) for row in boat_trace.itertuples()]
+        if not latlons:
+            return None  # Some runs have a file with no data
 
         osm_map = folium.Map(location=latlons[0], zoom_start=16)
         osm_map.add_child(folium.features.PolyLine(latlons))
