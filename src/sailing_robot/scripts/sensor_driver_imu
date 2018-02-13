@@ -1,10 +1,11 @@
 #!/usr/bin/python
 #
 #
-
-#This Python 2 program reads the data from an LSM303D and an L3GD20H which are both attached to the I2C bus of a Raspberry Pi.
-#Both can be purchased as a unit from Pololu as their MinIMU-9 v3 Gyro, Accelerometer, and Compass  product.
-#
+# 
+# 
+# This Python 2 program reads the data from Polulu miniIMU (an LSM303D and an L3GD20H) which are both attached to the I2C bus of 
+# a Raspberry Pi. Both can be purchased as a unit from Pololu as their MinIMU-9 v3 Gyro, Accelerometer, and Compass  product.
+# 
 #First follow the procedure to enable I2C on R-Pi.
 #1. Add the lines "ic2-bcm2708" and "i2c-dev" to the file /etc/modules
 #2. Comment out the line "blacklist ic2-bcm2708" (with a #) in the file /etc/modprobe.d/raspi-blacklist.conf
