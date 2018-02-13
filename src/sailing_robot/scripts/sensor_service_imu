@@ -1,9 +1,12 @@
 #!/usr/bin/env python
-"""Translate quaternion orientation into heading angle.
+#
+# Sensor service IMU is a node to 
+#  * convert quaternion orientation into heading angle with our convention
+#  * transform NED (North East Down) reference IMU data into ENU (East North Up)
+#
+# Subscribe to: imu/data (Imu)
+# Published topic: heading (Float32)
 
-Subscribes: imu/data (Imu)
-Publishes: heading (Float32)
-"""
 
 from __future__ import division
 
@@ -35,6 +38,7 @@ class heading_processing(object):
         #                tf.transformations.euler_from_quaternion(
         #                (imu.x, imu.y,imu.z, imu.w))[0])
 
+    
 
     def run(self):
         r = rospy.Rate(20)
