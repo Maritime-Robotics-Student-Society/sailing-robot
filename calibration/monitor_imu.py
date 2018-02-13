@@ -14,8 +14,8 @@ from sailing_robot.imu_utils import ImuReader
 from curses_imu import IMUDisplay, pitch_roll
 
 IMU_BUS = 1
-LGD = 0x6b #Device I2C slave address
-LSM = 0x1d #Device I2C slave address
+LGD = 0x6a #Device I2C slave address
+LSM = 0x1e #Device I2C slave address
 
 imu = ImuReader(IMU_BUS, LSM, LGD)
 imu.check_status()
