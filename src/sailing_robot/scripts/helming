@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+'''
+Merginng actuator_demand_rudder and actuator_demand_sail
+'''
+
 import rospy
 from std_msgs.msg import Float64, Float32, Int16, String
 
@@ -25,23 +29,27 @@ def node_publisher():
     PID controller was used in other conditions.
     :rtype: object
     """
-    pub = rospy.Publisher('rudder_control', Int16, queue_size=10)  # Use UInt 16 here to minimize the memory use
-    pub = rospy.Publisher('sailsheet_normalized', Float32, queue_size=10)
+    pub_rudder = rospy.Publisher('rudder_control', Int16, queue_size=10)  # Use UInt 16 here to minimize the memory use
+    pub_sailsheet = rospy.Publisher('sailsheet_normalized', Float32, queue_size=10)
     rospy.init_node('helming', anonymous=True)
-    rate = rospy.Rate(10)
 
+    rate = rospy.Rate(10)
     while not rospy.is_shutdown():
+        # rudder
         rospy.loginfo("Sailing state: %r", data.sailing_state)
         if data.sailing_state == 'normal':
-            rawangle = -controller.update_PID(angle_subtract(
-                                               data.heading, data.goal_heading))
+            rawangle = -controller.update_PID(angle_subtract(data.heading, data.goal_heading))
             angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
             rospy.loginfo("Angle: %r", angle)
         else:
             rawangle = data.tack_rudder
             angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
 
-        pub.publish(int(angle))
+        pub_rudder.publish(int(angle))
+
+        #sailsheet
+        sheet_normalized = sail_data.calculate_sheet_setting()
+        pub_sailsheet.publish(sheet_normalized)
 
         rate.sleep()
 
