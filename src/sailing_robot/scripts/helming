@@ -22,6 +22,8 @@ sheet_out_to_jibe = rospy.get_param('sailsettings/sheet_out_to_jibe', False)
 sail_table = SailTable(sail_table_dict)
 sail_data = SailData(sail_table,  sheet_out_to_jibe=sheet_out_to_jibe)
 
+
+
 def node_publisher():
     """
     Publish rudder servo angle data (Int16) to Arduino node.
@@ -29,6 +31,21 @@ def node_publisher():
     PID controller was used in other conditions.
     :rtype: object
     """
+    def set_rudder(state):
+        if state=="PID":
+
+            rawangle = -controller.update_PID(angle_subtract(data.heading, data.goal_heading))
+            angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
+            rospy.loginfo("Angle: %r", angle)
+   
+        elif state="+Max":
+            angle = rudder['maxAngle']
+        elif state="-Max":
+            angle = -rudder['maxAngle']
+
+        pub_rudder.publish(int(angle))
+
+
     pub_rudder = rospy.Publisher('rudder_control', Int16, queue_size=10)  # Use UInt 16 here to minimize the memory use
     pub_sailsheet = rospy.Publisher('sailsheet_normalized', Float32, queue_size=10)
     rospy.init_node('helming', anonymous=True)
@@ -36,16 +53,9 @@ def node_publisher():
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         # rudder
-        rospy.loginfo("Sailing state: %r", data.sailing_state)
+        rospy.loginfo("Sailing state: %r", data.sail ing_state)
         if data.sailing_state == 'normal':
-            rawangle = -controller.update_PID(angle_subtract(data.heading, data.goal_heading))
-            angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
-            rospy.loginfo("Angle: %r", angle)
-        else:
-            rawangle = data.tack_rudder
-            angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
-
-        pub_rudder.publish(int(angle))
+            set_rudder("PID") # NEEDS TO SUBSCRIBE TO TOPIC
 
         #sailsheet
         sheet_normalized = sail_data.calculate_sheet_setting()
