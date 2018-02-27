@@ -46,6 +46,10 @@ class SailTable(object):
         return last_sail_setting
 
 class SailData(object):
+    """ 
+    TODO: remove sailing_state dependancy, this should be handled by the helming node now
+          do we still need saildata then? probably not
+    """
     def __init__(self, sail_table, sheet_out_to_jibe=True, jibe_sheet_setting=0.75):
         self.wind_direction_apparent = 0
         self.sailing_state = 'normal'
