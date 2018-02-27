@@ -1,0 +1,42 @@
+#!/usr/bin/python
+
+
+class ProcedureBase():
+    def __Init__(self):
+        self.start_time = ...
+        self.rate = ...
+        # TODO: subscribe to stuff
+
+
+    def update_sailingstate(self, msg):
+        self.sailingstate = msg.data
+
+
+    def check_end_condition(self):
+        """
+        Should I continue?
+        check time out too?
+        """
+        return  
+        
+
+
+
+class TackProcedure(ProcedureBase):
+    """
+        Basic Tack procedure
+    """
+    def __Init__(self, switch_to_port_tack):
+        ProcedureBase.__Init__(self)
+        self.switch_to_port_tack = switch_to_port_tack
+
+    def Procedure(self):
+        while self.check_end_condition():
+            set_sail("Wind")
+            if self.switch_to_port_tack:
+                set_rudder("+Max")
+            else:
+                set_rudder("-Max")
+            self.rate.sleep()
+
+
