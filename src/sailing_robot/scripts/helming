@@ -22,7 +22,22 @@ sheet_out_to_jibe = rospy.get_param('sailsettings/sheet_out_to_jibe', False)
 sail_table = SailTable(sail_table_dict)
 sail_data = SailData(sail_table,  sheet_out_to_jibe=sheet_out_to_jibe)
 
+def set_sail(sheet_control):
+   
+    if sheet_control == "Normal":
+	sheet_normalized = sail_data.calculate_sheet_setting()
+      
+    
+    elif sheet_control == "In":
+	sheet_normalized = 0
+      
+ 
+    elif sheet_control == "Out":
+	sheet_normalized = 1
 
+    pub_sailsheet.publish(sailsheet_normalized)
+    
+    
 
 def node_publisher():
     """
@@ -45,7 +60,6 @@ def node_publisher():
 
         pub_rudder.publish(int(angle))
 
-
     pub_rudder = rospy.Publisher('rudder_control', Int16, queue_size=10)  # Use UInt 16 here to minimize the memory use
     pub_sailsheet = rospy.Publisher('sailsheet_normalized', Float32, queue_size=10)
     rospy.init_node('helming', anonymous=True)
@@ -53,9 +67,9 @@ def node_publisher():
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
         # rudder
-        rospy.loginfo("Sailing state: %r", data.sail ing_state)
+        rospy.loginfo("Sailing state: %r", data.sailing_state)
         if data.sailing_state == 'normal':
-            set_rudder("PID") # NEEDS TO SUBSCRIBE TO TOPIC
+            set_rudder("PID")
 
         #sailsheet
         sheet_normalized = sail_data.calculate_sheet_setting()
