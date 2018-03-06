@@ -17,7 +17,7 @@ import traceback
 import rospy
 from std_msgs.msg import Int16
 from sensor_msgs.msg import NavSatFix
-from sailing_robot.msg import gpswtime
+from sailing_robot.msg import gpswtime, Velocity
 from sailing_robot.gps_utils import UBXMessage, get_port, UbxNmeaParser
 
 BAUD_RATE = 9600
@@ -85,6 +85,12 @@ def pos_publisher():
             rospy.logdebug("GPS received {!r}".format(sentence))
             if not isinstance(sentence, pynmea2.NMEASentence):
                 continue
+            if sentence.sentence_type == 'VTG':
+                velocity = Velocity()
+                velocity.speed = sentence.spd_over_grnd_kmph / 3.6
+                velocity.heading = sentence.true_track
+                velocity_pub.publish(velocity)
+                
             if sentence.sentence_type != 'GGA':
                 continue
 
@@ -146,6 +152,7 @@ def set_gps_options(serial_port):
 if __name__ == '__main__':
     try:
         pos_pub = rospy.Publisher('position', NavSatFix, queue_size=10)
+        velocity_pub = rospy.Publisher('gps_velocity', Velocity, queue_size=10)
         gps_pub = rospy.Publisher('gps_fix', gpswtime, queue_size=10)
         nsats_pub = rospy.Publisher('gps_satellites', Int16, queue_size=10)
         rospy.init_node("sensor_driver_gps", anonymous=True)
