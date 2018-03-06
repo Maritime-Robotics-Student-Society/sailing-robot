@@ -1,0 +1,94 @@
+#!/usr/bin/python
+# This file is a draft for the futur helming/procedure system, nomenclature and variable/class names are likely to change
+
+# TODO
+# import stuff
+
+
+class Helming():
+    def __init__(self):
+        # subscribe to sailing state
+
+        self.rate = rospy.Rate(rospy.get_param("config/rate"))
+
+        self.Runner()
+
+
+    def Runner(self):
+        while not rospy.is_shutdown():
+
+            if self.sailing_state == 'normal':
+                set_rudder("PID")
+                set_sail("Normal")
+            else:
+                self.switch_tack()
+            
+            self.rate.sleep()
+
+
+    def switch_tack(self):
+        for procedure in ProcedureList:
+            currentProcedure = procedure(self.sailing_state)            
+            if currentProcedure.check_success():
+                break
+
+
+
+########################################################################
+
+
+
+
+
+
+class ProcedureBase():
+    def __Init__(self):
+        self.start_time = ...
+        self.rate = ...
+        # TODO: subscribe to stuff 
+
+
+    def update_sailingstate(self, msg):
+        self.sailing_state = msg.data
+
+    def check_success(self):
+        """
+            Is the maneuvre done successfully?
+            (Or we don't want to switch tack anymore)
+        """
+
+
+    def check_timeout(self):
+        """
+        Am I out of time?
+        """
+        return currenttime - self.start_time > self.timeout
+
+    def check_end_condition(self):
+        """
+        Should I continue?
+        check time out too?
+        """
+        return self.check_success() or self.check_timeout() 
+        
+
+
+
+class TackProcedure(ProcedureBase):
+    """
+        Basic Tack procedure
+    """
+    def __Init__(self, switch_to_port_tack, timeout=15):
+        super().__Init__(self)
+        self.switch_to_port_tack = switch_to_port_tack
+
+    def Procedure(self):
+        while self.check_end_condition():
+            set_sail("Wind")
+            if self.switch_to_port_tack:
+                set_rudder("+Max")
+            else:
+                set_rudder("-Max")
+            self.rate.sleep()
+
+
