@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 
-
 from std_msgs.msg import BatteryState
 from ina219 import INA219
 import rospy
@@ -10,33 +9,36 @@ import rospy
 
 
 class Battery():
+    """
+        Node that publishes current and voltage from the ina219 module
+    """
     def __init__(self):
-        """
-        """
         # initialize the library
         SHUNT_OHMS = 0.1
         MAX_EXPECTED_AMPS = 1
-        ina = INA219(SHUNT_OHMS, MAX_EXPECTED_AMPS, log_level=logging.INFO)
-        ina.configure(ina.RANGE_16V, ina.GAIN_AUTO)
+        self.ina = INA219(SHUNT_OHMS, MAX_EXPECTED_AMPS)
+        self.ina.configure(ina.RANGE_16V, ina.GAIN_AUTO)
+        self.ina.sleep()
 
 
-        self.battery_pub = rospy.Publisher('battery', Float32, queue_size=10)
-
+        self.battery_pub = rospy.Publisher('battery', BatteryState, queue_size=10)
         rospy.init_node("battery", anonymous=True)
-        self.rate = rospy.Rate(0.01)
+
+        self.rate = rospy.Rate(rospy.get_param("config/rate_battery"))
         self.battery_publisher()
 
 
     def battery_publisher(self):
 
         while not rospy.is_shutdown():
-
             msg = BatteryState()
-            ina.wake()j
-            msg.voltage = ina.voltage()
-            msg.current = -ina.current()
-            ina.sleep()
+            self.ina.wake()
+            msg.voltage =  self.ina.voltage()
+            msg.current = -self.ina.current()
+            self.ina.sleep()
             self.battery_pub(msg)
+            self.rate.sleep()
+
 
 if __name__ == '__main__':
     try:
