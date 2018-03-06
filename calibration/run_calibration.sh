@@ -16,7 +16,7 @@ echo '----------------------------------------------------------'
 echo 'Calibration of the Compass, be ready to dance!'
 echo '----------------------------------------------------------'
 
-python2 compasscalib_roll
+#python2 compasscalib_roll
 
 
 echo '----------------------------------------------------------'
