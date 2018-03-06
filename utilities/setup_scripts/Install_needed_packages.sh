@@ -1,6 +1,5 @@
 #!/bin/sh 
 set -e
-cd ~
 
 # Install Geos headers (for shapely), and scipy (for compass calibration), install pip too
 sudo apt-get --assume-yes install libgeos-dev python-scipy python-pip
@@ -24,5 +23,3 @@ sudo apt-get --assume-yes install pigpio python-pigpio
 sudo cp pigpio.service /lib/systemd/system
 sudo systemctl enable pigpio
 sudo systemctl start pigpio
-
-cd ~
