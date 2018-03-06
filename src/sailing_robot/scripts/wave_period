@@ -58,7 +58,7 @@ class tack_params():
             #position on wave relative to wave period
 
             position = t_cress/wave_period
-            roll_angle = atan2(self.Acc_Y, sqrt(self.Acc_Z**2 + self.Acc_X**2)) * 180/pi # reparing the code
+            roll_angle = atan2(self.Acc_Y, sqrt(self.Acc_Z**2 + self.Acc_X**2)) # reparing the code
 
             self.wave_period_pub.publish(position)
             self.roll_angle_pub.publish(degrees(roll_angle))
