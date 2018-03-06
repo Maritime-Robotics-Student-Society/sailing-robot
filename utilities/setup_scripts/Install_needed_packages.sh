@@ -36,4 +36,8 @@ sudo timedatectl set-timezone Europe/London
 #make -j4
 #sudo make install
 
+# Install ina219 library (voltmeter/currentmeter)
+sudo pip install pi_ina219
+
+
 cd ~
