@@ -29,6 +29,11 @@ dummy/longitude: -1.405315
 # in [Hz]
 config/rate: 10
 
+
+# Battery sensor rate
+# in [Hz]
+config/battery_rate: 0.05
+
 #
 # Navigation
 #
@@ -50,7 +55,8 @@ navigation/jibe_to_turn: true
 # Define which heading the boat uses (compensate for the z axis or not
 heading/compensation: true
 
-heading/offset_true_north: -1.017 # in degree, for SOUTHAMPTON 2016
+heading/offset_true_north: -0.75   # in degree, for SOUTHAMPTON 2018
+#heading/offset_true_north: -1.017 # in degree, for SOUTHAMPTON 2016
 #heading/offset_true_north: -2.6   # in degree, for PORTUGAL 2016
 
 #

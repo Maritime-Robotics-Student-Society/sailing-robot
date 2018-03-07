@@ -1,0 +1,48 @@
+#!/usr/bin/python
+
+
+from std_msgs.msg import BatteryState
+from ina219 import INA219
+import rospy
+
+
+
+
+class Battery():
+    """
+        Node that publishes current and voltage from the ina219 module
+    """
+    def __init__(self):
+        # initialize the library
+        SHUNT_OHMS = 0.1
+        MAX_EXPECTED_AMPS = 1
+        self.ina = INA219(SHUNT_OHMS, MAX_EXPECTED_AMPS)
+        self.ina.configure(ina.RANGE_16V, ina.GAIN_AUTO)
+        self.ina.sleep()
+
+
+        self.battery_pub = rospy.Publisher('battery', BatteryState, queue_size=10)
+        rospy.init_node("battery", anonymous=True)
+
+        self.rate = rospy.Rate(rospy.get_param("config/rate_battery"))
+        self.battery_publisher()
+
+
+    def battery_publisher(self):
+
+        while not rospy.is_shutdown():
+            msg = BatteryState()
+            self.ina.wake()
+            msg.voltage =  self.ina.voltage()
+            msg.current = -self.ina.current()
+            self.ina.sleep()
+            self.battery_pub(msg)
+            self.rate.sleep()
+
+
+if __name__ == '__main__':
+    try:
+        Battery()
+    except rospy.ROSInterruptException:
+        pass
+
