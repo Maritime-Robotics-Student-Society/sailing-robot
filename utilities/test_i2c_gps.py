@@ -8,7 +8,7 @@ import logging
 
 BUS = None
 address = 0x42
-gpsReadInterval = 0.1
+gpsReadInterval = 0.0
 TOTALmsg=1
 OKmsg=1
 
@@ -51,8 +51,8 @@ def parseResponse(gpsLine):
 
     gpsStr, chkSum = gpsChars.split('*')
     gpsComponents = gpsStr.split(',')
-    gpsStart = gpsComponents[0]
-    if (gpsStart == "$GNGGA"):
+    gpsStart = gpsComponents[0][1:]
+    if (gpsStart == "GNGGA"):
         chkVal = 0
         TOTALmsg += 1
         for ch in gpsStr[1:]: # Remove the $
@@ -67,12 +67,7 @@ def parseResponse(gpsLine):
             #    'DPGS_updt', 'DPGS_ID']):
             #    GPSDAT[k] = gpsComponents[i]
             #print json.dumps(GPSDAT, indent=2)
-            print gpsComponents
-        currenttime = time.time() 
-        print("ratio: ", 1.0*OKmsg/TOTALmsg)
-        print("freq:  ", 1.0*TOTALmsg/(currenttime-starttime))
-        print("freqok:", 1.0*OKmsg/(currenttime-starttime))
-        print()
+            #print gpsComponents
 
 def readGPS():
     c = None
@@ -94,7 +89,13 @@ def readGPS():
         print e
 
 connectBus()
-while True:
-    starttime = time.time()
+starttime = time.time()
+while time.time()-starttime < 20:
     readGPS()
-    time.sleep(gpsReadInterval)
+#    time.sleep(gpsReadInterval)
+
+currenttime = time.time() 
+print("ratio: ", 1.0*OKmsg/TOTALmsg)
+print("freq:  ", 1.0*TOTALmsg/(currenttime-starttime))
+print("freqok:", 1.0*OKmsg/(currenttime-starttime))
+print()
