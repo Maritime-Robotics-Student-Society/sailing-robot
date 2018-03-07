@@ -8,7 +8,7 @@ set -e
 # vim
 # bc (calculator)
 echo "Installing apt packages..."
-sudo apt-get --assume-yes install libgeos-dev python-scipy python-pip vim bc
+sudo apt-get --assume-yes install libgeos-dev python-scipy python-pip vim bc i2c-tools
 
 # Install:
 # Latlon, shapely, pyproj (navigation)
