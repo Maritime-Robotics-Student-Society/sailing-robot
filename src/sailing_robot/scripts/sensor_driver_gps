@@ -84,7 +84,7 @@ def pos_publisher():
             s = "Error parsing GPS data.\nbuffer={!r}\ndata={!r}\n{}".format(
                         gps_reader.buf, data, traceback.format_exc()
             )
-            rospy.logerr(s)
+            rospy.logwarn(s)
             gps_reader.buf = b''
             continue
 
@@ -100,8 +100,7 @@ def pos_publisher():
             gps_reader = UbxNmeaParser()
 
         for sentence in batch:
-            rospy.logwarn("GPS received {!r}".format(sentence))
-            #rospy.logdebug("GPS received {!r}".format(sentence))
+            rospy.logdebug("GPS received {!r}".format(sentence))
             if not isinstance(sentence, pynmea2.NMEASentence):
                 continue
             if sentence.sentence_type == 'VTG':
