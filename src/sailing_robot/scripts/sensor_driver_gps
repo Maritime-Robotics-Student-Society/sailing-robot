@@ -15,6 +15,7 @@ import time
 import traceback
 
 import rospy
+import smbus
 from std_msgs.msg import Int16
 from sensor_msgs.msg import NavSatFix
 from sailing_robot.msg import gpswtime, Velocity
@@ -51,7 +52,7 @@ def decimal_degrees(d_m, hemisphere):
     return res
 
 def pos_publisher():
-    use_i2c = rospy.getparam("gps_via_i2c")
+    use_i2c = rospy.get_param("gps_via_i2c")
     if use_i2c:
         i2c_bus = smbus.SMBus(1)
         set_gps_options(i2c_bus, use_i2c)
@@ -65,7 +66,9 @@ def pos_publisher():
         if use_i2c:
             data = b''
             for _ in range(64):
-                data += i2c_bus.read_byte(i2c_ADDRESS)
+                char = chr(i2c_bus.read_byte(i2c_ADDRESS))
+                if char != b'\xff':
+                    data += char
         else:
             data = serial_port.read(64)
 
@@ -97,7 +100,8 @@ def pos_publisher():
             gps_reader = UbxNmeaParser()
 
         for sentence in batch:
-            rospy.logdebug("GPS received {!r}".format(sentence))
+            rospy.logwarn("GPS received {!r}".format(sentence))
+            #rospy.logdebug("GPS received {!r}".format(sentence))
             if not isinstance(sentence, pynmea2.NMEASentence):
                 continue
             if sentence.sentence_type == 'VTG':
@@ -114,8 +118,12 @@ def pos_publisher():
             msg = NavSatFix()
             if sentence.lat == '':
                 continue
-            msg.latitude = decimal_degrees(sentence.lat, sentence.lat_dir)
-            msg.longitude = decimal_degrees(sentence.lon, sentence.lon_dir)
+            try:
+                msg.latitude = decimal_degrees(sentence.lat, sentence.lat_dir)
+                msg.longitude = decimal_degrees(sentence.lon, sentence.lon_dir)
+            except ValueError:
+                rospy.logwarn("Error parsing position: {!r}".format(sentence))
+                continue
             pos_pub.publish(msg)
             nsats_pub.publish(int(sentence.num_sats))
 
@@ -145,7 +153,7 @@ def set_gps_options(communicator, use_i2c):
 
     for option in option_list:
         if use_i2c:
-            first_byte, msg_list = UBXMessage().i2cise_serial(option)
+            first_byte, msg_list = UBXMessage(None, None).i2cise_serial(option)
             communicator.write_i2c_block_data(i2c_ADDRESS, first_byte, msg_list)
         else:
             communicator.write(option)
