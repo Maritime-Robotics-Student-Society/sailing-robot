@@ -88,9 +88,10 @@ def pos_publisher():
             if sentence.sentence_type == 'VTG':
                 velocity = Velocity()
                 if sentence.spd_over_grnd_kmph is not None:
-                    velocity.speed = sentence.spd_over_grnd_kmph / 3.6
-                    velocity.heading = sentence.true_track
-                    velocity_pub.publish(velocity)
+                    if sentence.true_track is not None:
+                        velocity.speed = sentence.spd_over_grnd_kmph / 3.6
+                        velocity.heading = sentence.true_track
+                        velocity_pub.publish(velocity)
 
             if sentence.sentence_type != 'GGA':
                 continue
