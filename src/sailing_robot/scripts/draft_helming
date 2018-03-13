@@ -68,6 +68,10 @@ class ProcedureBase():
         """
         return currenttime - self.start_time > self.timeout
 
+    def time(self):
+        currenttime = ...
+        return currenttime - self.start_time 
+
     def end(self):
 
 
@@ -103,4 +107,25 @@ class JibeProcedure(ProcedureBase):
         else:
             set_rudder.min()
 
+class Tack_IncreaseAngleToWind(ProcedureBase):
+    """
+        Basic Tack procedure
+    """
+    def __Init__(self, sailing_state, timeout=15):
+        super().__Init__(self)
+        self.sailing_state = sailing_state
+        self.beating_angle = 80
+
+    def loop(self):
+        set_sail.wind()
+        if self.time() < 5:
+            if self.sailing_state == "switch_to_port_tack":
+                set_rudder(TO WIND, angle_to_wind = self.beating_angle)
+            else:
+                set_rudder(TO WIND, angle_to_wind = 360-self.beating_angle)  
+        else:
+            if self.sailing_state == "switch_to_port_tack":
+                set_rudder.min()
+            else:
+                set_rudder.max()
 
