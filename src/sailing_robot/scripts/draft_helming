@@ -3,6 +3,50 @@
 
 # TODO
 # import stuff
+WIND = object()
+IN   = object()
+OUT  = object()
+PID = object()
+RUDDER_TO_LEFT = object()
+RUDDER_TO_RIGHT = object()
+
+
+def set_sail(sheet_control):
+    if sheet_control is WIND:
+        sheet_normalized = sail_data.calculate_sheet_setting()
+        
+    elif sheet_control is IN:
+        sheet_normalized = 0
+
+    elif sheet_control is OUT:
+        sheet_normalized = 1
+
+    elif sheet_control is float:
+        sheet_normalized = sheet_control
+
+    pub_sailsheet.publish(sailsheet_normalized)
+    
+def set_rudder(state, angle_to_wind=0):
+    if state is PID:
+        rawangle = -controller.update_PID(angle_subtract(data.heading, data.goal_heading))
+        angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
+
+    elif state is RUDDER_TO_LEFT:
+        angle = rudder['maxAngle']
+    elif state is RUDDER_TO_RIGHT:
+        angle = -rudder['maxAngle']
+
+    elif state is TO_WIND:
+#         rawangle = -controller.update_PID(angle_subtract(data.heading, data.goal_heading))
+#         angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
+
+
+
+    pub_rudder.publish(int(angle))
+
+
+
+set_rudder(TO_WIND, angle_to_wind=80)
 
 
 class Helming():
@@ -24,8 +68,8 @@ class Helming():
                 if self.currentProcedure:
                     self.currentProcedure.end()
                     self.currentProcedure = None
-                set_rudder.PID()
-                set_sail.wind()
+                set_rudder(PID)
+                set_sail(WIND)
             else:
                 self.run_procedure()
             
@@ -80,11 +124,11 @@ class TackProcedure(ProcedureBase):
         self.sailing_state = sailing_state
 
     def loop(self):
-        set_sail.wind()
+        set_sail(WIND)
         if self.sailing_state == "switch_to_port_tack":
-            set_rudder.min()
+            set_rudder(MIN)
         else:
-            set_rudder.max()
+            set_rudder(MAX)
 
 
 
