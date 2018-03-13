@@ -236,7 +236,7 @@ def save_map(run):
         return map_filename
 
     boat_trace = pandas.read_csv(gps_trace_path, names=['time', 'lat', 'long'])
-    latlons = [(row.lat / 1e7, row.long / 1e7) for row in boat_trace.itertuples()]
+    latlons = [(row.lat / 1e7, row.long / 1e7) for row in boat_trace.dropna().itertuples()]
     if not latlons:
         return None  # Some runs have a file with no data
 
