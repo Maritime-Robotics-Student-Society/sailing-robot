@@ -10,7 +10,10 @@ class Helming():
         # subscribe to sailing state
 
         self.rate = rospy.Rate(rospy.get_param("config/rate"))
+        ProcedureList = [tack, jibe, ..]
+        self.currentProcedureId = 0
 
+        self.currentProcedure = None
         self.Runner()
 
 
@@ -18,19 +21,31 @@ class Helming():
         while not rospy.is_shutdown():
 
             if self.sailing_state == 'normal':
-                set_rudder("PID")
-                set_sail("Normal")
+                if self.currentProcedure:
+                    self.currentProcedure.end()
+                    self.currentProcedure = None
+                set_rudder.PID()
+                set_sail.wind()
             else:
-                self.switch_tack()
+                self.run_procedure()
             
             self.rate.sleep()
 
 
-    def switch_tack(self):
-        for procedure in ProcedureList:
-            currentProcedure = procedure(self.sailing_state)            
-            if currentProcedure.check_success():
-                break
+    def run_procedure(self):
+        
+        if not self.currentProcedure:
+            # no procedure have been started
+            self.currentProcedureId = 0
+            self.currentProcedure = ProcedureList[self.currentProcedureId](self.sailing_state)
+
+        elif self.currentProcedure.check_timeout():
+            # if time out we start the next procedure in the list
+            self.currentProcedureId = (self.currentProcedureId + 1) % len(self.ProcedureList)
+            self.currentProcedure = ProcedureList[self.currentProcedureId](self.sailing_state)
+
+        # we advance to the next timestep 
+        self.currentProcedure.loop()
 
 
 
@@ -44,51 +59,48 @@ class Helming():
 class ProcedureBase():
     def __Init__(self):
         self.start_time = ...
-        self.rate = ...
         # TODO: subscribe to stuff 
 
-
-    def update_sailingstate(self, msg):
-        self.sailing_state = msg.data
-
-    def check_success(self):
-        """
-            Is the maneuvre done successfully?
-            (Or we don't want to switch tack anymore)
-        """
-
-
-    def check_timeout(self):
+    def is_failed(self):
         """
         Am I out of time?
+        Am I failing?
         """
         return currenttime - self.start_time > self.timeout
 
-    def check_end_condition(self):
-        """
-        Should I continue?
-        check time out too?
-        """
-        return self.check_success() or self.check_timeout() 
-        
-
+    def end(self):
 
 
 class TackProcedure(ProcedureBase):
     """
         Basic Tack procedure
     """
-    def __Init__(self, switch_to_port_tack, timeout=15):
+    def __Init__(self, sailing_state, timeout=15):
         super().__Init__(self)
-        self.switch_to_port_tack = switch_to_port_tack
+        self.sailing_state = sailing_state
 
-    def Procedure(self):
-        while self.check_end_condition():
-            set_sail("Wind")
-            if self.switch_to_port_tack:
-                set_rudder("+Max")
-            else:
-                set_rudder("-Max")
-            self.rate.sleep()
+    def loop(self):
+        set_sail.wind()
+        if self.sailing_state == "switch_to_port_tack":
+            set_rudder.min()
+        else:
+            set_rudder.max()
+
+
+
+class JibeProcedure(ProcedureBase):
+    """
+        Basic Jibe procedure
+    """
+    def __Init__(self, sailing_state, timeout=15):
+        super().__Init__(self)
+        self.sailing_state = sailing_state
+
+    def loop(self):
+        set_sail.wind()
+        if self.sailing_state == "switch_to_port_tack":
+            set_rudder.max()
+        else:
+            set_rudder.min()
 
 
