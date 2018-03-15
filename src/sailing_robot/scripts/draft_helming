@@ -3,12 +3,17 @@
 
 # TODO
 # import stuff
-WIND = object()
-IN   = object()
-OUT  = object()
-PID = object()
-RUDDER_TO_LEFT = object()
-RUDDER_TO_RIGHT = object()
+
+# Sheet control
+WIND      = object()
+SHEET_IN  = object()
+SHEET_OUT = object()
+
+# Rudder control
+PID_GOAL_HEADING  = object()
+PID_ANGLE_TO_WIND = object() # set an angle to the wind, 0 being going torward the wind, can be either 0/360 or -180/180
+RUDDER_FULL_LEFT  = object() # the boat is going to the left
+RUDDER_FULL_RIGHT = object() # the boat is going to the right
 
 
 def set_sail(sheet_control):
@@ -27,18 +32,19 @@ def set_sail(sheet_control):
     pub_sailsheet.publish(sailsheet_normalized)
     
 def set_rudder(state, angle_to_wind=0):
-    if state is PID:
+    if state is PID_GOAL_HEADING:
         rawangle = -controller.update_PID(angle_subtract(data.heading, data.goal_heading))
         angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
+
+    elif state is PID_ANGLE_TO_WIND:
+#         rawangle = -controller.update_PID(angle_subtract(data.heading, data.goal_heading))
+#         angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
 
     elif state is RUDDER_TO_LEFT:
         angle = rudder['maxAngle']
     elif state is RUDDER_TO_RIGHT:
         angle = -rudder['maxAngle']
 
-    elif state is TO_WIND:
-#         rawangle = -controller.update_PID(angle_subtract(data.heading, data.goal_heading))
-#         angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
 
 
 
