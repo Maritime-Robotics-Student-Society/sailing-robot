@@ -15,6 +15,18 @@ PID_ANGLE_TO_WIND = object() # set an angle to the wind, 0 being going torward t
 RUDDER_FULL_LEFT  = object() # the boat is going to the left
 RUDDER_FULL_RIGHT = object() # the boat is going to the right
 
+# Publishers for rudder and sailsheet control
+PUB_RUDDER    = rospy.Publisher('rudder_control', Int16, queue_size=10)  # Use UInt 16 here to minimize the memory use
+PUB_SAILSHEET = rospy.Publisher('sailsheet_normalized', Float32, queue_size=10)
+
+controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'],rudder['maxAngle'], -rudder['maxAngle'])
+
+sail_table_dict = rospy.get_param('sailsettings/table')
+sheet_out_to_jibe = rospy.get_param('sailsettings/sheet_out_to_jibe', False)
+sail_table = SailTable(sail_table_dict)
+sail_data = SailData(sail_table)
+
+
 
 def set_sail(sheet_control):
     if sheet_control is WIND:
@@ -29,8 +41,9 @@ def set_sail(sheet_control):
     elif sheet_control is float:
         sheet_normalized = sheet_control
 
-    pub_sailsheet.publish(sailsheet_normalized)
+    PUB_SAILSHEET.publish(sailsheet_normalized)
     
+
 def set_rudder(state, angle_to_wind=0):
     if state is PID_GOAL_HEADING:
         rawangle = -controller.update_PID(angle_subtract(data.heading, data.goal_heading))
@@ -45,14 +58,10 @@ def set_rudder(state, angle_to_wind=0):
     elif state is RUDDER_TO_RIGHT:
         angle = -rudder['maxAngle']
 
+    PUB_RUDDER.publish(int(angle))
 
 
 
-    pub_rudder.publish(int(angle))
-
-
-
-set_rudder(TO_WIND, angle_to_wind=80)
 
 
 class Helming():
@@ -83,7 +92,6 @@ class Helming():
 
 
     def run_procedure(self):
-        
         if not self.currentProcedure:
             # no procedure have been started
             self.currentProcedureId = 0
@@ -125,7 +133,7 @@ class ProcedureBase():
     def end(self):
 
 
-class TackProcedure(ProcedureBase):
+class TackBasic(ProcedureBase):
     """
         Basic Tack procedure
     """
@@ -142,7 +150,7 @@ class TackProcedure(ProcedureBase):
 
 
 
-class JibeProcedure(ProcedureBase):
+class JibeBasic(ProcedureBase):
     """
         Basic Jibe procedure
     """
