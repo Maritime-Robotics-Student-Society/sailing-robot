@@ -25,6 +25,7 @@ class Extrema(object):
         self.max = -99999
 
     def update(self, value):
+        value = float(value)
         if value < self.min:
             self.min = value
         if value > self.max:
@@ -44,27 +45,22 @@ class VoltDisplay(object):
         self.current_extreme = Extrema()
 
     def update_current(self):
-        self.stdscr.addstr(1, 14, '{:6d} | {:6d} | {:6d}'.format(*self.current_extreme.update(ina.current)))
+        self.stdscr.addstr(1, 14, '{:3.3f} | {:3.3f} | {:3.3f}'.format(*self.current_extreme.update(ina.current())))
     def update_voltage(self):
-        self.stdscr.addstr(2, 14, '{:6d} | {:6d} | {:6d}'.format(*self.voltage_extreme.update(ina.voltage)))
+        self.stdscr.addstr(2, 14, '{:3.3f} | {:3.3f} | {:3.3f}'.format(*self.voltage_extreme.update(ina.voltage())))
 
 
 def main(stdscr):
     display = VoltDisplay(stdscr)
-
-    with open(sys.argv[1]) as f:
-        cr = csv.DictReader(f)
-        for row in cr:
-            display.update_current()
-            display.update_voltage()
-            stdscr.refresh()
-            time.sleep(0.1)
+    while True:
+        display.update_current()
+        display.update_voltage()
+        stdscr.refresh()
+        time.sleep(0.5)
 
     stdscr.getkey()
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2 or not os.path.isfile(sys.argv[1]):
-        sys.exit('Usage: curses_imu.py calibration_file.csv')
 
     try:
         wrapper(main)
