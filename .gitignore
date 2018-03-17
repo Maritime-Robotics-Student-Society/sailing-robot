@@ -32,6 +32,10 @@ msg/_*.py
 # Jupyter notebook stuff
 .ipynb_checkpoints/
 
+# Dumped parameter
+*.json
+gps-raw*
+
 # qcreator stuff
 CMakeLists.txt.user
 
@@ -67,6 +71,8 @@ CATKIN_IGNORE
 # Ignore recorded data from tests
 /recorded_data/*.*
 /recorded_data/shared_pics/
+/recorded_data/sync_sailing_data
+/recorded_data/Experiment 1/
 
 # ignore mac DS files
 *.DS_Store
