@@ -42,6 +42,7 @@ def parseResponse(gpsLine):
     global TOTALmsg
     global OKmsg
     global lastLocation
+    global starttime
     gpsChars = ''.join(chr(c) for c in gpsLine)
     gpsCharsbin = ''.join(str(bin(c)) for c in gpsLine)
     
@@ -67,8 +68,11 @@ def parseResponse(gpsLine):
             #    GPSDAT[k] = gpsComponents[i]
             #print json.dumps(GPSDAT, indent=2)
             print gpsComponents
-
-        print(1.0*OKmsg/TOTALmsg)
+        currenttime = time.time() 
+        print("ratio: ", 1.0*OKmsg/TOTALmsg)
+        print("freq:  ", 1.0*TOTALmsg/(currenttime-starttime))
+        print("freqok:", 1.0*OKmsg/(currenttime-starttime))
+        print()
 
 def readGPS():
     c = None
@@ -91,5 +95,6 @@ def readGPS():
 
 connectBus()
 while True:
+    starttime = time.time()
     readGPS()
     time.sleep(gpsReadInterval)
