@@ -94,7 +94,7 @@ def readGPS():
         print e
 
 connectBus()
+starttime = time.time()
 while True:
-    starttime = time.time()
     readGPS()
     time.sleep(gpsReadInterval)
