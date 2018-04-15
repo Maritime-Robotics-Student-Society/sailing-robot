@@ -1,0 +1,173 @@
+#!/usr/bin/python
+
+
+import time, math, sys
+from scipy.optimize import minimize_scalar
+import rospy
+from std_msgs.msg import Float32
+from sensor_msgs.msg import NavSatFix
+
+
+
+
+
+class Swarm_simu():
+    def __init__():
+        self.publishGoalHeading = rospy.publisher('goal_heading', Float32, queue_size=10)
+
+        utm_zone = rospy.get_param('navigation/utm_zone')
+        self.nav = Navigation(utm_zone=utm_zone)
+        self.ownBoatID = rospy.get_param('swarm/BoatID')
+        self.beatingAngle = rospy.get_param('navigation/beating_angle')
+        
+        self.boatCount = rospy.get_param('swarm/BoatCount')
+        self.listOtherBoat = {}
+
+        for boatID in range(self.boatCount-1):
+            param_prefix = '/boat' + str(boatID) + '/'
+
+            wp_list = rospy.get_param(param_prefix + 'wp/list')
+            init_position = self.nav.latlon_to_utm(wp_list[0])
+            init_heading = rospy.get_param(param_prefix + 'simulation/heading_init')
+
+            if boatID == self.boatID:
+                self.ownPosition = init_position
+                self.ownHeading = init_heading 
+            else:
+                self.listOtherBoat[boatID]['position_utm'] = init_position
+                self.listOtherBoat[boatID]['heading'] = init_heading
+
+        self.A = rospy.get_param('swarm/A')
+        self.C = rospy.get_param('swarm/C')
+        self.S = rospy.get_param('swarm/S')
+        
+
+    def updateWindDirection(self, msg):
+        self.windDirection = msg.data
+
+    def updateOwnHeading(self, msg):
+        self.ownHeading = msg.data
+
+    def updateOwnPosition(self, msg):
+        self.ownPosition = self.nav.latlon_to_utm(msg.latitude, 
+                                                  msg.longitude)
+
+    def updateOtherHeading(self, msg, boatID):
+        self.listOtherBoat[BoatID]['heading'] = msg.data 
+
+    def updateOtherPosition(self, msg, boatID):
+        self.listOtherBoat[BoatID]['position_utm'] = self.nav.latlon_to_utm(msg.latitude, 
+                                                                            msg.longitude)
+
+    def computeHeadingToClosest(self):
+        closestID = 0 
+        closestDistance = sys.maxint
+
+        for boatID, boat in self.listOtherBoat.iteritems():
+            distance = math.sqrt((self.ownPosition[0] - boat['position_utm'][0])**2 + 
+                                 (self.ownPosition[1] - boat['position_utm'][1])**2)
+            if distance < closestDistance:
+                closestID = boatID
+                closestDistance = distance
+
+        closest_position = self.listOtherBoat[closestID]['position_utm']
+        heading = math.atan2(closest_position[1]-self.position_utm[1], 
+                             closest_position[0]-self.position_utm[0])
+        return (heading, closestDistance)
+
+
+    def computeMeanHeading(self):
+        angle_list = [boat['heading'] for _, boat in self.listOtherBoat.iteritems()]
+        heading = self.nav.angle_average(angle_list)
+        return heading
+         
+
+    def computeHeadingToMeanPosition(self):
+        position_sum_x = 0
+        position_sum_y = 0
+
+        for boatID, boat in self.listOtherBoat.iteritems():
+            position_sum_x += boat['position_utm'][0]
+            position_sum_y += boat['position_utm'][1]
+        N = self.boatCount -1
+        mean_position = (position_sum_x/N, position_sum_y/N) 
+        
+        heading = math.atan2(mean_position[1]-self.position_utm[1], 
+                             mean_position[0]-self.position_utm[0])
+        return heading
+         
+
+    def publishGoalHeading(self):
+        
+        while not rospy.is_shutdown():
+            heading_to_mean_position = self.computeHeadingMeanHeading()
+            mean_heading = self.computeMeanHeading()
+            heading_to_closest, distance_to_closest = self.computeHeadingToClosest()
+
+            optimum_heading = minimize_scalar(utility_function,
+                                              args=(self.C, self.A, self.S, 
+                                                    heading_to_mean_position,
+                                                    mean_heading,
+                                                    heading_to_closest, 
+                                                    distance_to_closest)
+                                              bounds = (0, 3*numpy.pi),
+                                              method='bounded'
+                                              ).x %360
+
+            goal_heading = get_feseable_heading(optimum_heading)
+
+            self.publishGoalHeading.publish(goal_heading)
+
+
+            
+    def get_feseable_heading(self, optimum_heading):
+        wind_direction_north = (self.windDirection + self.ownHeading) %360
+
+        heading_demand_in_dead_zone = (self.nav.angleAbsDistance(wind_direction_north, optimum_heading) 
+                                       < self.beatingAngle)
+
+        if heading_demand_in_dead_zone:
+            # check wind direction relative to boat to get the closest beating angle
+            on_port_tack = self.windDirection < 180
+            if on_port_tack:
+                return (wind_direction_north + self.beatingAngle) %360
+            else:
+                return (wind_direction_north - self.beatingAngle) %360
+        else:
+            return optimum_heading
+
+
+
+def utility_function(optimisation_heading, C, A, S, 
+                     heading_to_mean_position, 
+                     mean_heading,
+                     heading_to_closest, 
+                     distance_to_closest):
+    cohesion = C*math.cos(optimisation_heading - heading_to_mean_position)
+    alignment = A*math.cos(optimisation_heading - mean_heading)
+    separation = S*math.cos(optimisation_heading - heading_to_closest)/distance_to_closest**2
+    
+    return -(cohesion + alignment - separation) 
+
+
+
+
+
+if __name__ == '__main__':
+    try:
+        swarmManager = Swarm_simu()
+         
+        rospy.Subscriber('heading', Float32, swarmManager.updateOwnHeading)
+        rospy.Subscriber('position', NavSatFix, swarmManager.updateOwnPosition)
+        rospy.Subscriber('wind_direction_apparent', Float64, swarmManager.updateWindDirection)
+
+        for boatID, boat in swarmManager.listOtherBoat.iteritems():
+            topic_prefix = '/boat' + str(boatID) + '/'
+            rospy.Subscriber(topic_prefix + 'heading', Float32, lambda: x -> swarmManager.updateOtherHeading(x, boatID))
+            rospy.Subscriber(topic_prefix + 'position', Float32, lambda: x -> swarmManager.updateOtherPosition(x, boatID))
+        
+        swarmManager.publishGoalHeading()
+
+    except rospy.ROSInterruptException:
+        pass
+
