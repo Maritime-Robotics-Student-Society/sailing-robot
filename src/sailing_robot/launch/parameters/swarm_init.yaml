@@ -1,0 +1,19 @@
+
+
+/boat0/BoatID: 0
+/boat0/simulation/heading_init: 0.0
+/boat0/wp/list: ["0"]
+
+
+
+/boat1/BoatID: 1
+/boat1/simulation/heading_init: 90.0
+/boat1/wp/list: ["1"]
+
+
+
+
+
+
+wp/table: {"0" : [50.936981, -1.405315],
+           "1" : [50.936881, -1.405315],}
