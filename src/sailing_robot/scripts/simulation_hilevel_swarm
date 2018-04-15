@@ -1,19 +1,17 @@
 #!/usr/bin/python
 
-
 import time, math, sys
 from scipy.optimize import minimize_scalar
 import rospy
-from std_msgs.msg import Float32
+from std_msgs.msg import Float32,String
 from sensor_msgs.msg import NavSatFix
-
-
 
 
 
 class Swarm_simu():
     def __init__():
         self.publishGoalHeading = rospy.publisher('goal_heading', Float32, queue_size=10)
+        self.publishSailingState = rospy.publisher('sailing_state',String, queue_size=10)
 
         utm_zone = rospy.get_param('navigation/utm_zone')
         self.nav = Navigation(utm_zone=utm_zone)
@@ -26,11 +24,18 @@ class Swarm_simu():
         for boatID in range(self.boatCount-1):
             param_prefix = '/boat' + str(boatID) + '/'
 
-            wp_list = rospy.get_param(param_prefix + 'wp/list')
-            init_position = self.nav.latlon_to_utm(wp_list[0])
+            try:
+                wp_list = rospy.get_param(param_prefix + 'wp/list')
+                wp0 = wp_list[0]
+            except KeyError:
+                task_list = rospy.get_param(param_prefix + 'wp/tasks')
+                wp0 = task_list[0]['waypoint']
+            wp_table = rospy.get_param(param_prefix + 'wp/table')
+
+            init_position = self.nav.latlon_to_utm(wp_table[wp0])
             init_heading = rospy.get_param(param_prefix + 'simulation/heading_init')
 
-            if boatID == self.boatID:
+            if boatID == self.ownBoatID:
                 self.ownPosition = init_position
                 self.ownHeading = init_heading 
             else:
@@ -40,6 +45,8 @@ class Swarm_simu():
         self.A = rospy.get_param('swarm/A')
         self.C = rospy.get_param('swarm/C')
         self.S = rospy.get_param('swarm/S')
+        
+        self.rate = rospy.Rate(rospy.get_param("config/rate"))
         
 
     def updateWindDirection(self, msg):
@@ -117,6 +124,9 @@ class Swarm_simu():
             goal_heading = get_feseable_heading(optimum_heading)
 
             self.publishGoalHeading.publish(goal_heading)
+            self.publishSailingState('normal')
+
+            self.rate.sleep()
 
 
             
