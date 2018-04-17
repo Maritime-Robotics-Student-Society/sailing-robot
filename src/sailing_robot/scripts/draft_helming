@@ -77,10 +77,6 @@ def set_rudder(state, angle_to_wind=0):
 
     PUB_RUDDER.publish(int(angle))
 
-
-
-
-
 ##########################################################################
 
 
@@ -113,6 +109,7 @@ class TackBasic(ProcedureBase):
     """
     def __init__(self, sailing_state, timeout=15):
         super(TackBasic, self).__init__(sailing_state, timeout) 
+        self.name = "TackBasic"
 
     def loop(self):
         set_sail(WIND)
@@ -129,6 +126,7 @@ class JibeBasic(ProcedureBase):
     """
     def __init__(self, sailing_state, timeout=15):
         super(JibeBasic, self).__init__(sailing_state, timeout) 
+        self.name = "JibeBasic"
 
     def loop(self):
         set_sail.wind()
@@ -145,6 +143,7 @@ class Tack_IncreaseAngleToWind(ProcedureBase):
     """
     def __init__(self, sailing_state, timeout=15):
         super(Tack_IncreaseAngleToWind, self).__init__(sailing_state, timeout) 
+        self.name = "Tack_IncreaseAngleToWind"
         self.beating_angle = 80
 
     def loop(self):
@@ -179,6 +178,7 @@ class Helming():
             if data.sailing_state == 'normal':
                 if self.currentProcedure:
                     # ending a procedure because it is finished according to the highlevel
+                    rospy.logwarn("END procedure, back to normal state")
                     self.currentProcedure.end()
                     self.currentProcedure = None
                 set_rudder(PID_GOAL_HEADING)
@@ -194,21 +194,26 @@ class Helming():
     def runProcedure(self):
         if not self.currentProcedure:
             # no procedure have been started (=we just decided to swich tack)
+            rospy.logwarn("START new procedure")
             self.currentProcedureId = 0
             self.currentProcedure = self.ProcedureList[self.currentProcedureId](data.sailing_state)
 
         elif data.sailing_state != self.currentProcedure.sailing_state:
             # if we reswitch tack we restart at the begining of the list
+            rospy.logwarn("RESTART procedure list at the begining")
             self.currentProcedure.end()
             self.currentProcedureId = 0
             self.currentProcedure = self.ProcedureList[self.currentProcedureId](data.sailing_state)
 
         elif self.currentProcedure.is_failed():
+            rospy.logwarn("Procedure failed")
             # if time out we start the next procedure in the list
             self.currentProcedureId = (self.currentProcedureId + 1) % len(self.ProcedureList)
             self.currentProcedure = self.ProcedureList[self.currentProcedureId](data.sailing_state)
 
         # we advance to the next timestep 
+        rospy.logwarn("Run procedure: " + self.currentProcedure.name)
+        rospy.logwarn("ID           : " + str(self.currentProcedureId))
         self.currentProcedure.loop()
 
 
