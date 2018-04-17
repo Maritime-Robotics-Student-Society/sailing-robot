@@ -4,7 +4,7 @@ import rospy
 class PID_Data:
     def __init__(self):
         self.tack_rudder = 0.
-        self.sailing_state = ''
+        self.sailing_state = 'normal'
         self.goal_heading = 0.
         self.heading = 0.
 
