@@ -1,0 +1,91 @@
+
+import struct
+import smbus
+import time
+from sailing_robot.gps_utils import UBXMessage, get_port, UbxNmeaParser
+
+BUS = None
+address = 0x42
+
+
+def connectBus():
+    global BUS
+    BUS = smbus.SMBus(1)
+
+connectBus()
+
+def sendData(msg):
+    bytelist = []
+    firstbyte = ''
+    for char in msg:
+        if not firstbyte:
+            firstbyte = int(char.encode('hex'), 16)
+        else:
+            bytelist.append(int(char.encode('hex'), 16))
+    BUS.write_i2c_block_data(address, firstbyte, bytelist)
+
+#GxGSA
+sendData(b'\xB5\x62\x06\x00\x08\x00\xF0\x02\x00\x00\x00\x00\x00\x01\x02\x32\x10\x13')
+time.sleep(0.1)
+
+# GxGSV off
+sendData(b'\xB5\x62\x06\x00\x08\x00\xF0\x03\x00\x00\x00\x00\x00\x01\x03\x39\x10\x13')
+time.sleep(0.1)
+
+# GxRMC off
+sendData(b'\xB5\x62\x06\x00\x08\x00\xF0\x04\x00\x00\x00\x00\x00\x01\x04\x40\x10\x13')
+time.sleep(0.1)
+
+# GxVTG off
+sendData(b'\xB5\x62\x06\x00\x08\x00\xF0\x05\x00\x00\x00\x00\x00\x01\x05\x47\x10\x13')
+time.sleep(0.1)
+
+# GxGLL off
+sendData(b'\xB5\x62\x06\x00\x08\x00\xF0\x01\x00\x00\x00\x00\x00\x01\x01\x2B\x10\x13')
+time.sleep(0.1)
+
+# NMEA rate: 5Hz
+#sendData(b'\xB5\x62\x06\x00\x06\x00\xC8\x00\x01\x00\x01\x00\xDE\x6A\x10\x13')
+sendData(UBXMessage(b'\x06\x08', payload=b'\x00\x48\x00\x01\x00\x01').serialise())
+time.sleep(0.1)
+
+
+
+# GxZDA on (time measurement)
+sendData(UBXMessage(b'\x06\x01', payload=b'\xF0\x08\x08').serialise())
+
+# GPVTG on speed feedback
+sendData(UBXMessage(b'\x06\x01', payload=b'\xF0\x05\x01').serialise())
+
+
+
+# GxGSA
+sendData(b'\xB5\x62\x06\x01\x08\x00\xF0\x02\x00\x00\x00\x00\x00\x01\x02\x32\x10\x13')
+time.sleep(0.1)
+
+# GxGSV off
+sendData(b'\xB5\x62\x06\x01\x08\x00\xF0\x03\x00\x00\x00\x00\x00\x01\x03\x39\x10\x13')
+time.sleep(0.1)
+
+# GxRMC off
+sendData(b'\xB5\x62\x06\x01\x08\x00\xF0\x04\x00\x00\x00\x00\x00\x01\x04\x40\x10\x13')
+time.sleep(0.1)
+
+# GxVTG off
+sendData(b'\xB5\x62\x06\x01\x08\x00\xF0\x05\x00\x00\x00\x00\x00\x01\x05\x47\x10\x13')
+time.sleep(0.1)
+
+# GxGLL off
+sendData(b'\xB5\x62\x06\x01\x08\x00\xF0\x01\x00\x00\x00\x00\x00\x01\x01\x2B\x10\x13')
+time.sleep(0.1)
+
+# NMEA rate: 5Hz
+sendData(b'\xB5\x62\x06\x08\x06\x00\xC8\x00\x01\x00\x01\x00\xDE\x6A\x10\x13')
+time.sleep(0.1)
+
+# GxZDA on (time measurement)
+time.sleep(0.1)
+
+# GPVTG on speed feedback
+time.sleep(0.1)
+
