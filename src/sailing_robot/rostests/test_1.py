@@ -62,7 +62,7 @@ class TestOnShutdown(unittest.TestCase):
         rospy.init_node(NAME, anonymous=True)
         p = rospy.Publisher("/sailing_state", String, queue_size=10)
         time.sleep(0.2) # Icky fudge factor to give the tack node time to be ready
-        p.publish('tack_to_stbd_tack')
+        p.publish('switch_to_stbd_tack')
         msg = q.get(timeout=2)
         self.assertEqual(msg.data, 90)
 
