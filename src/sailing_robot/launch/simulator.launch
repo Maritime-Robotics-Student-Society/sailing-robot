@@ -30,7 +30,7 @@
     <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" />
     <node name = "actuator_demand_sail" pkg="sailing_robot" type = "actuator_demand_sail" />
     -->
-    <node name = "draft_helming" pkg="sailing_robot" type="draft_helming" />
+    <node name = "helming" pkg="sailing_robot" type="helming" />
     <node name = "simulation_position" pkg='sailing_robot' type="simulation_position"/>
     <node name = "simulation_velocity" pkg='sailing_robot' type="simulation_velocity"/>
     <node name = "simulation_wind_apparent" pkg="sailing_robot" type="simulation_wind_apparent" />
