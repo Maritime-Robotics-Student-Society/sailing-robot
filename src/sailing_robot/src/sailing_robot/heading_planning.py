@@ -81,7 +81,7 @@ class HeadingPlan(TaskBase):
         self.wp_heading = 0
         self.side_heading = 0
         self.alternate_heading = 0
-        self.sailing_state = 'normal'  # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
+        self.sailing_state = 'normal'  # sailing state can be 'normal','switch_to_port_tack' or  'switch_to_stbd_tack'
         self.tack_voting = TackVoting(tack_decision_samples,
                          int(tack_decision_threshold * tack_decision_samples))
     
@@ -119,10 +119,10 @@ class HeadingPlan(TaskBase):
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':
             # A tack is in progress
-            if self.sailing_state == 'tack_to_port_tack':
+            if self.sailing_state == 'switch_to_port_tack':
                 beating_angle = self.nav.beating_angle
                 continue_tack = boat_wind_angle < beating_angle
-            else:  # 'tack_to_stbd_tack'
+            else:  # 'switch_to_stbd_tack'
                 beating_angle = -self.nav.beating_angle
                 continue_tack = boat_wind_angle > beating_angle
             if continue_tack:
@@ -145,13 +145,13 @@ class HeadingPlan(TaskBase):
 
         if tack_now:
             if on_port_tack:
-                tack_to = 'tack_to_stbd_tack'
+                switch_to = 'switch_to_stbd_tack'
                 beating_angle = -self.nav.beating_angle
             else:
-                tack_to = 'tack_to_port_tack'
+                switch_to = 'switch_to_port_tack'
                 beating_angle = self.nav.beating_angle
-            self.sailing_state = tack_to
-            return tack_to, self.nav.wind_angle_to_heading(beating_angle)
+            self.sailing_state = switch_to
+            return switch_to, self.nav.wind_angle_to_heading(beating_angle)
 
         # Continue on our current tack
         goal_wind_angle = wp_wind_angle

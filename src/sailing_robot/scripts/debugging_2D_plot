@@ -153,12 +153,12 @@ class Debugging_2D_plot():
                 marker.color.r = 0.5
                 marker.color.g = 0.5
                 marker.color.b = 0.5
-            elif self.sailing_state == 'tack_to_port_tack':
+            elif self.sailing_state == 'switch_to_port_tack':
                 marker.color.a = 1.0
                 marker.color.r = 1.0
                 marker.color.g = 0.0
                 marker.color.b = 0.0
-            elif  self.sailing_state == 'tack_to_stbd_tack':
+            elif  self.sailing_state == 'switch_to_stbd_tack':
                 marker.color.a = 1.0
                 marker.color.r = 0.0
                 marker.color.g = 1.0
