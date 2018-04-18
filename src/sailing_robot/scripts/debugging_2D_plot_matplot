@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+
+from sailing_robot.navigation import Navigation
+import rospy, math, time
+import matplotlib.pyplot as plt
+
+from std_msgs.msg import String
+from sensor_msgs.msg import NavSatFix
+import numpy as np
+from drawnow import drawnow
+
+class Debugging_2D_matplot():
+
+    def __init__(self):
+
+        rospy.init_node("debugging_2D_matplot")
+        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
+        self.sailing_state = 'normal'
+
+        self.position_history = []
+        rospy.Subscriber('position', NavSatFix, self.update_position)
+        self.gps_fix_lock = True
+
+        utm_zone = rospy.get_param('navigation/utm_zone')
+        self.nav = Navigation(utm_zone=utm_zone)
+
+        self.rate = rospy.Rate(rospy.get_param("config/rate"))
+
+        if rospy.has_param('wp/list'):
+            self.generate_wp_Array()
+        elif rospy.has_param('wp/tasks'):
+            tasks_list = rospy.get_param('wp/tasks')
+            wp_list = [t['waypoint'] for t in tasks_list if 'waypoint' in t]
+            wp_table = rospy.get_param('wp/table')
+            wp_list = list(set(wp_list)) # print each point only once
+            self.wp_array = np.array([wp_table[wp] for wp in wp_list]).T # [lat, lon]
+            # TODO handle dynamic parameters?
+        else:
+            rospy.logwarn("No waypoint was found!")
+
+
+        self.draw_waypoints()
+
+        self.update_plot()
+
+    def update_sailing_state(self, msg):
+        self.sailing_state = msg.data
+
+    def update_position(self, msg):
+        self.position = [msg.latitude, msg.longitude]
+        self.position_gps = msg
+        self.position_history.append(self.position)
+        self.gps_fix_lock = False
+
+    def draw_waypoints(self):
+        plt.ion()
+        fig = plt.figure()
+
+        wp_lat, wp_lon = self.wp_array
+        plt.scatter(wp_lat, wp_lon)
+
+    def draw_path(self):
+        lat, lon = np.array(self.position_history).T
+        plt.plot(lat, lon)
+
+    def update_plot(self):
+
+        while not rospy.is_shutdown():
+            drawnow(self.draw_path)
+            self.rate.sleep()
+
+if __name__ == '__main__':
+    try :
+        Debugging_2D_matplot()
+    except rospy.ROSInterruptException:
+        pass
