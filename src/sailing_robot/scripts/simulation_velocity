@@ -6,7 +6,7 @@
 
 import rospy
 from std_msgs.msg import Float64, Float32, String
-from sailing_robot.msg import velocity
+from sailing_robot.msg import Velocity
 from sailing_robot.sail_table import SailTable
 import scipy.interpolate
 import time, math
@@ -21,12 +21,16 @@ class Velocity_simu():
         A minimum velocity is set in the parameter file to be able to tack correctly
     """
     def __init__(self):
-        self.velocity_pub = rospy.Publisher('velocity', velocity, queue_size=10)
+        self.velocity_pub = rospy.Publisher('gps_velocity', Velocity, queue_size=10)
 
         rospy.init_node("simulation_velocity", anonymous=True)
 
+        rospy.Subscriber('heading', Float32, self.update_heading)
+        self.heading = rospy.get_param("simulation/heading_init")
+
         rospy.Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
         self.wind_direction = 0
+
         rospy.Subscriber('wind_speed_apparent', Float64, self.update_wind_speed)
         self.wind_speed = 0
 
@@ -51,11 +55,14 @@ class Velocity_simu():
         self.freq = rospy.get_param("config/rate")
         self.rate = rospy.Rate(self.freq)
 
-        self.velocity = velocity()
+        self.velocity = Velocity()
 
         rospy.loginfo("Velocity simulated")
         self.polardef()
         self.velocity_publisher()
+
+    def update_heading(self, msg):
+        self.heading = msg.data
 
     def update_wind_direction(self, msg):
         self.wind_direction = msg.data
@@ -150,9 +157,8 @@ class Velocity_simu():
                 velx = self.velocity_minimum
             
 
-            self.velocity.velx = velx * self.punishment
-            self.velocity.vely = 0
-            self.velocity.velz = 0
+            self.velocity.speed = velx * self.punishment
+            self.velocity.heading = self.heading
             self.velocity_pub.publish(self.velocity)
 
             self.rate.sleep()

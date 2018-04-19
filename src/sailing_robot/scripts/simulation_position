@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# READY FOR MIT
 # Simulator for the boat position based on velocity and heading
 
 
@@ -7,7 +6,7 @@ import rospy
 from std_msgs.msg import Float64, Float32
 import time, math
 from sensor_msgs.msg import NavSatFix
-from sailing_robot.msg import velocity
+from sailing_robot.msg import Velocity
 from LatLon import LatLon
 
 from sailing_robot.navigation import Navigation
@@ -24,8 +23,8 @@ class Position_simu():
         rospy.Subscriber('heading', Float32, self.update_heading)
         self.heading = rospy.get_param("simulation/heading_init")
 
-        rospy.Subscriber('velocity', velocity, self.update_velocity)
-        self.velocity = [0,0,0]
+        rospy.Subscriber('gps_velocity', Velocity, self.update_velocity)
+        self.velocity = (0, 0)
 
         self.freq = rospy.get_param("config/rate")
         self.rate = rospy.Rate(self.freq)
@@ -57,7 +56,9 @@ class Position_simu():
         self.heading = msg.data
 
     def update_velocity(self, msg):
-        self.velocity = (msg.velx, msg.vely, msg.velz)
+        # velocity in the boat reference system
+        self.velocity = (msg.speed * math.cos(math.radians(msg.heading - self.heading)),
+                         msg.speed * math.sin(math.radians(msg.heading - self.heading)))
 
     def position_publisher(self):
 

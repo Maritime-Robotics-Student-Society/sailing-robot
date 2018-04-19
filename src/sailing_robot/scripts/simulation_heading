@@ -1,11 +1,10 @@
 #!/usr/bin/python
-# READY FOR MIT
 # Simulator for the heading
 
 
 import rospy
 from std_msgs.msg import Float32, Int16
-from sailing_robot.msg import velocity
+from sailing_robot.msg import Velocity
 import time, math
 
 
@@ -22,8 +21,8 @@ class Heading_simu():
 
         rospy.Subscriber('rudder_control', Int16, self.update_rudder)
         self.rudder = 0
-        rospy.Subscriber('velocity', velocity, self.update_velocity)
-        self.velocity = [0,0,0]
+        rospy.Subscriber('gps_velocity', Velocity, self.update_velocity)
+        self.speed = 0
 
         self.heading = rospy.get_param("simulation/heading_init")
 
@@ -40,7 +39,7 @@ class Heading_simu():
         self.rudder = msg.data
 
     def update_velocity(self, msg):
-        self.velocity = (msg.velx, msg.vely, msg.velz)
+        self.speed = msg.speed
 
     def diff_heading(self):
         if self.rudder == 0:
@@ -53,7 +52,7 @@ class Heading_simu():
         Cx = - r*math.sin(math.radians(self.rudder))
         Cy = By - r*math.cos(math.radians(self.rudder))
 
-        d = self.velocity[0]/self.freq
+        d = self.speed/self.freq
 
         y = d
         x = (-(-Cx**2-Cy**2+Ay*Cy+math.sqrt(Cx**4+Cy**4-2*Ay*Cy**3+Ay**2*Cy**2+2*Cx**2*Cy**2-4*Cx**2*d**2-2*Ay*Cx**2*Cy+4*Ay*Cx**2*d))/(2*Cx))
