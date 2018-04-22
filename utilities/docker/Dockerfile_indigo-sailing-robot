@@ -4,8 +4,8 @@ Maintainer Martin Biggs
 USER root
 RUN apt-get --assume-yes install libgeos-dev python-scipy python-pip \
     && pip install --upgrade pip \
-    && pip install Latlon shapely pynmea2 spidev wiringpi2 tornado jinja2 \
-         folium pandas
+    && pip install Latlon shapely pynmea2 spidev wiringpi2 jinja2 \
+         folium "tornado<5" pandas
 # Fix for Mac's looking for python in /usr/local/bin
 RUN ln -s /usr/bin/python /usr/local/bin/python
 
