@@ -5,7 +5,7 @@
 
 import rospy
 from std_msgs.msg import Float64, Float32
-from sailing_robot.msg import velocity
+from sailing_robot.msg import Velocity
 import time, math
 import numpy as np
 
@@ -26,8 +26,8 @@ class Wind_simu():
 
         self.wind_speed = rospy.get_param("simulation/wind/speed")
 
-        rospy.Subscriber('velocity', velocity, self.update_velocity)
-        self.velocity = [0,0,0]
+        rospy.Subscriber('gps_velocity', Velocity, self.update_velocity)
+        self.velocity = (0, 0)
 
         self.rate = rospy.Rate(rospy.get_param("config/rate"))
         self.wind_direction_north = rospy.get_param("simulation/wind/direction")
@@ -44,7 +44,9 @@ class Wind_simu():
         self.heading = msg.data
 
     def update_velocity(self, msg):
-        self.velocity = (msg.velx, msg.vely, msg.velz)
+        # velocity in the boat reference system
+        self.velocity = (msg.speed * math.cos(math.radians(msg.heading - self.heading)),
+                         msg.speed * math.sin(math.radians(msg.heading - self.heading)))
 
 
     def wind_publisher(self):

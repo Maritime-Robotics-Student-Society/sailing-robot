@@ -21,6 +21,17 @@ class UBXMessage(object):
         checksum = ubx_checksum(msg_body)
         return b'\xB5\x62' + msg_body + checksum + b'\x10\x13'
 
+    def i2cise(self):
+        msg_body = self.msg_id + struct.pack('<H', len(self.payload)) + self.payload
+        checksum = ubx_checksum(msg_body)
+        msg_string = b'\x62' + msg_body + checksum + b'\x10\x13'
+        first_byte = int(b'\xB5'.encode('hex'), 16)
+
+        msg_list = []
+        for byte in msg_string:
+            msg_list.append(int(byte.encode('hex'), 16))
+        return first_byte, msg_list
+
 
 def ubx_checksum(msg):
     a = b = 0

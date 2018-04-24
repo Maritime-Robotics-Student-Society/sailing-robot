@@ -22,6 +22,7 @@ class tack_params():
         self.AccZ = collections.deque(maxlen =500)
         self.Acc_Y = 0
         self.Acc_Z = 0
+        self.Acc_X = 0 # trying to repair the code
 
         self.rate = rospy.Rate(10)
 
@@ -57,7 +58,7 @@ class tack_params():
             #position on wave relative to wave period
 
             position = t_cress/wave_period
-            roll_angle = atan2(self.Acc_Y / sqrt(self.Acc_Z^2 + self.Acc_X^2) * 180/pi)
+            roll_angle = atan2(self.Acc_Y, sqrt(self.Acc_Z**2 + self.Acc_X**2)) # reparing the code
 
             self.wave_period_pub.publish(position)
             self.roll_angle_pub.publish(degrees(roll_angle))
@@ -66,8 +67,10 @@ class tack_params():
 
     def update_AccZ(self, msg):
         self.AccZ.append(msg.linear_acceleration.z)
+        self.Acc_X = msg.linear_acceleration.x # trying to repair the code
         self.Acc_Y = msg.linear_acceleration.y
         self.Acc_Z = msg.linear_acceleration.z
+
 
 def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     try:
