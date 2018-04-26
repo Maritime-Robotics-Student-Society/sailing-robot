@@ -32,6 +32,17 @@ class UBXMessage(object):
             msg_list.append(int(byte.encode('hex'), 16))
         return first_byte, msg_list
 
+    def i2cise_serial(self, serial_msg):
+        # Convert a serial message to i2c format
+        msg_list = []
+        first_byte = ''
+        for char in serial_msg:
+            if not first_byte:
+                first_byte = int(char.encode('hex'), 16)
+            else:
+                msg_list.append(int(char.encode('hex'), 16))
+        return first_byte, msg_list
+
 
 def ubx_checksum(msg):
     a = b = 0

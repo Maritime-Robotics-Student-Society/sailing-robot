@@ -24,6 +24,8 @@ BAUD_RATE = 9600
 READ_TIMEOUT = 0.5
 FILENAME_BASE = "~/sailing-robot/gps-raw-nmea_{}_{}"
 
+i2c_ADDRESS = 0x42
+
 params = rospy.get_param('/')
 
 if params.get('log_raw_gps', True):
@@ -49,12 +51,22 @@ def decimal_degrees(d_m, hemisphere):
     return res
 
 def pos_publisher():
-    serial_port = serial.Serial(get_port(), BAUD_RATE, timeout=READ_TIMEOUT)
-    set_gps_options(serial_port)
+    use_i2c = rospy.getparam("gps_via_i2c")
+    if use_i2c:
+        i2c_bus = smbus.SMBus(1)
+        set_gps_options(i2c_bus, use_i2c)
+    else:
+        serial_port = serial.Serial(get_port(), BAUD_RATE, timeout=READ_TIMEOUT)
+        set_gps_options(serial_port, use_i2c)
+
     gps_reader = UbxNmeaParser()
 
     while not rospy.is_shutdown():
-        data = serial_port.read(64)
+        if use_i2c:
+            data = i2c_bus.read_byte(i2c_ADDRESS)
+        else:
+            data = serial_port.read(64)
+
         if raw_log:
             raw_log.write(data)
             raw_log.flush()
@@ -77,8 +89,9 @@ def pos_publisher():
             # shut it down and reopen it. 512 bytes is hopefully larger than any
             # message we want.
             rospy.logwarn("512 bytes unprocessed in GPS serial buffer - resetting serial port")
-            serial_port.close()
-            serial_port = serial.Serial(get_port(), BAUD_RATE, timeout=READ_TIMEOUT)
+            if not use_i2c:
+                serial_port.close()
+                serial_port = serial.Serial(get_port(), BAUD_RATE, timeout=READ_TIMEOUT)
             gps_reader = UbxNmeaParser()
 
         for sentence in batch:
@@ -111,7 +124,7 @@ def pos_publisher():
             wtime.time_s = sentence.timestamp.second
             gps_pub.publish(wtime)
 
-def set_gps_options(serial_port):
+def set_gps_options(communicator, use_i2c):
     '''Send ublox commands to turn off some data and change GPS rate to 5Hz.
 
     Thanks to Simon of team Anemoi for info on how to do this.
@@ -119,37 +132,24 @@ def set_gps_options(serial_port):
     if not rospy.get_param('change_gps_rate', False):
         return
 
-    # GxGSA
-    serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x02\x00\x00\x00\x00\x00\x01\x02\x32\x10\x13')
-    time.sleep(0.1)
+    option_list = [b'\xB5\x62\x06\x01\x08\x00\xF0\x02\x00\x00\x00\x00\x00\x01\x02\x32\x10\x13', # GxGSA
+                   b'\xB5\x62\x06\x01\x08\x00\xF0\x03\x00\x00\x00\x00\x00\x01\x03\x39\x10\x13', # GxGSV off
+                   b'\xB5\x62\x06\x01\x08\x00\xF0\x04\x00\x00\x00\x00\x00\x01\x04\x40\x10\x13', # GxRMC off
+                   b'\xB5\x62\x06\x01\x08\x00\xF0\x05\x00\x00\x00\x00\x00\x01\x05\x47\x10\x13', # GxVTG off
+                   b'\xB5\x62\x06\x01\x08\x00\xF0\x01\x00\x00\x00\x00\x00\x01\x01\x2B\x10\x13', # GxGLL off
+                   b'\xB5\x62\x06\x08\x06\x00\xC8\x00\x01\x00\x01\x00\xDE\x6A\x10\x13',         # NMEA rate 5Hz
+                   UBXMessage(b'\x06\x01', payload=b'\xF0\x08\x08').serialise(),                # GxZDA on (time measurement)
+                   UBXMessage(b'\x06\x01', payload=b'\xF0\x05\x01').serialise()]                # GPVTG on speed feedback
 
-    # GxGSV off
-    serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x03\x00\x00\x00\x00\x00\x01\x03\x39\x10\x13')
-    time.sleep(0.1)
+    for option in option_list:
+        if use_i2c:
+            first_byte, msg_list = UBXMessage().i2cise_serial(option)
+            communicator.write_i2c_block_data(i2c_ADDRESS, first_byte, msg_list)
+        else:
+            communicator.write(option)
 
-    # GxRMC off
-    serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x04\x00\x00\x00\x00\x00\x01\x04\x40\x10\x13')
-    time.sleep(0.1)
+        time.sleep(0.1)
 
-    # GxVTG off
-    serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x05\x00\x00\x00\x00\x00\x01\x05\x47\x10\x13')
-    time.sleep(0.1)
-
-    # GxGLL off
-    serial_port.write(b'\xB5\x62\x06\x01\x08\x00\xF0\x01\x00\x00\x00\x00\x00\x01\x01\x2B\x10\x13')
-    time.sleep(0.1)
-
-    # NMEA rate: 5Hz
-    serial_port.write(b'\xB5\x62\x06\x08\x06\x00\xC8\x00\x01\x00\x01\x00\xDE\x6A\x10\x13')
-    time.sleep(0.1)
-
-    # GxZDA on (time measurement)
-    serial_port.write(UBXMessage(b'\x06\x01', payload=b'\xF0\x08\x08').serialise())
-    time.sleep(0.1)
-
-    # GPVTG on speed feedback
-    serial_port.write(UBXMessage(b'\x06\x01', payload=b'\xF0\x05\x01').serialise())
-    time.sleep(0.1)
 
 if __name__ == '__main__':
     try:
