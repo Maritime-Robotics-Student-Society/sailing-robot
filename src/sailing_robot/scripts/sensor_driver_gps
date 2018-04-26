@@ -63,7 +63,9 @@ def pos_publisher():
 
     while not rospy.is_shutdown():
         if use_i2c:
-            data = i2c_bus.read_byte(i2c_ADDRESS)
+            data = b''
+            for _ in range(64):
+                data += i2c_bus.read_byte(i2c_ADDRESS)
         else:
             data = serial_port.read(64)
 
