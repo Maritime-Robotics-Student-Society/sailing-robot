@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# This file is a draft for the futur helming/procedure system, nomenclature and variable/class names are likely to change
 
 import rospy
 import time
@@ -28,10 +27,8 @@ PUB_RUDDER    = rospy.Publisher('rudder_control', Int16, queue_size=10)  # Use U
 PUB_SAILSHEET = rospy.Publisher('sailsheet_normalized', Float32, queue_size=10)
 
 
-
 data = PID_Data()
 rudder = rospy.get_param('rudder')
-controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'],rudder['maxAngle'], -rudder['maxAngle'])
 controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'],rudder['maxAngle'], -rudder['maxAngle'])
 
 sail_table_dict = rospy.get_param('sailsettings/table')
@@ -129,7 +126,7 @@ class JibeBasic(ProcedureBase):
         self.name = "JibeBasic"
 
     def loop(self):
-        set_sail.wind()
+        set_sail(WIND)
         if self.sailing_state == "switch_to_port_tack":
             set_rudder(RUDDER_FULL_RIGHT)
         else:
@@ -147,7 +144,7 @@ class Tack_IncreaseAngleToWind(ProcedureBase):
         self.beating_angle = 80
 
     def loop(self):
-        set_sail.wind()
+        set_sail(WIND)
         if self.ProcedureEnlapsedTime() < 5:
             if self.sailing_state == "switch_to_port_tack":
                 set_rudder(PID_ANGLE_TO_WIND, angle_to_wind = self.beating_angle)
