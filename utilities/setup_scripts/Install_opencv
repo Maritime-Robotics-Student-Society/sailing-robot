@@ -1,6 +1,0 @@
-#!/bin/sh 
-
-sudo apt-get --assume-yes update
-
-# Install OpenCV Python bindings
-sudo apt-get install --assume-yes python-opencv

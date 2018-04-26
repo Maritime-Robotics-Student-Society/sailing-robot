@@ -3,7 +3,7 @@
 # when using the sailrobot
 # It only includes widely used configurations
 
-cat <<EOT >> ~/.bashrc
+cat <<EOF >> ~/.bashrc
 
 # Some useful aliases
 alias ls='ls --color=auto'
@@ -17,11 +17,11 @@ alias vi='vim'
 alias mv='mv -i'
 alias cp='cp -i'
 
-EOT
+EOF
 
 
 
-cat <<EOT >> ~/.vimrc
+cat <<EOF >> ~/.vimrc
 
 syntax enable   " enable syntax processing
 set background=dark
@@ -31,7 +31,7 @@ set showcmd     " show command in bottom bar
 set cursorline  " highlight current line
 set expandtab   " tabs are spaces
 set lazyredraw  " redraw only when we need to.
-EOT
+EOF
 
 
 
