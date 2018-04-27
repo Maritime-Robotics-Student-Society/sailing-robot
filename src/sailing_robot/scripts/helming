@@ -39,9 +39,10 @@ sail_data = SailData(sail_table)
 
 ##########################################################################
 
-def set_sail(sheet_control):
+def set_sail(sheet_control, offset=1.0):
     if sheet_control is WIND:
-        sheet_normalized = sail_data.calculate_sheet_setting()
+        sheet_normalized = sail_data.calculate_sheet_setting() + offset
+
         
     elif sheet_control is IN:
         sheet_normalized = 0
@@ -50,10 +51,10 @@ def set_sail(sheet_control):
         sheet_normalized = 1
 
     elif sheet_control is float:
-        if sheet_control>1: sheet_control = 1
-        if sheet_control<0: sheet_control = 0
         sheet_normalized = sheet_control
 
+    # be sure we don't publish values above 1 and below 0
+    sheet_normalized = max(0, min(1, sheet_normalized))
     PUB_SAILSHEET.publish(sheet_normalized)
     
 
@@ -104,16 +105,16 @@ class TackBasic(ProcedureBase):
     """
     Basic Tack procedure
     """
-    def __init__(self, sailing_state, timeout=15):
+    def __init__(self, sailing_state, timeout=2):
         super(TackBasic, self).__init__(sailing_state, timeout) 
         self.name = "TackBasic"
 
     def loop(self):
         set_sail(WIND)
         if self.sailing_state == "switch_to_port_tack":
-            set_rudder(RUDDER_FULL_LEFT) #TODO check 'sign', (RIGHT maybe?)
+            set_rudder(RUDDER_FULL_RIGHT) 
         else:
-            set_rudder(RUDDER_FULL_RIGHT)
+            set_rudder(RUDDER_FULL_LEFT)
 
 
 
@@ -121,16 +122,36 @@ class JibeBasic(ProcedureBase):
     """
     Basic Jibe procedure
     """
-    def __init__(self, sailing_state, timeout=15):
+    def __init__(self, sailing_state, timeout=2):
         super(JibeBasic, self).__init__(sailing_state, timeout) 
-        self.name = "JibeBasic"
 
     def loop(self):
-        set_sail(WIND)
+        # sheet out a bit more than what is given by the look up table
+        set_sail(WIND, offset=+0.2)
         if self.sailing_state == "switch_to_port_tack":
-            set_rudder(RUDDER_FULL_RIGHT)
+            set_rudder(RUDDER_FULL_LEFT) 
         else:
-            set_rudder(RUDDER_FULL_LEFT) #TODO check 'sign', (RIGHT maybe?)
+            set_rudder(RUDDER_FULL_RIGHT)
+
+
+class TackSheetOut(ProcedureBase):
+    """
+    Tack procedure where we sheet out a bit
+
+    When sheeted in completely the jib has too much power and tacking becomes impossible
+    in some strong conditions. Hence sheeting out is needed, however if the sails are out
+    too much the boat will not have enough power to tack 
+    """
+    def __init__(self, sailing_state, timeout=2):
+        super(TackSheetOut, self).__init__(sailing_state, timeout) 
+
+    def loop(self):
+        # sheet out a bit more than what is given by the look up table
+        set_sail(WIND, offset=+0.2)
+        if self.sailing_state == "switch_to_port_tack":
+            set_rudder(RUDDER_FULL_RIGHT) 
+        else:
+            set_rudder(RUDDER_FULL_LEFT)
 
 
 
@@ -138,9 +159,8 @@ class Tack_IncreaseAngleToWind(ProcedureBase):
     """
     More advance Tack procedure, building speed for 5s by going less upwind
     """
-    def __init__(self, sailing_state, timeout=15):
+    def __init__(self, sailing_state, timeout=2):
         super(Tack_IncreaseAngleToWind, self).__init__(sailing_state, timeout) 
-        self.name = "Tack_IncreaseAngleToWind"
         self.beating_angle = 80
 
     def loop(self):
@@ -152,9 +172,9 @@ class Tack_IncreaseAngleToWind(ProcedureBase):
                 set_rudder(PID_ANGLE_TO_WIND, angle_to_wind = 360-self.beating_angle)  
         else:
             if self.sailing_state == "switch_to_port_tack":
-                set_rudder(RUDDER_FULL_LEFT) #TODO check 'sign', (RIGHT maybe?)
+                set_rudder(RUDDER_FULL_RIGHT) 
             else:
-                set_rudder(RUDDER_FULL_RIGHT)
+                set_rudder(RUDDER_FULL_LEFT)
 
 
 
@@ -165,7 +185,7 @@ class Helming():
     def __init__(self):
         rospy.init_node('helming', anonymous=True)
         self.rate = rospy.Rate(rospy.get_param("config/rate"))
-        self.ProcedureList = [TackBasic, JibeBasic, Tack_IncreaseAngleToWind]
+        self.ProcedureList = [TackBasic, TackSheetOut, JibeBasic, Tack_IncreaseAngleToWind]
         self.currentProcedureId = 0
         self.currentProcedure = None
         self.Runner()
@@ -205,11 +225,12 @@ class Helming():
         elif self.currentProcedure.is_failed():
             rospy.logwarn("Procedure failed")
             # if time out we start the next procedure in the list
+            self.currentProcedure.end()
             self.currentProcedureId = (self.currentProcedureId + 1) % len(self.ProcedureList)
             self.currentProcedure = self.ProcedureList[self.currentProcedureId](data.sailing_state)
 
         # we advance to the next timestep 
-        rospy.logwarn("Run procedure: " + self.currentProcedure.name)
+        rospy.logwarn("Run procedure: " + self.currentProcedure.__class__.__name__)
         rospy.logwarn("ID           : " + str(self.currentProcedureId))
         self.currentProcedure.loop()
 
