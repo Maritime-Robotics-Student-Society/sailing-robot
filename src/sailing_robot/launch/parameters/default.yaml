@@ -134,4 +134,4 @@ do_post: false
 change_gps_rate: true
 
 # Use i2c for the GPS connection (otherwise serial is used)
-gps_via_i2c: false
+gps_via_i2c: true
