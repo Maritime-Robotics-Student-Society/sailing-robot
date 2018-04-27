@@ -18,8 +18,6 @@ def test_sail_table():
 
 def test_sail_data():
     st = SailTable(SAMPLE_SAIL_TABLE)
-    sd = SailData(st, sheet_out_to_jibe=True, jibe_sheet_setting=0.75)
+    sd = SailData(st)
     sd.wind_direction_apparent = 90
     assert_almost_equal(sd.calculate_sheet_setting(), 0.5)
-    sd.sailing_state = 'jibe_to_stbd_tack'
-    assert_almost_equal(sd.calculate_sheet_setting(), 0.75)

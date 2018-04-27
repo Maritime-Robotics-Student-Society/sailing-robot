@@ -28,7 +28,7 @@ class StationKeeping(TaskBase):
         ])
         self.inner_zone = self.target_zone.buffer(-buffer_width)
         self.goal_heading = 0
-        self.sailing_state = 'normal'  # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
+        self.sailing_state = 'normal'  # sailing state can be 'normal','switch_to_port_tack' or  'switch_to_stbd_tack'
     
     def start(self):
         pass
@@ -39,10 +39,10 @@ class StationKeeping(TaskBase):
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':
             # A tack is in progress
-            if self.sailing_state == 'tack_to_port_tack':
+            if self.sailing_state == 'switch_to_port_tack':
                 beating_angle = self.nav.beating_angle
                 continue_tack = boat_wind_angle < beating_angle
-            else:  # 'tack_to_stbd_tack'
+            else:  # 'switch_to_stbd_tack'
                 beating_angle = -self.nav.beating_angle
                 continue_tack = boat_wind_angle > beating_angle
             if continue_tack:
@@ -69,10 +69,10 @@ class StationKeeping(TaskBase):
             else:
                 # We need to tack before going towards the centroid
                 if centroid_wind_angle > 0:
-                    switch_to = 'tack_to_port_tack'
+                    switch_to = 'switch_to_port_tack'
                     beating_angle = self.nav.beating_angle
                 else:
-                    switch_to = 'tack_to_stbd_tack'
+                    switch_to = 'switch_to_stbd_tack'
                     beating_angle = -self.nav.beating_angle
                 self.sailing_state = switch_to
                 return switch_to, self.nav.wind_angle_to_heading(beating_angle)
@@ -80,10 +80,10 @@ class StationKeeping(TaskBase):
         if boat_wind_angle > 0:
             # On the port tack
             beating_angle = self.nav.beating_angle
-            other_tack = 'tack_to_stbd_tack'
+            other_tack = 'switch_to_stbd_tack'
         else:
             beating_angle = -self.nav.beating_angle
-            other_tack = 'tack_to_port_tack'
+            other_tack = 'switch_to_port_tack'
         if abs(centroid_wind_angle) > 15:
             # Switch to the tack that will take us closest to the centroid
             if (centroid_wind_angle * boat_wind_angle) < 0:

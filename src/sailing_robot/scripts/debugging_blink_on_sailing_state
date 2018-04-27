@@ -31,11 +31,11 @@ class Blink_on_sailing_state():
 
         while not rospy.is_shutdown():
 
-            if self.sailing_state == "tack_to_port_tack":
+            if self.sailing_state == "switch_to_port_tack":
                 color = 255*300*300 # red
                 self.led_blink.publish(color)
 
-            elif self.sailing_state == "tack_to_stbd_tack":
+            elif self.sailing_state == "switch_to_stbd_tack":
                 color = 255*300 # green
                 self.led_blink.publish(color)
 

@@ -9,7 +9,7 @@ import sailing_robot.pid_control as _PID
 sail_table_dict = rospy.get_param('sailsettings/table')
 sheet_out_to_jibe = rospy.get_param('sailsettings/sheet_out_to_jibe', False)
 sail_table = SailTable(sail_table_dict)
-sail_data = SailData(sail_table,  sheet_out_to_jibe=sheet_out_to_jibe)
+sail_data = SailData(sail_table)
 
 def node_publisher():
     pub = rospy.Publisher('sailsheet_normalized', Float32, queue_size=10)

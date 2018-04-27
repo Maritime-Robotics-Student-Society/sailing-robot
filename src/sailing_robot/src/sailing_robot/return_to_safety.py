@@ -26,7 +26,7 @@ class ReturnToSafetyZone(TaskBase):
         self.waypoint_xy = self.nav.safety_zone.centroid
         margin = self.nav.safety_zone_margin
         self.safety_zone_double_margin = self.nav.safety_zone.buffer(-2*margin)
-        # sailing state can be 'normal','tack_to_port_tack' or  'tack_to_stbd_tack'
+        # sailing state can be 'normal','switch_to_port_tack' or  'switch_to_stbd_tack'
         self.sailing_state = 'normal'
 
     def start(self):
@@ -62,19 +62,13 @@ class ReturnToSafetyZone(TaskBase):
         boat_wind_angle = self.nav.angle_to_wind()
         if self.sailing_state != 'normal':
             # A tack/jibe is in progress
-            if self.sailing_state == 'jibe_to_port_tack':
-                goal_angle = -180
-                continue_tack = boat_wind_angle < 0
-            elif self.sailing_state == 'jibe_to_stbd_tack':
-                goal_angle = 180
-                continue_tack = boat_wind_angle > 0
-            elif self.sailing_state == 'tack_to_port_tack':
+            if self.sailing_state == 'switch_to_port_tack':
                 goal_angle = self.nav.beating_angle
-                continue_tack = boat_wind_angle < goal_angle
-            else:  # 'tack_to_stbd_tack'
+                continue_tack = boat_wind_angle < goal_angle or boat_wind_angle > 120
+            else:  # 'switch_to_stbd_tack'
                 goal_angle = -self.nav.beating_angle
-                continue_tack = boat_wind_angle > goal_angle
-
+                continue_tack = boat_wind_angle > goal_angle or boat_wind_angle < -120
+            
             if continue_tack:
                 self.debug_pub('dbg_goal_wind_angle', goal_angle)
                 return self.sailing_state, self.nav.wind_angle_to_heading(goal_angle)
@@ -104,19 +98,11 @@ class ReturnToSafetyZone(TaskBase):
         if tack_now:
             # Ready about!
             if on_port_tack:
-                if self.nav.jibe_to_turn:
-                    state = 'jibe_to_stbd_tack'
-                    goal_wind_angle = 180
-                else:
-                    state = 'tack_to_stbd_tack'
-                    goal_wind_angle = -self.nav.beating_angle
+                state = 'switch_to_stbd_tack'
+                goal_wind_angle = -self.nav.beating_angle
             else:
-                if self.nav.jibe_to_turn:
-                    state = 'jibe_to_port_tack'
-                    goal_wind_angle = -180
-                else:
-                    state = 'tack_to_port_tack'
-                    goal_wind_angle = self.nav.beating_angle
+                state = 'switch_to_port_tack'
+                goal_wind_angle = self.nav.beating_angle
             self.sailing_state = state
         else:
             # Stay on our current tack

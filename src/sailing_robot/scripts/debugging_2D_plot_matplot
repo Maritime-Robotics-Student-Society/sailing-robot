@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 from sailing_robot.navigation import Navigation
-import rospy, math, time
+import rospy, math, time, collections
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
-from std_msgs.msg import String
+from std_msgs.msg import String, Float32, Float64
 from sensor_msgs.msg import NavSatFix
 import numpy as np
 from drawnow import drawnow
@@ -17,7 +18,15 @@ class Debugging_2D_matplot():
         rospy.Subscriber('sailing_state', String, self.update_sailing_state)
         self.sailing_state = 'normal'
 
-        self.position_history = []
+        rospy.Subscriber('heading', Float32, self.update_heading)
+        self.heading = rospy.get_param("simulation/heading_init")
+
+        rospy.Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
+        self.wind_boat = 0
+        self.wind_north = 0
+
+
+        self.position_history = collections.deque(maxlen = 1000)
         rospy.Subscriber('position', NavSatFix, self.update_position)
         self.gps_fix_lock = True
 
@@ -33,41 +42,64 @@ class Debugging_2D_matplot():
             wp_list = [t['waypoint'] for t in tasks_list if 'waypoint' in t]
             wp_table = rospy.get_param('wp/table')
             wp_list = list(set(wp_list)) # print each point only once
-            self.wp_array = np.array([wp_table[wp] for wp in wp_list]).T # [lat, lon]
-            # TODO handle dynamic parameters?
+            self.wp_array = np.array([self.nav.latlon_to_utm(wp_table[wp][0], wp_table[wp][1]) for wp in wp_list]).T # [lat, lon]
         else:
             rospy.logwarn("No waypoint was found!")
 
+        minx = np.min(self.wp_array[0]) - 30
+        miny = np.min(self.wp_array[1]) - 30
+        maxx = np.max(self.wp_array[0]) + 30
+        maxy = np.max(self.wp_array[1]) + 30
 
-        self.draw_waypoints()
+        self.origin = [self.wp_array[0].mean(), self.wp_array[1].mean()]
+        minx = self.origin[0] - 50
+        maxx = self.origin[0] + 50
+        miny = self.origin[1] - 50
+        maxy = self.origin[1] + 50
 
+        self.fig = plt.figure()
+        self.line, = plt.plot([], [], c='C0')
+        self.wpfig = plt.scatter(self.wp_array[0], self.wp_array[1], c='C3')
+        self.wind_arrow = plt.arrow(0,0,1,1)
+
+        plt.xlim(minx, maxx) 
+        plt.ylim(miny, maxy)
         self.update_plot()
 
     def update_sailing_state(self, msg):
         self.sailing_state = msg.data
 
     def update_position(self, msg):
-        self.position = [msg.latitude, msg.longitude]
+        self.position = self.nav.latlon_to_utm(msg.latitude, msg.longitude)
         self.position_gps = msg
         self.position_history.append(self.position)
         self.gps_fix_lock = False
 
-    def draw_waypoints(self):
-        plt.ion()
-        fig = plt.figure()
+    def update_heading(self, msg):
+        self.heading = msg.data
+        self.wind_north = np.radians(self.heading + self.wind_boat)
 
-        wp_lat, wp_lon = self.wp_array
-        plt.scatter(wp_lat, wp_lon)
+    def update_wind_direction(self, msg):
+        self.wind_boat = msg.data
+        self.wind_north = np.radians(self.heading + self.wind_boat)
 
-    def draw_path(self):
+    def animate(self, i):
         lat, lon = np.array(self.position_history).T
-        plt.plot(lat, lon)
+        self.line.set_data(lat,lon)
+        
+        self.wind_arrow = plt.arrow(self.origin[0]+40, self.origin[1]-40, 
+                                    5*np.sin(self.wind_north), 5*np.cos(self.wind_north),
+                                    head_width=1.05, 
+                                    head_length=1.1,  fc='C1', ec='C1' )
+
+
+        return self.line, self.wpfig, self.wind_arrow 
+
 
     def update_plot(self):
-
-        while not rospy.is_shutdown():
-            drawnow(self.draw_path)
-            self.rate.sleep()
+        line_ani = animation.FuncAnimation(self.fig, self.animate,
+                                           interval=200, blit=True)
+        plt.show()
 
 if __name__ == '__main__':
     try :

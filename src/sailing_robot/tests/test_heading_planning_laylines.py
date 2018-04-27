@@ -40,5 +40,5 @@ class HeadingPlanTests(unittest.TestCase):
         # Outside laylines, going in wrong direction
         self.hp.nav.position_xy = Point(-50, 50)
         state, goal_heading = self.hp.calculate_state_and_goal()
-        self.assertEqual(state, 'tack_to_stbd_tack')
+        self.assertEqual(state, 'switch_to_stbd_tack')
         self.assertAlmostEqual(goal_heading, 180)
