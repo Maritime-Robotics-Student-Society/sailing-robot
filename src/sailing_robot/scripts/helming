@@ -105,7 +105,7 @@ class TackBasic(ProcedureBase):
     """
     Basic Tack procedure
     """
-    def __init__(self, sailing_state, timeout=2):
+    def __init__(self, sailing_state, timeout=15):
         super(TackBasic, self).__init__(sailing_state, timeout) 
         self.name = "TackBasic"
 
@@ -122,7 +122,7 @@ class JibeBasic(ProcedureBase):
     """
     Basic Jibe procedure
     """
-    def __init__(self, sailing_state, timeout=2):
+    def __init__(self, sailing_state, timeout=15):
         super(JibeBasic, self).__init__(sailing_state, timeout) 
 
     def loop(self):
@@ -142,7 +142,7 @@ class TackSheetOut(ProcedureBase):
     in some strong conditions. Hence sheeting out is needed, however if the sails are out
     too much the boat will not have enough power to tack 
     """
-    def __init__(self, sailing_state, timeout=2):
+    def __init__(self, sailing_state, timeout=15):
         super(TackSheetOut, self).__init__(sailing_state, timeout) 
 
     def loop(self):
@@ -159,7 +159,7 @@ class Tack_IncreaseAngleToWind(ProcedureBase):
     """
     More advance Tack procedure, building speed for 5s by going less upwind
     """
-    def __init__(self, sailing_state, timeout=2):
+    def __init__(self, sailing_state, timeout=15):
         super(Tack_IncreaseAngleToWind, self).__init__(sailing_state, timeout) 
         self.beating_angle = 80
 
