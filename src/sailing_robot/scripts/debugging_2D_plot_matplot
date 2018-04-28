@@ -30,7 +30,7 @@ class Debugging_2D_matplot():
         self.sailing_state = 'normal'
 
         rospy.Subscriber('heading', Float32, self.update_heading)
-        self.heading = rospy.get_param("simulation/heading_init")
+        self.heading = 0
 
         rospy.Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
         self.wind_boat = 0
