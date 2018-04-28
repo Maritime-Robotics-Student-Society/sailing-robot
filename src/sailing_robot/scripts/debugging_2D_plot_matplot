@@ -8,7 +8,18 @@ import matplotlib.animation as animation
 from std_msgs.msg import String, Float32, Float64
 from sensor_msgs.msg import NavSatFix
 import numpy as np
-from drawnow import drawnow
+from matplotlib.transforms import blended_transform_factory
+
+
+
+def get_max_dist(origin, wparray):
+    max_dist = 0
+    for i, _ in enumerate(wparray[0]):
+        dist = np.sqrt((wparray[0][i]-origin[0])**2 + (wparray[1][i]-origin[1])**2) 
+        if dist >= max_dist:
+            max_dist = dist
+    return max_dist
+
 
 class Debugging_2D_matplot():
 
@@ -26,54 +37,44 @@ class Debugging_2D_matplot():
         self.wind_north = 0
 
 
-        self.position_history = collections.deque(maxlen = 1000)
+        self.position_history = collections.deque(maxlen = 500)
         rospy.Subscriber('position', NavSatFix, self.update_position)
+        self.position = [0,0]
         self.gps_fix_lock = True
 
         utm_zone = rospy.get_param('navigation/utm_zone')
         self.nav = Navigation(utm_zone=utm_zone)
 
         self.rate = rospy.Rate(rospy.get_param("config/rate"))
+        self.wp_radius = rospy.get_param('wp/acceptRadius')
 
         if rospy.has_param('wp/list'):
-            self.generate_wp_Array()
+            wp_list = rospy.get_param('wp/list')
         elif rospy.has_param('wp/tasks'):
             tasks_list = rospy.get_param('wp/tasks')
             wp_list = [t['waypoint'] for t in tasks_list if 'waypoint' in t]
-            wp_table = rospy.get_param('wp/table')
-            wp_list = list(set(wp_list)) # print each point only once
-            self.wp_array = np.array([self.nav.latlon_to_utm(wp_table[wp][0], wp_table[wp][1]) for wp in wp_list]).T # [lat, lon]
         else:
             rospy.logwarn("No waypoint was found!")
 
-        minx = np.min(self.wp_array[0]) - 30
-        miny = np.min(self.wp_array[1]) - 30
-        maxx = np.max(self.wp_array[0]) + 30
-        maxy = np.max(self.wp_array[1]) + 30
+        wp_table = rospy.get_param('wp/table')
+        wp_list = list(set(wp_list)) # print each point only once
+        self.wp_array = np.array([self.nav.latlon_to_utm(wp_table[wp][0], wp_table[wp][1]) for wp in wp_list]).T # [lat, lon]
 
         self.origin = [self.wp_array[0].mean(), self.wp_array[1].mean()]
-        minx = self.origin[0] - 50
-        maxx = self.origin[0] + 50
-        miny = self.origin[1] - 50
-        maxy = self.origin[1] + 50
+        self.dist = get_max_dist(self.origin, self.wp_array) 
 
-        self.fig = plt.figure()
-        self.line, = plt.plot([], [], c='C0')
-        self.wpfig = plt.scatter(self.wp_array[0], self.wp_array[1], c='C3')
-        self.wind_arrow = plt.arrow(0,0,1,1)
-
-        plt.xlim(minx, maxx) 
-        plt.ylim(miny, maxy)
+        self.init_plot()
         self.update_plot()
+
 
     def update_sailing_state(self, msg):
         self.sailing_state = msg.data
 
     def update_position(self, msg):
-        self.position = self.nav.latlon_to_utm(msg.latitude, msg.longitude)
-        self.position_gps = msg
+        self.position = list(self.nav.latlon_to_utm(msg.latitude, msg.longitude))
+        self.position[0] -= self.origin[0]
+        self.position[1] -= self.origin[1]
         self.position_history.append(self.position)
-        self.gps_fix_lock = False
 
     def update_heading(self, msg):
         self.heading = msg.data
@@ -83,22 +84,94 @@ class Debugging_2D_matplot():
         self.wind_boat = msg.data
         self.wind_north = np.radians(self.heading + self.wind_boat)
 
+
+    def init_plot(self):
+
+        # recenter wp to the origin
+        for i, _ in enumerate(self.wp_array[0]):
+            self.wp_array[0][i] -= self.origin[0]
+            self.wp_array[1][i] -= self.origin[1]
+
+
+        self.fig = plt.figure()
+        self.boatline, = plt.plot([], [], c='C0', label="Heading")
+        plt.plot([], [], c='C1', label="Wind direction")
+
+        # display  Waypoints
+        self.wpfig = plt.scatter(self.wp_array[0], self.wp_array[1], c='C3')
+
+        minx =  - 1.5*self.dist
+        maxx =  + 1.5*self.dist
+        miny =  - 1.5*self.dist
+        maxy =  + 1.5*self.dist
+        plt.xlim(minx, maxx) 
+        # plt.ylim(miny, maxy)
+        plt.axis('equal')
+        plt.tight_layout()
+        self.ax = plt.subplot(111)
+    
+        plt.legend()
+
+
+    def get_arrow(self, angle, color, reverse=False):
+
+        figsize = self.fig.get_size_inches()
+        scale_dx = figsize[0]/np.sqrt(figsize[0]**2 + figsize[1]**2)
+        scale_dy = figsize[1]/np.sqrt(figsize[0]**2 + figsize[1]**2)
+
+        if reverse:
+            style = '<-'
+        else:
+            style = '->'
+
+#         sign = -(reverse-0.5)*2
+#         tform = blended_transform_factory(self.ax.transAxes, self.ax.transAxes)
+#         arrow = plt.arrow(0.9, 0.1,
+#                           sign*0.03*np.sin(angle)/scale_dx, sign*0.03*np.cos(angle)/scale_dy,
+#                           head_width=0.005, 
+#                           head_length=0.005,  fc=color, ec=color, 
+#                           transform=tform, label='Heading')
+
+        arrow_ori = (0.88, 0.12)
+        arrow_target = (arrow_ori[0] + 0.05*np.sin(angle)/scale_dx, arrow_ori[1] + 0.05*np.cos(angle)/scale_dy)
+        arrow = self.ax.annotate("",
+                                 xy=arrow_target, xycoords=self.ax.transAxes,
+                                 xytext=arrow_ori, textcoords=self.ax.transAxes,
+                                 arrowprops=dict(arrowstyle=style,
+                                                 color=color,
+                                                 connectionstyle="arc3"),
+                                 )
+
+        return arrow
+
+
+
     def animate(self, i):
         lat, lon = np.array(self.position_history).T
-        self.line.set_data(lat,lon)
-        
-        self.wind_arrow = plt.arrow(self.origin[0]+40, self.origin[1]-40, 
-                                    5*np.sin(self.wind_north), 5*np.cos(self.wind_north),
-                                    head_width=1.05, 
-                                    head_length=1.1,  fc='C1', ec='C1' )
+        self.boatline.set_data(lat,lon)
+
+        self.wind_arrow = self.get_arrow(self.wind_north, 'C1', reverse=True)
+
+        self.heading_arrow = self.get_arrow(np.radians(self.heading), 'C0')
 
 
-        return self.line, self.wpfig, self.wind_arrow 
+        arrow_col = 'C0' 
+        if self.sailing_state != 'normal':
+            arrow_col = 'C1'
+        arrow_dx = 0.1*np.sin(np.radians(self.heading))
+        arrow_dy = 0.1*np.cos(np.radians(self.heading))
+        self.boat_arrow = plt.arrow(self.position[0] - arrow_dx, self.position[1] - arrow_dy,
+                                    arrow_dx, arrow_dy,
+                                    head_width=0.5, 
+                                    head_length=1.,  
+                                    fc=arrow_col, 
+                                    ec=arrow_col)
+        return self.boatline, self.wind_arrow, self.boat_arrow, self.wpfig, self.heading_arrow
 
 
     def update_plot(self):
         line_ani = animation.FuncAnimation(self.fig, self.animate,
-                                           interval=200, blit=True)
+                                           interval=100, blit=True)
         plt.show()
 
 if __name__ == '__main__':
