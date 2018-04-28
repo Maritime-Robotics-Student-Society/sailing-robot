@@ -11,6 +11,10 @@ import numpy as np
 from matplotlib.transforms import blended_transform_factory
 
 
+# color palette definition (V2 from  https://matplotlib.org/users/dflt_style_changes.html#colors-color-cycles-and-color-maps)
+C = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
+     '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
+     '#bcbd22', '#17becf']
 
 def get_max_dist(origin, wparray):
     max_dist = 0
@@ -24,23 +28,7 @@ def get_max_dist(origin, wparray):
 class Debugging_2D_matplot():
 
     def __init__(self):
-
         rospy.init_node("debugging_2D_matplot")
-        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
-        self.sailing_state = 'normal'
-
-        rospy.Subscriber('heading', Float32, self.update_heading)
-        self.heading = 0
-
-        rospy.Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
-        self.wind_boat = 0
-        self.wind_north = 0
-
-
-        self.position_history = collections.deque(maxlen = 500)
-        rospy.Subscriber('position', NavSatFix, self.update_position)
-        self.position = [0,0]
-        self.gps_fix_lock = True
 
         utm_zone = rospy.get_param('navigation/utm_zone')
         self.nav = Navigation(utm_zone=utm_zone)
@@ -62,6 +50,23 @@ class Debugging_2D_matplot():
 
         self.origin = [self.wp_array[0].mean(), self.wp_array[1].mean()]
         self.dist = get_max_dist(self.origin, self.wp_array) 
+
+        # Subscribers init
+        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
+        self.sailing_state = 'normal'
+
+        rospy.Subscriber('heading', Float32, self.update_heading)
+        self.heading = 0
+
+        rospy.Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
+        self.wind_boat = 0
+        self.wind_north = 0
+
+        self.position_history = collections.deque(maxlen = 500)
+        rospy.Subscriber('position', NavSatFix, self.update_position)
+        self.position = [0,0]
+        self.gps_fix_lock = True
+
 
         self.init_plot()
         self.update_plot()
@@ -94,11 +99,11 @@ class Debugging_2D_matplot():
 
 
         self.fig = plt.figure()
-        self.boatline, = plt.plot([], [], c='C0', label="Heading")
-        plt.plot([], [], c='C1', label="Wind direction")
+        self.boatline, = plt.plot([], [], c=C[0], label="Heading")
+        plt.plot([], [], c=C[1], label="Wind direction")
 
         # display  Waypoints
-        self.wpfig = plt.scatter(self.wp_array[0], self.wp_array[1], c='C3')
+        self.wpfig = plt.scatter(self.wp_array[0], self.wp_array[1], c=C[3])
 
         minx =  - 1.5*self.dist
         maxx =  + 1.5*self.dist
@@ -151,14 +156,14 @@ class Debugging_2D_matplot():
             lat, lon = np.array(self.position_history).T
             self.boatline.set_data(lat,lon)
 
-        self.wind_arrow = self.get_arrow(self.wind_north, 'C1', reverse=True)
+        self.wind_arrow = self.get_arrow(self.wind_north, C[1], reverse=True)
 
-        self.heading_arrow = self.get_arrow(np.radians(self.heading), 'C0')
+        self.heading_arrow = self.get_arrow(np.radians(self.heading), C[0])
 
 
-        arrow_col = 'C0' 
+        arrow_col = C[0]
         if self.sailing_state != 'normal':
-            arrow_col = 'C1'
+            arrow_col = C[1]
         arrow_dx = 0.1*np.sin(np.radians(self.heading))
         arrow_dy = 0.1*np.cos(np.radians(self.heading))
         self.boat_arrow = plt.arrow(self.position[0] - arrow_dx, self.position[1] - arrow_dy,
