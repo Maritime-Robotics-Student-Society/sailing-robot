@@ -124,6 +124,7 @@ def pos_publisher():
                 rospy.logwarn("Error parsing position: {!r}".format(sentence))
                 continue
             pos_pub.publish(msg)
+            
             nsats_pub.publish(int(sentence.num_sats))
 
             wtime = gpswtime()
@@ -140,6 +141,7 @@ def set_gps_options(communicator, use_i2c):
     '''
     if not rospy.get_param('change_gps_rate', False):
         return
+
 
     option_list = [b'\xB5\x62\x06\x01\x08\x00\xF0\x02\x00\x00\x00\x00\x00\x01\x02\x32\x10\x13', # GxGSA
                    b'\xB5\x62\x06\x01\x08\x00\xF0\x03\x00\x00\x00\x00\x00\x01\x03\x39\x10\x13', # GxGSV off
