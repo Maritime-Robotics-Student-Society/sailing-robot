@@ -214,6 +214,7 @@ class Helming():
             rospy.logwarn("START new procedure")
             self.currentProcedureId = 0
             self.currentProcedure = self.ProcedureList[self.currentProcedureId](data.sailing_state)
+            rospy.logwarn("Run procedure: " + self.currentProcedure.__class__.__name__)
 
         elif data.sailing_state != self.currentProcedure.sailing_state:
             # if we reswitch tack we restart at the begining of the list
@@ -221,17 +222,16 @@ class Helming():
             self.currentProcedure.end()
             self.currentProcedureId = 0
             self.currentProcedure = self.ProcedureList[self.currentProcedureId](data.sailing_state)
+            rospy.logwarn("Run procedure: " + self.currentProcedure.__class__.__name__)
 
         elif self.currentProcedure.is_failed():
-            rospy.logwarn("Procedure failed")
+            rospy.logwarn("Procedure failed: " + self.currentProcedure.__class__.__name__)
             # if time out we start the next procedure in the list
             self.currentProcedure.end()
             self.currentProcedureId = (self.currentProcedureId + 1) % len(self.ProcedureList)
             self.currentProcedure = self.ProcedureList[self.currentProcedureId](data.sailing_state)
 
         # we advance to the next timestep 
-        rospy.logwarn("Run procedure: " + self.currentProcedure.__class__.__name__)
-        rospy.logwarn("ID           : " + str(self.currentProcedureId))
         self.currentProcedure.loop()
 
 
