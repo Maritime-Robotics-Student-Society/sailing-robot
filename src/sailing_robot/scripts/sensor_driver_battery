@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 
-from std_msgs.msg import BatteryState
+from sailing_robot.msg import BatteryState
 from ina219 import INA219
 import rospy
 
