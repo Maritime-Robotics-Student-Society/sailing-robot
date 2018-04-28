@@ -147,8 +147,9 @@ class Debugging_2D_matplot():
 
 
     def animate(self, i):
-        lat, lon = np.array(self.position_history).T
-        self.boatline.set_data(lat,lon)
+        if self.position_history:
+            lat, lon = np.array(self.position_history).T
+            self.boatline.set_data(lat,lon)
 
         self.wind_arrow = self.get_arrow(self.wind_north, 'C1', reverse=True)
 
