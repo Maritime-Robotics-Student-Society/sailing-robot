@@ -3,6 +3,7 @@
 # Run this from Tabarly while connected to the raspi by wifi.
 set -e
 
+sudo modprobe vhci-hcd
 echo "SSH-ing to Pi to set up usbip export..."
 ssh -t pi@${SAIL_PI_IP:=192.168.12.1} bash sailing-robot/piaccess/usbip-export.sh
 BUSID=$(ssh pi@${SAIL_PI_IP} cat /tmp/xsens_busid)
