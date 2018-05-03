@@ -35,3 +35,19 @@ EOF
 
 
 
+cat <<EOF >> ~/.inputrc
+
+$include /etc/inputrc
+
+set completion-ignore-case on
+
+set show-all-if-ambiguous on
+
+TAB:menu-complete
+# arrow up
+"\e[A":history-search-backward
+
+# arow down
+"\e[B":history-search-forward
+
+EOF
