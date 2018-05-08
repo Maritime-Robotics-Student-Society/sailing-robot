@@ -50,6 +50,7 @@ add_message_files(
     FILES
     Velocity.msg
     gpswtime.msg
+    BatteryState.msg
 )
 
 ## Generate services in the 'srv' folder
