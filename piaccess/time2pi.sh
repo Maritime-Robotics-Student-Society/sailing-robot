@@ -15,4 +15,4 @@ echo "Sending time to the pi at ${SAIL_PI_IP:=192.168.12.1}..."
 TIMESTAMP=$(date --utc +%Y-%m-%dT%H:%M:%S)
 
 set -x
-ssh pi@$SAIL_PI_IP "sudo date --utc +%Y-%m-%dT%H:%M:%S -s $TIMESTAMP"
+ssh -t pi@$SAIL_PI_IP "sudo date --utc +%Y-%m-%dT%H:%M:%S -s $TIMESTAMP"
