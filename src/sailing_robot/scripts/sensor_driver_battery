@@ -17,14 +17,14 @@ class Battery():
         SHUNT_OHMS = 0.1
         MAX_EXPECTED_AMPS = 1
         self.ina = INA219(SHUNT_OHMS, MAX_EXPECTED_AMPS)
-        self.ina.configure(ina.RANGE_16V, ina.GAIN_AUTO)
+        self.ina.configure(self.ina.RANGE_16V, self.ina.GAIN_AUTO)
         self.ina.sleep()
 
 
         self.battery_pub = rospy.Publisher('battery', BatteryState, queue_size=10)
         rospy.init_node("battery", anonymous=True)
 
-        self.rate = rospy.Rate(rospy.get_param("config/rate_battery"))
+        self.rate = rospy.Rate(rospy.get_param("config/battery_rate"))
         self.battery_publisher()
 
 
@@ -35,8 +35,9 @@ class Battery():
             self.ina.wake()
             msg.voltage =  self.ina.voltage()
             msg.current = -self.ina.current()
+            msg.power = -msg.voltage * msg.current
             self.ina.sleep()
-            self.battery_pub(msg)
+            self.battery_pub.publish(msg)
             self.rate.sleep()
 
 

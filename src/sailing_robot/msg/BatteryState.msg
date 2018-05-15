@@ -31,8 +31,9 @@ uint8 POWER_SUPPLY_TECHNOLOGY_NICD = 5
 uint8 POWER_SUPPLY_TECHNOLOGY_LIMN = 6
 
 Header  header
+float32 power            # Power in mW
 float32 voltage          # Voltage in Volts (Mandatory)
-float32 current          # Negative when discharging (A)  (If unmeasured NaN)
+float32 current          # Negative when discharging (mA)  (If unmeasured NaN)
 float32 charge           # Current charge in Ah  (If unmeasured NaN)
 float32 capacity         # Capacity in Ah (last full capacity)  (If unmeasured NaN)
 float32 design_capacity  # Capacity in Ah (design capacity)  (If unmeasured NaN)
