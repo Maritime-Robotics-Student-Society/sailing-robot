@@ -8,7 +8,7 @@
 ```
                                           This is Southampton Sailing Robot Team's code repository.
                 -..                       We have built an one meter long autonomous sailing boat  
-               oMN.                       that compete for the 2016 World Sailing Robot Competition.
+               oMN.                       that compete for the World Sailing Robot Competition.
                o:                         Our code are based on ROS framework. 
                o:`Ns.                     
                o: dMMy-                   
@@ -34,4 +34,4 @@
                                           Thank you for your support!
 ```
 
-Click Wiki page for more information. 
+Click Wiki page for more information. We also have a [website](http://sotonsailrobot.org/) and a [blog](https://blog.sotonsailrobot.org/). 
