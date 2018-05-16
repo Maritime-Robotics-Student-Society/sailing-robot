@@ -20,7 +20,7 @@ ISO8601 = "%Y-%m-%dT%H:%M:%SZ"  # Standard format for date+time
 
 # Some directories we'll use
 utils_dir = dirname(realpath(__file__))
-repo_dir = dirname(utils_dir)
+repo_dir = dirname(dirname(utils_dir))
 data_dir = os.path.join(repo_dir, 'recorded_data')
 notes_dir = os.path.join(data_dir, 'notes')
 
