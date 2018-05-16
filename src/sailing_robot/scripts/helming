@@ -39,7 +39,7 @@ sail_data = SailData(sail_table)
 
 ##########################################################################
 
-def set_sail(sheet_control, offset=1.0):
+def set_sail(sheet_control, offset=0.0):
     if sheet_control is WIND:
         sheet_normalized = sail_data.calculate_sheet_setting() + offset
 
