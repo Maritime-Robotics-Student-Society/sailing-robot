@@ -24,12 +24,14 @@ import math
 from sailing_robot.imu_utils import ImuReader
 
 IMU_BUS = 1
-#LGD = 0x6b #Device I2C slave address
-#LSM = 0x1d #Device I2C slave address
 
+# minIMU without the jumper wired
+LGD = 0x6b #Device I2C slave address
+LSM = 0x1d #Device I2C slave address
 
-LGD = 0x6a #Device I2C slave address
-LSM = 0x1e #Device I2C slave address
+# minIMU with the jumper wired
+# LGD = 0x6a #Device I2C slave address
+# LSM = 0x1e #Device I2C slave address
 
 def heading_publisher():
 
