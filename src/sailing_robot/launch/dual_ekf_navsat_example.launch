@@ -20,6 +20,9 @@
 
   <node pkg='robot_localization' type="ekf_localization_node" name="ekf_se_map" clear_params="true">
     <remap from="odometry/filtered" to="odometry/filtered_map"/>
+    <param name="two_d_mode" value="true"/>
+    <param name="odom0" value="gps/fix"/>
+    <param name="imu0" value="/imu">
   </node>
 
 
@@ -27,6 +30,8 @@
     <remap from="odometry/filtered" to="odometry/filtered_map"/>
     <remap from="position" to="gps/fix"/>
   </node>
+
+
 
    <node name = "sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps"/>
 
