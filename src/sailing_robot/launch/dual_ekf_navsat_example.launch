@@ -35,5 +35,5 @@
 
    <node name = "sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps"/>
 
-   <node name = "sensor_driver_imu_fusion" pkg = 'sailing_robot' type ="sensor_driver_imu_fusion"/>
+   <include file="$(find xsens_driver)/launch/xsens_driver.launch" />
 </launch>
