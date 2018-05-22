@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Sensor service IMU is a node to 
+# Sensor service IMU is a node to
 #  * convert quaternion orientation into heading angle with our convention
 #  * transform NED (North East Down) reference IMU data into ENU (East North Up)
 #
@@ -22,8 +22,8 @@ class heading_processing(object):
         rospy.init_node('Heading_service')
         self.heading = 0
         self.heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
-        #self.pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
-        #self.roll_pub = rospy.Publisher('roll', Float32, queue_size=10)
+        self.pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
+        self.roll_pub = rospy.Publisher('roll', Float32, queue_size=10)
         rospy.Subscriber('imu/data', Imu, self.heading_publisher)
 
     def heading_publisher(self, msg):
@@ -31,14 +31,14 @@ class heading_processing(object):
         self.heading = (math.degrees(
                         tf.transformations.euler_from_quaternion(
                         (imu.x, imu.y,imu.z, imu.w))[2]) - 90) % 360
-        #self.pitch = math.degrees(
-        #                tf.transformations.euler_from_quaternion(
-        #                (imu.x, imu.y,imu.z, imu.w))[1])
-        #self.roll = math.degrees(
-        #                tf.transformations.euler_from_quaternion(
-        #                (imu.x, imu.y,imu.z, imu.w))[0])
+        self.pitch = math.degrees(
+                        tf.transformations.euler_from_quaternion(
+                        (imu.x, imu.y,imu.z, imu.w))[1])
+        self.roll = math.degrees(
+                        tf.transformations.euler_from_quaternion(
+                        (imu.x, imu.y,imu.z, imu.w))[0])
 
-    
+
 
     def run(self):
         r = rospy.Rate(20)
