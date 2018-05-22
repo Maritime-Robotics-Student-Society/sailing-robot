@@ -22,7 +22,7 @@
     <remap from="odometry/filtered" to="odometry/filtered_map"/>
     <param name="two_d_mode" value="true"/>
     <param name="odom0" value="gps/fix"/>
-    <param name="imu0" value="/imu">
+    <param name="imu0" value="/imu"/>
   </node>
 
 
