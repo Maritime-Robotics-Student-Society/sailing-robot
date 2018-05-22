@@ -9,10 +9,26 @@ import os.path
 import time
 import rospy
 import sys
+import yaml
+
+
+defaultboatname = 'blackpython'
+print("Name of the calibration file ["+ defaultboatname +"]")
+boatname = raw_input("")
+
+if not boatname:
+    boatname = defaultboatname
+
+
+filename = "calibration_"+ boatname + ".yaml"
+
 
 my_dir = os.path.dirname(__file__)
 robot_src_dir = os.path.abspath(os.path.join(my_dir, '../src/sailing_robot/src'))
 sys.path.append(robot_src_dir)
+calibration_file = os.path.join(robot_src_dir, '../launch/parameters/', filename)
+
+
 
 from sailing_robot.imu_utils import ImuReader
 
@@ -75,13 +91,13 @@ range_X = maxx - minx
 range_Y = maxy - miny
 range_Z = maxz - minz
 
-rospy.set_param('/calibration/compass', {'XOFFSET': offset_X,
-                                          'YOFFSET': offset_Y,
-                                          'ZOFFSET': offset_Z,
-                                          'XSCALE': range_X,
-                                          'YSCALE': range_Y,
-                                          'ZSCALE': range_Z,
-                                          })
+# rospy.set_param('/calibration/compass', {'XOFFSET': offset_X,
+#                                           'YOFFSET': offset_Y,
+#                                           'ZOFFSET': offset_Z,
+#                                           'XSCALE': range_X,
+#                                           'YSCALE': range_Y,
+#                                           'ZSCALE': range_Z,
+#                                           })
 
 
 
@@ -91,3 +107,30 @@ print("ZOFFSET = " + str(offset_Z))
 print("XSCALE = " + str(range_X))
 print("YSCALE = " + str(range_Y))
 print("ZSCALE = " + str(range_Z))
+
+
+
+# Load of the previous configuration in the configuration file
+# (we are just updating it without overwriting everything)
+if os.path.isfile(calibration_file):
+    calib_dict = yaml.load(open(calibration_file))
+else:
+    calib_dict = {}
+
+
+print("-----------------------------------------")
+print("Great, now dumping to file: " + filename)
+calib_dict['compass'] ={'XOFFSET': offset_X,
+                        'YOFFSET': offset_Y,
+                        'ZOFFSET': offset_Z,
+                        'XSCALE': range_X,
+                        'YSCALE': range_Y,
+                        'ZSCALE': range_Z,
+                        }
+
+with open(calibration_file, 'w') as calib_file:
+    yaml.dump(calib_dict, calib_file, default_flow_style=False)
+
+
+
+
