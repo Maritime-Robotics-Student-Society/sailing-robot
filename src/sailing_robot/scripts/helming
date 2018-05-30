@@ -2,6 +2,8 @@
 
 import rospy
 import time
+import numpy as np
+import random
 from std_msgs.msg import Float64, Float32, Int16, String
 
 from sailing_robot.sail_table import SailTable, SailData
@@ -31,11 +33,13 @@ data = PID_Data()
 rudder = rospy.get_param('rudder')
 controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'],rudder['maxAngle'], -rudder['maxAngle'])
 
-sail_table_dict = rospy.get_param('sailsettings/table')
+sail_table_dict   = rospy.get_param('sailsettings/table')
 sheet_out_to_jibe = rospy.get_param('sailsettings/sheet_out_to_jibe', False)
-sail_table = SailTable(sail_table_dict)
-sail_data = SailData(sail_table)
+sail_table        = SailTable(sail_table_dict)
+sail_data         = SailData(sail_table)
 
+TIMEOUT      = rospy.get_param('procedure/timeout')
+EXPLORE_COEF = rospy.get_param('procedure/exploration_coefficient')
 
 ##########################################################################
 
@@ -80,32 +84,32 @@ def set_rudder(state, angle_to_wind=0):
 
 
 class ProcedureBase(object):
-    def __init__(self, sailing_state, timeout=15):
+    def __init__(self, sailing_state, timeout=TIMEOUT):
         self.start_time = time.time()
         self.timeout = timeout
         self.sailing_state = sailing_state
 
-    def is_failed(self):
+    def has_failed(self):
         """
         Am I out of time?
         Am I failing?
         """
         currenttime = time.time()
-        return self.ProcedureEnlapsedTime() > self.timeout
+        return self.EnlapsedTime() > self.timeout
 
-    def ProcedureEnlapsedTime(self):
+    def EnlapsedTime(self):
         currenttime = time.time()
         return currenttime - self.start_time 
 
-    def end(self):
-        return
+    def __str__(self):
+        return self.__class__.__name__
 
 
 class TackBasic(ProcedureBase):
     """
     Basic Tack procedure
     """
-    def __init__(self, sailing_state, timeout=15):
+    def __init__(self, sailing_state, timeout=TIMEOUT):
         super(TackBasic, self).__init__(sailing_state, timeout) 
         self.name = "TackBasic"
 
@@ -122,7 +126,7 @@ class JibeBasic(ProcedureBase):
     """
     Basic Jibe procedure
     """
-    def __init__(self, sailing_state, timeout=15):
+    def __init__(self, sailing_state, timeout=TIMEOUT):
         super(JibeBasic, self).__init__(sailing_state, timeout) 
 
     def loop(self):
@@ -142,7 +146,7 @@ class TackSheetOut(ProcedureBase):
     in some strong conditions. Hence sheeting out is needed, however if the sails are out
     too much the boat will not have enough power to tack 
     """
-    def __init__(self, sailing_state, timeout=15):
+    def __init__(self, sailing_state, timeout=TIMEOUT):
         super(TackSheetOut, self).__init__(sailing_state, timeout) 
 
     def loop(self):
@@ -159,13 +163,13 @@ class Tack_IncreaseAngleToWind(ProcedureBase):
     """
     More advance Tack procedure, building speed for 5s by going less upwind
     """
-    def __init__(self, sailing_state, timeout=15):
+    def __init__(self, sailing_state, timeout=TIMEOUT):
         super(Tack_IncreaseAngleToWind, self).__init__(sailing_state, timeout) 
         self.beating_angle = 80
 
     def loop(self):
         set_sail(WIND)
-        if self.ProcedureEnlapsedTime() < 5:
+        if self.EnlapsedTime() < 5:
             if self.sailing_state == "switch_to_port_tack":
                 set_rudder(PID_ANGLE_TO_WIND, angle_to_wind = self.beating_angle)
             else:
@@ -180,32 +184,89 @@ class Tack_IncreaseAngleToWind(ProcedureBase):
 
 ##########################################################################
 
+class ProcedureHandle():
+    """
+        Class to handle a list of procedure and the priority based on weights
+        after each tack attempt weight based on time taken by the procedure
+        are given to each procedure for the future.
+    """
+    def __init__(self, ProcedureList):
+
+        # Initialisation of the procedure list with initial weights, integers with increment of 1
+        self.ProcedureList = [ {"Procedure": Procedure, 
+                                "Weight": [],
+                                "InitPos": i} for i,Procedure in enumerate(ProcedureList) ]
+
+        self.currentProcedureId = 0
+        self.currentProcedure = None
+
+    def ProcedureInProgress(self):
+        return (self.currentProcedure != None)
+
+    def FirstProcedure(self):
+        self.OrderList()
+        self.currentProcedureId = 0
+
+    def NextProcedure(self):
+        self.currentProcedureId = (self.currentProcedureId + 1) % len(self.ProcedureList)
+
+    def OrderList(self):
+        def get_weight(x):
+            if x['Weight']:
+                return np.mean(x['Weight'])
+            else:
+                if random.random() < EXPLORE_COEF:
+                    # Add some randomness in choice for untested procedures
+                    return 0.1*random.random()
+                else:
+                    # Just to keep the order given at first if the procedure was not tested yet
+                    return TIMEOUT + x['InitPos']*0.01*TIMEOUT
+
+        self.ProcedureList = sorted(self.ProcedureList, key=get_weight)
+        # rospy.logwarn(str(self.ProcedureList))
+
+    def MarkSuccess(self):
+        self.ProcedureList[self.currentProcedureId]['Weight'].append(self.currentProcedure.EnlapsedTime())
+        self.currentProcedure = None
+
+    def MarkFailure(self):
+        # In case of failure the weight given is 1.5 times the timeout
+        self.ProcedureList[self.currentProcedureId]['Weight'].append(1.5*TIMEOUT)
+        self.currentProcedure = None
+
+    def StartProcedure(self, sailing_state):
+        self.currentProcedure = self.ProcedureList[self.currentProcedureId]['Procedure'](sailing_state)
+
+
+##########################################################################
+
+
 
 class Helming():
     def __init__(self):
         rospy.init_node('helming', anonymous=True)
         self.rate = rospy.Rate(rospy.get_param("config/rate"))
 
-        if rospy.get_param('navigation/jibe_to_turn'):
-            self.ProcedureList = [JibeBasic, TackBasic, TackSheetOut, Tack_IncreaseAngleToWind]
+        # Initialisation of the procedure list
+        if rospy.get_param('procedure/jibe_to_turn'):
+            procedureList = [JibeBasic, TackBasic, TackSheetOut, Tack_IncreaseAngleToWind]
         else:
-            self.ProcedureList = [TackBasic, TackSheetOut, JibeBasic, Tack_IncreaseAngleToWind]
+            procedureList = [TackBasic, TackSheetOut, JibeBasic, Tack_IncreaseAngleToWind]
 
-        self.currentProcedureId = 0
-        self.currentProcedure = None
+
+        self.Proc = ProcedureHandle(procedureList)
         self.Runner()
 
     def Runner(self):
         while not rospy.is_shutdown():
             if data.sailing_state == 'normal':
-                if self.currentProcedure:
+                if self.Proc.ProcedureInProgress():
                     # ending a procedure because it is finished according to the highlevel
-                    rospy.logwarn("Success procedure " + self.currentProcedure.__class__.__name__ + ", back to normal state")
-                    self.currentProcedure.end()
-                    self.currentProcedure = None
+                    rospy.logwarn("Procedure success " + str(self.Proc.currentProcedure) + ", back to normal state")
+                    self.Proc.MarkSuccess()
+
                 set_rudder(PID_GOAL_HEADING)
                 set_sail(WIND)
-
             else:
                 # Continuing a procedure
                 self.runProcedure()
@@ -214,30 +275,23 @@ class Helming():
 
 
     def runProcedure(self):
-        if not self.currentProcedure:
+        if (not self.Proc.ProcedureInProgress()) or (data.sailing_state != self.Proc.currentProcedure.sailing_state):
             # no procedure have been started (=we just decided to swich tack)
-            self.currentProcedureId = 0
-            self.currentProcedure = self.ProcedureList[self.currentProcedureId](data.sailing_state)
-            rospy.logwarn("Run procedure " + self.currentProcedure.__class__.__name__)
+            self.Proc.FirstProcedure()
+            self.Proc.StartProcedure(data.sailing_state)
+            rospy.logwarn("Run procedure " + str(self.Proc.currentProcedure))
 
-        elif data.sailing_state != self.currentProcedure.sailing_state:
-            # if we reswitch tack we restart at the begining of the list
-            rospy.logwarn("Restart procedure list at the begining")
-            self.currentProcedure.end()
-            self.currentProcedureId = 0
-            self.currentProcedure = self.ProcedureList[self.currentProcedureId](data.sailing_state)
-            rospy.logwarn("Run procedure " + self.currentProcedure.__class__.__name__)
+        elif self.Proc.currentProcedure.has_failed():
+            rospy.logwarn("Procedure failed " + str(self.Proc.currentProcedure))
 
-        elif self.currentProcedure.is_failed():
-            rospy.logwarn("Procedure failed " + self.currentProcedure.__class__.__name__)
+            self.Proc.MarkFailure()
             # if time out we start the next procedure in the list
-            self.currentProcedure.end()
-            self.currentProcedureId = (self.currentProcedureId + 1) % len(self.ProcedureList)
-            self.currentProcedure = self.ProcedureList[self.currentProcedureId](data.sailing_state)
-            rospy.logwarn("Run procedure " + self.currentProcedure.__class__.__name__)
+            self.Proc.NextProcedure()
+            self.Proc.StartProcedure(data.sailing_state)
+            rospy.logwarn("Run procedure " + str(self.Proc.currentProcedure))
 
         # we advance to the next timestep 
-        self.currentProcedure.loop()
+        self.Proc.currentProcedure.loop()
 
 
 

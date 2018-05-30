@@ -48,8 +48,24 @@ navigation/beating_angle: 50
 # Distance calculations will be less accurate the further from the specified
 # zone you are.
 navigation/utm_zone: 30
-# True to turn by jibing instead of tacking:
-navigation/jibe_to_turn: false
+
+#
+# Helming Procedure
+#
+# True to turn by jibing preferably instead of tacking:
+procedure/jibe_to_turn: false
+
+# Timeout after wich a procedure is considered as failed
+procedure/timeout: 15 #in second
+
+# Exploration coefficient: it is the percentage of exploration in the search for the best procedure
+# If the coefficient is 0: the fastest procedure that works will always be chosen
+# If the coefficient is 1: all the procedures will be tried randomly at first
+# If the coefficient is 0.3: 30% of the time an untested procedure will be tried
+procedure/exploration_coefficient: 0.1 #number between 0 and 1
+
+
+
 
 # Heading
 # Define which heading the boat uses (compensate for the z axis or not
@@ -91,14 +107,8 @@ wind/sensor_average_time: 0.5
 wind/trend_average_time: 40.0
 
 
-#
-# Force Jibing
-#
-# Time spent trying to tack before trying to jibe
-force_jibe/time_tack: 7 # [s]
 
 
-#
 # Camera detection 
 #
 # Threshold at wich the detection will be triggered (=% of the image that contain the colors)

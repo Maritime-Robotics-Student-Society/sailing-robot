@@ -12,7 +12,7 @@ class Navigation(object):
     heading, along with apparent wind angle.
     """
     def __init__(self, 
-                beating_angle=45, utm_zone=30, jibe_to_turn=False,
+                beating_angle=45, utm_zone=30, 
                 safety_zone_ll=None, safety_zone_margin=5):
         """
         beating_angle : Closest absolute angle relative to the wind that we can
@@ -21,7 +21,6 @@ class Navigation(object):
             zone 30, Portugal in zone 29. http://www.dmap.co.uk/utmworld.htm
             Distance calculations will be less accurate the further from the
             specified zone you are.
-        jibe_to_turn : True to turn by jibing instead of tacking.
         safety_zone_ll : A series of lat/lon points we should stay within.
         safety_zone_margin : The safety buffer (in metres) to stay inside
             the bounding box.
@@ -33,7 +32,6 @@ class Navigation(object):
         self.heading = 0.
         self.wind_direction = 0.
         self.beating_angle = beating_angle
-        self.jibe_to_turn = jibe_to_turn
         self.safety_zone_ll = safety_zone_ll
         self.safety_zone_margin = safety_zone_margin
         if safety_zone_ll:
