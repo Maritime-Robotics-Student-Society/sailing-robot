@@ -28,6 +28,8 @@ RUDDER_FULL_RIGHT = object() # the boat is going to the right
 PUB_RUDDER    = rospy.Publisher('rudder_control', Int16, queue_size=10)  # Use UInt 16 here to minimize the memory use
 PUB_SAILSHEET = rospy.Publisher('sailsheet_normalized', Float32, queue_size=10)
 
+PUB_dbg_helming = rospy.Publisher('dbg_helming_procedure', String, queue_size=10)
+
 
 data = PID_Data()
 rudder = rospy.get_param('rudder')
@@ -68,7 +70,7 @@ def set_rudder(state, angle_to_wind=0):
         angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
 
     elif state is PID_ANGLE_TO_WIND:
-        rawangle = -controller.update_PID(angle_subtract(sail_data.wind_direction_apparent, angle_to_wind)) # TODO: check sign (=order of argument in angle_substract)
+        rawangle = -controller.update_PID(angle_subtract(angle_to_wind, sail_data.wind_direction_apparent)) 
         angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
 
     elif state is RUDDER_FULL_LEFT:
@@ -169,7 +171,7 @@ class Tack_IncreaseAngleToWind(ProcedureBase):
 
     def loop(self):
         set_sail(WIND)
-        if self.EnlapsedTime() < 5:
+        if self.EnlapsedTime() < 4:
             if self.sailing_state == "switch_to_port_tack":
                 set_rudder(PID_ANGLE_TO_WIND, angle_to_wind = self.beating_angle)
             else:
@@ -215,7 +217,8 @@ class ProcedureHandle():
             if x['Weight']:
                 return np.mean(x['Weight'])
             else:
-                if random.random() < EXPLORE_COEF:
+                if random.random() < (EXPLORE_COEF / sum([ x['Weight'] == [] for x in self.ProcedureList])):
+                    rospy.logwarn("random proc")
                     # Add some randomness in choice for untested procedures
                     return 0.1*random.random()
                 else:
@@ -226,16 +229,19 @@ class ProcedureHandle():
         # rospy.logwarn(str(self.ProcedureList))
 
     def MarkSuccess(self):
+        PUB_dbg_helming.publish("success " + str(self.currentProcedure))
         self.ProcedureList[self.currentProcedureId]['Weight'].append(self.currentProcedure.EnlapsedTime())
         self.currentProcedure = None
 
     def MarkFailure(self):
+        PUB_dbg_helming.publish("fail " + str(self.currentProcedure))
         # In case of failure the weight given is 1.5 times the timeout
         self.ProcedureList[self.currentProcedureId]['Weight'].append(1.5*TIMEOUT)
         self.currentProcedure = None
 
     def StartProcedure(self, sailing_state):
         self.currentProcedure = self.ProcedureList[self.currentProcedureId]['Procedure'](sailing_state)
+        PUB_dbg_helming.publish("start " + str(self.currentProcedure))
 
 
 ##########################################################################
@@ -251,7 +257,7 @@ class Helming():
         if rospy.get_param('procedure/jibe_to_turn'):
             procedureList = [JibeBasic, TackBasic, TackSheetOut, Tack_IncreaseAngleToWind]
         else:
-            procedureList = [TackBasic, TackSheetOut, JibeBasic, Tack_IncreaseAngleToWind]
+            procedureList = [TackBasic, TackSheetOut, Tack_IncreaseAngleToWind, JibeBasic]
 
 
         self.Proc = ProcedureHandle(procedureList)
@@ -262,7 +268,8 @@ class Helming():
             if data.sailing_state == 'normal':
                 if self.Proc.ProcedureInProgress():
                     # ending a procedure because it is finished according to the highlevel
-                    rospy.logwarn("Procedure success " + str(self.Proc.currentProcedure) + ", back to normal state")
+                    rospy.logwarn("Procedure success "+ str(self.Proc.currentProcedure)+
+                                  " in "+ '{:.2f}'.format(self.Proc.currentProcedure.EnlapsedTime()) + "s")
                     self.Proc.MarkSuccess()
 
                 set_rudder(PID_GOAL_HEADING)
@@ -279,16 +286,16 @@ class Helming():
             # no procedure have been started (=we just decided to swich tack)
             self.Proc.FirstProcedure()
             self.Proc.StartProcedure(data.sailing_state)
-            rospy.logwarn("Run procedure " + str(self.Proc.currentProcedure))
+            rospy.logwarn("Run procedure     " + str(self.Proc.currentProcedure))
 
         elif self.Proc.currentProcedure.has_failed():
-            rospy.logwarn("Procedure failed " + str(self.Proc.currentProcedure))
+            rospy.logwarn("Procedure failed  " + str(self.Proc.currentProcedure))
 
             self.Proc.MarkFailure()
             # if time out we start the next procedure in the list
             self.Proc.NextProcedure()
             self.Proc.StartProcedure(data.sailing_state)
-            rospy.logwarn("Run procedure " + str(self.Proc.currentProcedure))
+            rospy.logwarn("Run procedure     " + str(self.Proc.currentProcedure))
 
         # we advance to the next timestep 
         self.Proc.currentProcedure.loop()
