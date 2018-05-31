@@ -58,6 +58,9 @@ class Debugging_2D_matplot():
         rospy.Subscriber('heading', Float32, self.update_heading)
         self.heading = 0
 
+        rospy.Subscriber('goal_heading', Float32, self.update_goal_heading)
+        self.goal_heading = 0
+
         rospy.Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
         self.wind_boat = 0
         self.wind_north = 0
@@ -85,6 +88,9 @@ class Debugging_2D_matplot():
         self.heading = msg.data
         self.wind_north = np.radians(self.heading + self.wind_boat)
 
+    def update_goal_heading(self, msg):
+        self.goal_heading = msg.data
+
     def update_wind_direction(self, msg):
         self.wind_boat = msg.data
         self.wind_north = np.radians(self.heading + self.wind_boat)
@@ -100,6 +106,7 @@ class Debugging_2D_matplot():
 
         self.fig = plt.figure()
         self.boatline, = plt.plot([], [], c=C[0], label="Heading")
+        plt.plot([], [], c=C[7], label="Goal heading")
         plt.plot([], [], c=C[1], label="Wind direction")
 
         # display  Waypoints
@@ -160,6 +167,7 @@ class Debugging_2D_matplot():
 
         self.heading_arrow = self.get_arrow(np.radians(self.heading), C[0])
 
+        self.goal_heading_arrow = self.get_arrow(np.radians(self.goal_heading), C[7])
 
         arrow_col = C[0]
         if self.sailing_state != 'normal':
@@ -172,7 +180,7 @@ class Debugging_2D_matplot():
                                     head_length=1.,  
                                     fc=arrow_col, 
                                     ec=arrow_col)
-        return self.boatline, self.wind_arrow, self.boat_arrow, self.wpfig, self.heading_arrow
+        return self.boatline, self.wind_arrow, self.boat_arrow, self.wpfig, self.goal_heading_arrow, self.heading_arrow
 
 
     def update_plot(self):
