@@ -27,6 +27,7 @@ simple_topics = [
     ('/dbg_goal_wind_angle', Float32),
     ('/rudder_control', Int16),
     ('/sailing_state', String),
+    ('/dbg_helming_procedure', String),
     ('/wind_direction_apparent', Float64),
     ('/dbg_distance_to_waypoint', Float32),
     ('/dbg_heading_to_waypoint', Float32),

@@ -2,6 +2,7 @@
 
 import rospy
 import time
+import collections
 import numpy as np
 import random
 from std_msgs.msg import Float64, Float32, Int16, String
@@ -113,7 +114,6 @@ class TackBasic(ProcedureBase):
     """
     def __init__(self, sailing_state, timeout=TIMEOUT):
         super(TackBasic, self).__init__(sailing_state, timeout) 
-        self.name = "TackBasic"
 
     def loop(self):
         set_sail(WIND)
@@ -196,7 +196,7 @@ class ProcedureHandle():
 
         # Initialisation of the procedure list with initial weights, integers with increment of 1
         self.ProcedureList = [ {"Procedure": Procedure, 
-                                "Weight": [],
+                                "Weight": collections.deque(maxlen = 10),
                                 "InitPos": i} for i,Procedure in enumerate(ProcedureList) ]
 
         self.currentProcedureId = 0
@@ -217,8 +217,8 @@ class ProcedureHandle():
             if x['Weight']:
                 return np.mean(x['Weight'])
             else:
-                if random.random() < (EXPLORE_COEF / sum([ x['Weight'] == [] for x in self.ProcedureList])):
-                    rospy.logwarn("random proc")
+                if random.random() < (EXPLORE_COEF / sum([ not x['Weight'] for x in self.ProcedureList])):
+                    rospy.logwarn("Random procedure picked")
                     # Add some randomness in choice for untested procedures
                     return 0.1*random.random()
                 else:
