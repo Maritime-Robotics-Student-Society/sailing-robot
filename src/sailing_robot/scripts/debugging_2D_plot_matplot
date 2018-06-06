@@ -10,6 +10,7 @@ from sensor_msgs.msg import NavSatFix
 import numpy as np
 from matplotlib.transforms import blended_transform_factory
 
+import smopy
 
 # color palette definition (V2 from  https://matplotlib.org/users/dflt_style_changes.html#colors-color-cycles-and-color-maps)
 C = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
@@ -60,6 +61,7 @@ class Debugging_2D_matplot():
         rospy.Subscriber('position', NavSatFix, self.update_position)
         self.position = [1,1]
 
+        self.window = [0,0,0,0]
         self.init_plot()
         self.update_plot()
 
@@ -204,6 +206,37 @@ class Debugging_2D_matplot():
         miny = - dist * scale_dy
         maxy = + dist * scale_dy 
         self.ax.axis([minx, maxx, miny, maxy])
+        
+        if self.window == [minx, maxx, miny, maxy]:
+            return
+
+        self.window = [minx, maxx, miny, maxy]
+        
+
+        SO_corner = self.nav.utm_to_latlon(self.origin[0] + minx, self.origin[1] + miny)
+        NE_corner = self.nav.utm_to_latlon(self.origin[0] + maxx, self.origin[1] + maxy)
+
+        image_map = smopy.Map((float(SO_corner.lat),
+                              float(SO_corner.lon),
+                              float(NE_corner.lat),
+                              float(NE_corner.lon)), )
+
+        mapminx, mapminy = image_map.to_pixels((float(SO_corner.lat),
+                                                float(SO_corner.lon)), )
+
+        mapmaxx, mapmaxy = image_map.to_pixels((float(NE_corner.lat),
+                                                float(NE_corner.lon)), )
+
+        mapminx = int(mapminx)
+        mapminy = int(mapminy)
+        mapmaxx = int(mapmaxx)
+        mapmaxy = int(mapmaxy)
+        image = image_map.to_numpy()[mapmaxy:mapminy, mapminx:mapmaxx, :]
+
+        self.ax.imshow(image, extent=(minx, maxx, miny, maxy))
+        
+
+
 
 
     def update_plot(self):
