@@ -16,14 +16,6 @@ C = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
      '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
      '#bcbd22', '#17becf']
 
-def get_max_dist(origin, wparray):
-    max_dist = 0
-    for i, _ in enumerate(wparray[0]):
-        dist = np.sqrt((wparray[0][i]-origin[0])**2 + (wparray[1][i]-origin[1])**2) 
-        if dist >= max_dist:
-            max_dist = dist
-    return max_dist
-
 
 class Debugging_2D_matplot():
 
@@ -49,7 +41,6 @@ class Debugging_2D_matplot():
         self.wp_array = np.array([self.nav.latlon_to_utm(wp_table[wp][0], wp_table[wp][1]) for wp in wp_list]).T # [lat, lon]
 
         self.origin = [self.wp_array[0].mean(), self.wp_array[1].mean()]
-        self.dist = get_max_dist(self.origin, self.wp_array) 
 
         # Subscribers init
         rospy.Subscriber('sailing_state', String, self.update_sailing_state)
@@ -67,9 +58,7 @@ class Debugging_2D_matplot():
 
         self.position_history = collections.deque(maxlen = 500)
         rospy.Subscriber('position', NavSatFix, self.update_position)
-        self.position = [0,0]
-        self.gps_fix_lock = True
-
+        self.position = [1,1]
 
         self.init_plot()
         self.update_plot()
@@ -103,6 +92,9 @@ class Debugging_2D_matplot():
             self.wp_array[0][i] -= self.origin[0]
             self.wp_array[1][i] -= self.origin[1]
 
+        self.maxwpdist = [0,0]
+        self.maxwpdist[0] = np.max(np.abs(self.wp_array[0]))
+        self.maxwpdist[1] = np.max(np.abs(self.wp_array[1]))
 
         self.fig = plt.figure()
         self.boatline, = plt.plot([], [], c=C[0], label="Heading")
@@ -112,13 +104,6 @@ class Debugging_2D_matplot():
         # display  Waypoints
         self.wpfig = plt.scatter(self.wp_array[0], self.wp_array[1], c=C[3])
 
-        minx =  - 1.5*self.dist
-        maxx =  + 1.5*self.dist
-        miny =  - 1.5*self.dist
-        maxy =  + 1.5*self.dist
-        plt.xlim(minx, maxx) 
-        # plt.ylim(miny, maxy)
-        plt.axis('equal')
         plt.tight_layout()
         self.ax = plt.subplot(111)
     
@@ -136,13 +121,13 @@ class Debugging_2D_matplot():
         else:
             style = '->'
 
-#         sign = -(reverse-0.5)*2
-#         tform = blended_transform_factory(self.ax.transAxes, self.ax.transAxes)
-#         arrow = plt.arrow(0.9, 0.1,
-#                           sign*0.03*np.sin(angle)/scale_dx, sign*0.03*np.cos(angle)/scale_dy,
-#                           head_width=0.005, 
-#                           head_length=0.005,  fc=color, ec=color, 
-#                           transform=tform, label='Heading')
+        # sign = -(reverse-0.5)*2
+        # tform = blended_transform_factory(self.ax.transAxes, self.ax.transAxes)
+        # arrow = plt.arrow(0.9, 0.1,
+        #                   sign*0.03*np.sin(angle)/scale_dx, sign*0.03*np.cos(angle)/scale_dy,
+        #                   head_width=0.005, 
+        #                   head_length=0.005,  fc=color, ec=color, 
+        #                   transform=tform, label='Heading')
 
         arrow_ori = (0.88, 0.12)
         arrow_target = (arrow_ori[0] + 0.05*np.sin(angle)/scale_dx, arrow_ori[1] + 0.05*np.cos(angle)/scale_dy)
@@ -180,7 +165,45 @@ class Debugging_2D_matplot():
                                     head_length=1.,  
                                     fc=arrow_col, 
                                     ec=arrow_col)
+
+        self.update_window(i)
+
         return self.boatline, self.wind_arrow, self.boat_arrow, self.wpfig, self.goal_heading_arrow, self.heading_arrow
+
+    def update_window(self, i):
+        # update window only every second
+        if not i%10 == 0:
+            return
+
+        # rounding of the window size in m 
+        rounding = 10.0
+
+        # maximum distance to origin in both direction
+        distx = max(self.maxwpdist[0], abs(self.position[0])) + rounding/2
+        disty = max(self.maxwpdist[1], abs(self.position[1])) + rounding/2
+
+        distx = int(round(distx/rounding)*rounding) + 1
+        disty = int(round(disty/rounding)*rounding) + 1
+
+        # scaling to keep x and y orthonormal
+        figsize = self.fig.get_size_inches()
+        scale_dx = figsize[0]/np.sqrt(figsize[0]**2 + figsize[1]**2)
+        scale_dy = figsize[1]/np.sqrt(figsize[0]**2 + figsize[1]**2)
+        norm = min(scale_dx, scale_dy)
+        scale_dx = scale_dx/norm
+        scale_dy = scale_dy/norm
+        
+        # decide which axis is the limiting one
+        if distx*scale_dy > disty*scale_dx:
+            dist = distx
+        else:
+            dist = disty
+
+        minx = - dist * scale_dx
+        maxx = + dist * scale_dx
+        miny = - dist * scale_dy
+        maxy = + dist * scale_dy 
+        self.ax.axis([minx, maxx, miny, maxy])
 
 
     def update_plot(self):
