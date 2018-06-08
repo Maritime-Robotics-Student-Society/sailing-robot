@@ -117,6 +117,7 @@ function toggle_map(map_id, filename, run_id) {
     <div class="run" id="{{run_id}}">
       <!-- Start time, log name, links to data files -->
       <div class="run-line">{{run.rosbag.start.strftime('%H:%M:%S')}} [{{run.rosbag.test_name.strip('_')}}] :
+        <a id="{{run_id}}"> link </a>
       {% for file in run %}
         <a href="{{file.filename}}">{{file.file_type}}</a> ·
       {% endfor %}
