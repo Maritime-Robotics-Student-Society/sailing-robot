@@ -61,7 +61,7 @@ def set_sail(sheet_control, offset=0.0):
         sheet_normalized = sheet_control
 
     # be sure we don't publish values above 1 and below 0
-    sheet_normalized = max(0, min(1, sheet_normalized))
+    sheet_normalized = np.clip(0, 1, sheet_normalized)
     PUB_SAILSHEET.publish(sheet_normalized)
     
 
