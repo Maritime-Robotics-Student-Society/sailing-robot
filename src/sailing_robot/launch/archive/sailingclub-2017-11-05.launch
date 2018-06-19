@@ -1,0 +1,48 @@
+<launch>
+    <!--
+    Test at the sailing club (navigation around waypoints), 2017-11-05
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailingClub_waypoints.yaml" command="load"/>
+    
+    <param name="log_name" value="sailingclub_tests" />
+
+    <!--
+    Nodes
+    -->
+    <include file="$(find xsens_driver)/launch/xsens_driver.launch" />
+    <node name = "sensor_service_imu" pkg="sailing_robot" type="sensor_service_imu" respawn="true"/>
+    <node name = "sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps" respawn="true"/>
+    <node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu"  respawn="true"/>
+    <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction"  respawn="true"/>
+    <node name = "sensor_driver_multiplexer" pkg="sailing_robot" type="sensor_driver_multiplexer" respawn="true"/>
+    <node name = "sensor_processed_wind_direction" pkg="sailing_robot" type="sensor_processed_wind_direction"/>
+
+    <node name = "tasks" pkg="sailing_robot" type = "tasks"  respawn="true"/>
+    <node name = "tack" pkg="sailing_robot" type = "tack"  respawn="true"/>
+    <!--<node name = "force_jibe_tack" pkg="sailing_robot" type="force_jibe_tack" respawn="true"/>-->
+
+    <node name = "actuator_demand_sail" pkg="sailing_robot" type = "actuator_demand_sail" respawn="true"/>
+    <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" respawn="true"/>
+    <node name = "actuator_driver_sail" pkg="sailing_robot" type = "actuator_driver_sail" respawn="true"/>
+    <node name = "actuator_driver_rudder" pkg="sailing_robot" type="actuator_driver_rudder"  respawn="true"/>
+
+    <node name="debugging_dump_params" pkg='sailing_robot' type="debugging_dump_params"/>
+    <!-- Rosbag records messages for later investigation -->
+    <node name="record" pkg="rosbag" type="record" args="-a -o /home/pi/sailing-robot/sailingclub_tests"/>
+    <!-- Also record GPS data as required by the competition -->
+    <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log" respawn="true"/>
+
+    <!-- Serve an HTML dashboard so we can see what's going on -->
+    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
+ </launch>
