@@ -59,15 +59,15 @@ def parseResponse(gpsLine):
             chkVal ^= ord(ch)
         if (chkVal == int(chkSum, 16)):
             OKmsg +=1
-            #for i, k in enumerate(
-            #    ['strType', 'fixTime',
-            #    'lat', 'latDir', 'lon', 'lonDir',
-            #    'fixQual', 'numSat', 'horDil',
-            #    'alt', 'altUnit', 'galt', 'galtUnit',
-            #    'DPGS_updt', 'DPGS_ID']):
-            #    GPSDAT[k] = gpsComponents[i]
-            #print json.dumps(GPSDAT, indent=2)
-            #print gpsComponents
+            for i, k in enumerate(
+                ['strType', 'fixTime',
+                'lat', 'latDir', 'lon', 'lonDir',
+                'fixQual', 'numSat', 'horDil',
+                'alt', 'altUnit', 'galt', 'galtUnit',
+                'DPGS_updt', 'DPGS_ID']):
+                GPSDAT[k] = gpsComponents[i]
+#            print json.dumps(GPSDAT, indent=2)
+            print gpsComponents
 
 def readGPS():
     c = None
@@ -90,9 +90,9 @@ def readGPS():
 
 connectBus()
 starttime = time.time()
-while time.time()-starttime < 20:
+while time.time()-starttime < 200000000:
     readGPS()
-#    time.sleep(gpsReadInterval)
+    time.sleep(gpsReadInterval)
 
 currenttime = time.time() 
 print("ratio: ", 1.0*OKmsg/TOTALmsg)
