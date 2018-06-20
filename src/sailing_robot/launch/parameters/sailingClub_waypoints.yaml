@@ -3,7 +3,7 @@
 # for simplified entry of path, simply add list of waypoint names
 # starts with list entry 0, continues until end is reached
 #wp/list: ["1", "2", "3"]
-wp/list: ["9", "10"]
+wp/list: ["9", "13"]
 # triangle: 4, 5, 6
 # position keeping: 4
 # position keeping: 4, 5
