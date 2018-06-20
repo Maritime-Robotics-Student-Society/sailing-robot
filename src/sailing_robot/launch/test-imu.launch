@@ -1,0 +1,24 @@
+<launch>
+    <!--
+    Test at the sailing club (navigation around waypoints), 2017-11-05
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailingClub_waypoints.yaml" command="load"/>
+    
+    <param name="log_name" value="sailingclub_tests" />
+
+    <!--
+    Nodes
+    -->
+    <node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu"  respawn="true"/>
+ </launch>
