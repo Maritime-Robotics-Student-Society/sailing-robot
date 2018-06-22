@@ -196,7 +196,7 @@ class ProcedureHandle():
 
         # Initialisation of the procedure list with initial weights, integers with increment of 1
         self.ProcedureList = [ {"Procedure": Procedure, 
-                                "Weight": collections.deque(maxlen = 10),
+                                "TimeList": collections.deque(maxlen = 10),
                                 "InitPos": i} for i,Procedure in enumerate(ProcedureList) ]
 
         self.currentProcedureId = 0
@@ -214,10 +214,10 @@ class ProcedureHandle():
 
     def OrderList(self):
         def get_weight(x):
-            if x['Weight']:
-                return np.mean(x['Weight'])
+            if x['TimeList']:
+                return np.mean(x['TimeList'])
             else:
-                if random.random() < (EXPLORE_COEF / sum([ not x['Weight'] for x in self.ProcedureList])):
+                if random.random() < (EXPLORE_COEF / sum([ not x['TimeList'] for x in self.ProcedureList])):
                     rospy.logwarn("Random procedure picked")
                     # Add some randomness in choice for untested procedures
                     return 0.1*random.random()
@@ -230,13 +230,13 @@ class ProcedureHandle():
 
     def MarkSuccess(self):
         PUB_dbg_helming.publish("success " + str(self.currentProcedure))
-        self.ProcedureList[self.currentProcedureId]['Weight'].append(self.currentProcedure.EnlapsedTime())
+        self.ProcedureList[self.currentProcedureId]['TimeList'].append(self.currentProcedure.EnlapsedTime())
         self.currentProcedure = None
 
     def MarkFailure(self):
         PUB_dbg_helming.publish("fail " + str(self.currentProcedure))
         # In case of failure the weight given is 1.5 times the timeout
-        self.ProcedureList[self.currentProcedureId]['Weight'].append(1.5*TIMEOUT)
+        self.ProcedureList[self.currentProcedureId]['TimeList'].append(1.5*TIMEOUT)
         self.currentProcedure = None
 
     def StartProcedure(self, sailing_state):
