@@ -1,6 +1,6 @@
 #
 # DUMMY
-# 
+#
 # These are dummy values whilst development goes on. We should get rid of them :D
 # (Or keep them for some tests only)
 
@@ -56,7 +56,7 @@ navigation/utm_zone: 30
 procedure/jibe_to_turn: false
 
 # Timeout after wich a procedure is considered as failed
-procedure/timeout: 15 #in second
+procedure/timeout: 30 #in second
 
 # Exploration coefficient: it is the percentage of exploration in the search for the best procedure
 # If the coefficient is 0: the fastest procedure that works will always be chosen
@@ -109,13 +109,13 @@ wind/trend_average_time: 40.0
 
 
 
-# Camera detection 
+# Camera detection
 #
 # Threshold at wich the detection will be triggered (=% of the image that contain the colors)
 # (here 4%)
 camera_detection/threshold: 0.04
 
-# Rate at wich picture are taken 
+# Rate at wich picture are taken
 camera_detection/rate: 5  # [Hz]
 
 # If more than 50% of the photos within this average time are above threshold, a detection is published

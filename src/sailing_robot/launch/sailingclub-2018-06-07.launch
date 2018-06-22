@@ -10,11 +10,11 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
 
     <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
-    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython_rigA.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
     <rosparam file="$(find sailing_robot)/launch/parameters/sailingClub_waypoints.yaml" command="load"/>  <!-- **Add waypoints file(can be found in the parameters directory, sailingClub_waypoints.yaml) -->
-    
+
     <arg name="log_name" value="sailingclub_tests" />         <!-- **Add log name(sailingclub_tests, eastleigh_tests) -->
     <param name="log_name" value="$(arg log_name)" />
 
@@ -24,7 +24,6 @@
     <include file="$(find xsens_driver)/launch/xsens_driver.launch" />
     <node name = "sensor_service_imu" pkg="sailing_robot" type="sensor_service_imu" respawn="true"/>
     <node name = "sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps" respawn="true"/>
-    <node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu"  respawn="true"/>
     <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction"  respawn="true"/>
     <node name = "sensor_driver_multiplexer" pkg="sailing_robot" type="sensor_driver_multiplexer" respawn="true"/>
     <node name = "sensor_processed_wind_direction" pkg="sailing_robot" type="sensor_processed_wind_direction"/>

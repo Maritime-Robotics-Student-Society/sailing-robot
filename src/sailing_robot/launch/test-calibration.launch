@@ -22,13 +22,12 @@
     <include file="$(find xsens_driver)/launch/xsens_driver.launch" />
     <node name = "sensor_service_imu" pkg="sailing_robot" type="sensor_service_imu" respawn="true"/>
     <node name = "sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps" respawn="true"/>
-    <node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu"  respawn="true"/>
     <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction"  respawn="true"/>
     <node name = "sensor_driver_multiplexer" pkg='sailing_robot' type="sensor_driver_multiplexer" respawn="true"/>
     <node name = "actuator_driver_rudder" pkg="sailing_robot" type="actuator_driver_rudder"  respawn="true"/>
     <node name = "actuator_driver_sail" pkg="sailing_robot" type = "actuator_driver_sail" respawn="true"/>
     <node name = "sensor_driver_battery" pkg="sailing_robot" type="sensor_driver_battery"/>
-    
+
     <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
 
 
