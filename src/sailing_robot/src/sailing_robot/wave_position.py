@@ -57,6 +57,24 @@ class Wave_position():
         l = len(self.ydata)
         self.xdata = np.linspace((-l + 1) * self.period, 0, l)
 
+    def get_position(self):
+        """
+        Returns predicted position on the wave (number 0-1).
+        Returns 0 for position on the crest of wave. While the ship is going down
+        to the trough, this number is increasing. After reaching the trough and
+        going to another crest this number is still continously incresing until
+        it is 1 at the crest, where it is set back to 0.
+        (It is relative distance from the last crest.)
+        """
+        a, b, c, d = self.popt
+        pi = np.pi
+        now = time.time()
+        diff = float(now - self.refresh_time)
+        cos_inner = float(b * diff + c)
+        rel_distance = cos_inner/pi - int(cos_inner/pi)
+        return rel_distance
+
+
 
     ################################################
     ## Debug methods
@@ -88,20 +106,44 @@ class Wave_position():
 
 
 
-# TODO: model_func fits well data that are one period of sine function, however,
+# TODO: - model_func fits well data that are one period of sine function, however,
 #       if several periods are passed, the fit is faulty.
+#       See the test cases below.
+#
+#       - get_position() needs to be tested
 
 
 
 if __name__ == '__main__':
-    wp = Wave_position(frequency=10, time_range=5, refresh_time=1)
-    # wp.queue = deque([6,3,0,3,6,3,0,3,6])
-    # wp.queue = deque([5, 4, 2.7, 1, 0.5, 1.2, 3.2, 4.5, 5, 3.4, 2.5, 1.5, 1, 1.7, 3, 3.7, 4.1])
-    # wp.queue = deque(1*[0,3,6,3,0])
-    # wp.queue = deque(4*[-1, -0.5, 0, 0.5, 1, 0.5, 0, -0.5])
+    wp = Wave_position(frequency=10, time_range=10, refresh_time=1)
 
-    o = 5
-    wp.queue = deque([-2 + o, -1 + o, 0 + o, 1 + o, 2 + o, 1 + o, 0 + o, -1 + o])
+    ########################################################
+    ## this works well
+    # wp.queue = deque(1*[0,3,6,3,0])
+    ########################################################
+
+    ########################################################
+    ## this doesn't work
+    # wp.queue = deque(2*[0,3,6,3,0])
+    ########################################################
+
+    ########################################################
+    ## this doesn't work either
+    # wp.queue = deque([5, 4, 2.7, 1, 0.5, 1.2, 3.2, 4.5, 5, 3.4, 2.5, 1.5, 1, 1.7, 3, 3.7, 4.1])
+    ########################################################
+
+
+    ########################################################
+    ## this works well
+    # o = 5
+    # wp.queue = deque([-2 + o, -1 + o, 0 + o, 1 + o, 2 + o, 1 + o, 0 + o, -1 + o])
+    ########################################################
+
+    ########################################################
+    ## this works well either
+    ## ! line below with wp.process_queue() has to be commented
+    # wp.generate_data()
+    ########################################################
 
     wp.process_queue()
     wp.train()
