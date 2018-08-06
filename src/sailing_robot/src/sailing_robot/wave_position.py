@@ -66,13 +66,16 @@ class Wave_position():
         it is 1 at the crest, where it is set back to 0.
         (It is relative distance from the last crest.)
         """
-        a, b, c, d = self.popt
-        pi = np.pi
-        now = time.time()
-        diff = float(now - self.refresh_time)
-        cos_inner = float(b * diff + c)
-        rel_distance = cos_inner/pi - int(cos_inner/pi)
-        return rel_distance
+        if (not self.initializing):
+            a, b, c, d = self.popt
+            pi = np.pi
+            now = time.time()
+            diff = float(now - self.refresh_time)
+            cos_inner = float(b * diff + c)
+            rel_distance = cos_inner/pi - int(cos_inner/pi)
+            return rel_distance
+        else:
+            return "initializing"
 
 
 
