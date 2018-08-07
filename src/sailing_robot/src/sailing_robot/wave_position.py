@@ -1,3 +1,29 @@
+"""
+Wave_position class helps to time a tack manoeuvre. It inputs vertical acceleration and predicts ship
+position on the wave so that tack manoevre can be started at the crest when it is most convenient.
+
+Usage:
+wp = Wave_position(frequency, time_range, refresh_time) # to initialize
+# Every time new reading is obtain, call
+wp.update(new_reading) # where new_reading is vertical acceleration
+# Call
+wp.get_position()
+# to get predicted position on the wave. Returns a number between 0 and 1 which is a relative distance
+# from the last crest. (at the crest it is 0, at the trough 0.5, just before the next crest 1 and just after
+# the crest 0 again). Be aware that during first time_range seconds after first call of update method,
+# initialisation is enabled and get_positon() returns "initializing"
+
+Code explanation:
+After get_positon is called for the first time, initialisation phase is enabled for the time specified by time_range.
+Every time update method is called, new reading is appended to a queue. If get_position is called now, it returns
+"initializing". After time_range seconds pass, initializing phase is disabled. Every time update method is called
+now, it appends new element to the queue and removes the oldest one to keep the size of the queue constant. Data from
+the queue are coppied to ydata variable every time update is called and time from the last update is larger
+then refresh_time. When this happens, xdata are generated based on the frequency and number of items in ydata.
+Next sine function is fitted to xdata, ydata. Prediction of the position on the wave is made based on this sine
+function and time that has passed from the last refresh.
+"""
+
 from collections import deque
 import time
 import numpy as np
@@ -5,6 +31,10 @@ from scipy.optimize import curve_fit
 
 class Wave_position():
     def __init__(self, frequency, time_range, refresh_time=1):
+        # frequency of acceleration reading
+        # time range, readings aquired during this time window are used for predictions (idealy should be a few sea waves)
+        # refresh time, how often is prediction function re-trained on the most recent data
+
         self.period = 1.0/frequency # period in seconds between each two data points
         # queue is updated every time update func is called.
         self.time_range = time_range # time range captured (size of window for fitting the curve)
@@ -18,6 +48,8 @@ class Wave_position():
         self.last_refresh = 0 # time when last refresh occured
 
     def update(self, data_point):
+        # data point, vertical acceleration reading
+        
         self.queue.append(data_point)
         if (self.initializing):
             now = time.time()
@@ -122,7 +154,7 @@ if __name__ == '__main__':
 
     ########################################################
     ## this works well
-    # wp.queue = deque(1*[0,3,6,3,0])
+    wp.queue = deque(1*[0,3,6,3,0])
     ########################################################
 
     ########################################################
