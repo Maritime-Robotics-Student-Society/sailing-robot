@@ -35,6 +35,7 @@ PUB_dbg_helming = rospy.Publisher('dbg_helming_procedure', String, queue_size=10
 data = PID_Data()
 rudder = rospy.get_param('rudder')
 controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'],rudder['maxAngle'], -rudder['maxAngle'])
+remote_control = False
 
 sail_table_dict   = rospy.get_param('sailsettings/table')
 sheet_out_to_jibe = rospy.get_param('sailsettings/sheet_out_to_jibe', False)
@@ -45,6 +46,8 @@ TIMEOUT      = rospy.get_param('procedure/timeout')
 EXPLORE_COEF = rospy.get_param('procedure/exploration_coefficient')
 
 ##########################################################################
+def update_remote_control(msg):
+    remote_control = msg.data
 
 def set_sail(sheet_control, offset=0.0):
     if sheet_control is WIND:
@@ -229,14 +232,16 @@ class ProcedureHandle():
         # rospy.logwarn(str(self.ProcedureList))
 
     def MarkSuccess(self):
-        PUB_dbg_helming.publish("success " + str(self.currentProcedure))
-        self.ProcedureList[self.currentProcedureId]['TimeList'].append(self.currentProcedure.EnlapsedTime())
+        if not remote_control:
+            PUB_dbg_helming.publish("success " + str(self.currentProcedure))
+            self.ProcedureList[self.currentProcedureId]['TimeList'].append(self.currentProcedure.EnlapsedTime())
         self.currentProcedure = None
 
     def MarkFailure(self):
-        PUB_dbg_helming.publish("fail " + str(self.currentProcedure))
-        # In case of failure the weight given is 1.5 times the timeout
-        self.ProcedureList[self.currentProcedureId]['TimeList'].append(1.5*TIMEOUT)
+        if not remote_control:
+            PUB_dbg_helming.publish("fail " + str(self.currentProcedure))
+            # In case of failure the weight given is 1.5 times the timeout
+            self.ProcedureList[self.currentProcedureId]['TimeList'].append(1.5*TIMEOUT)
         self.currentProcedure = None
 
     def StartProcedure(self, sailing_state):
@@ -310,6 +315,7 @@ if __name__ == '__main__':
         rospy.Subscriber('heading', Float32, data.update_heading)
         rospy.Subscriber('sailing_state', String, data.update_sailing_state)
         rospy.Subscriber('tack_rudder', Float32, data.update_tack_rudder)
+        rospy.Subscriber('remote_control', Bool, update_remote_control)
         Helming()
     except rospy.ROSInterruptException:
         pass
