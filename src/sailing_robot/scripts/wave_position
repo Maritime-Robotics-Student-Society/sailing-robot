@@ -1,0 +1,58 @@
+#!/usr/bin/python
+
+import rospy
+from std_msgs.msg import Float32
+from sensor_msgs.msg import Imu
+from sailing_robot.wave_position import Wave_position
+
+############################################################################
+##								Setting 		   						  ##
+############################################################################
+
+time_range = 3 # time window captured by the wave_position algorithm
+refresh_time = 0.5 # how often the model is re-trained
+
+"""
+The higher the time_range, the less the algorithm is sensitive to noise.
+Also, the higher the time_range, the worse the algorithm reacts to change
+to wave period. (time_range should be small for irregular waves)
+After resfrest_time seconds pass, the algorithm takes last time_range
+seconds of the acceleration reading and uses that for prediction. This
+repeats every refresh_time seconds.
+"""
+
+############################################################################
+
+
+rospy.init_node('wave_position', anonymous=True)
+initializing = True
+frequency = rospy.get_param("config/rate")
+
+wp = Wave_position(frequency, time_range, refresh_time)
+
+def update_wp_queue(msg):
+	wp.update(msg.linear_acceleration.z)
+
+rospy.Subscriber('/imu/data', Imu, update_wp_queue)
+
+def talker():
+	global initializing
+	pub = rospy.Publisher('wave_position', Float32, queue_size=10)
+	rate = rospy.Rate(frequency)
+	while not rospy.is_shutdown():
+		wave_position = wp.get_position()
+		# Start publishing only after initialization ends.
+		if(initializing):
+			if (wave_position != 'initializing'):
+				initializing = False
+				rospy.loginfo("Initialization of wave_position completed.")
+				rospy.loginfo("Sart publishing wave_position prediction.")
+		else:
+			pub.publish(wave_position)
+		rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        talker()
+    except rospy.ROSInterruptException:
+        pass
