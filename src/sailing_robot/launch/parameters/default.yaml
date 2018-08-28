@@ -65,6 +65,12 @@ procedure/timeout: 30 #in second
 procedure/exploration_coefficient: 0.3 #number between 0 and 1
 
 
+#
+# Wave Position
+#
+wave_position/time_range: 3 # time window in seconds captured by the wave_position algorithm
+wave_position/refresh_time: 0.5 # how often the model is re-trained
+
 
 
 # Heading

@@ -9,8 +9,8 @@ from sailing_robot.wave_position import Wave_position
 ##								Setting 		   						  ##
 ############################################################################
 
-time_range = 3 # time window captured by the wave_position algorithm
-refresh_time = 0.5 # how often the model is re-trained
+time_range = rospy.get_param('wave_position/time_range') # time window captured by the wave_position algorithm
+refresh_time = rospy.get_param('wave_position/refresh_time') # how often the model is re-trained
 
 """
 The higher the time_range, the less the algorithm is sensitive to noise.
