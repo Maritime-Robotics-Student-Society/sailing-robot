@@ -33,7 +33,7 @@ from scipy.optimize import curve_fit
 class Wave_position():
     def __init__(self, frequency, time_range, refresh_time=1):
         # frequency: rate of acceleration reading
-        # time range: readings aquired during this time window are used for predictions (idealy should be a few sea waves)
+        # time range: readings acquired during this time window are used for predictions
         # refresh time: how often is prediction function re-trained on the most recent data
 
         self.period = 1.0/frequency # period in seconds between each two data points
@@ -41,6 +41,7 @@ class Wave_position():
         self.time_range = time_range # time range captured (size of window for fitting the curve)
         self.refresh_time = refresh_time # after this time new fit is performed
         self.queue = deque()
+        self.required_queue_length = frequency * time_range
         # xdata & ydata are updated in time_range periods
         self.xdata = np.array([])
         self.ydata = np.array([])
@@ -53,10 +54,7 @@ class Wave_position():
 
         self.queue.append(data_point)
         if (self.initializing):
-            now = time.time()
-            if (len(self.queue) <= 1):
-                self.last_refresh = now
-            if ((now - self.last_refresh) >= self.time_range):
+            if (len(self.queue) >= self.required_queue_length):
                 self.initializing = False
         else:
             # Delete the oldest value to keep the queue size constant.
