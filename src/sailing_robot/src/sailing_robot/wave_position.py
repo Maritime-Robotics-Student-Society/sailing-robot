@@ -29,6 +29,8 @@ import time
 import copy
 import numpy as np
 from scipy.optimize import curve_fit
+from scipy import __version__ as scipy_version
+
 
 class Wave_position():
     def __init__(self, frequency, time_range, refresh_time=1):
@@ -36,6 +38,8 @@ class Wave_position():
         # time range: readings acquired during this time window are used for predictions
         # refresh time: how often is prediction function re-trained on the most recent data
 
+        if ((int(scipy_version.split('.')[0]) == 0) and (int(scipy_version.split('.')[1]) < 17)):
+            raise Exception("Your scipy is outdated. Minimal required version is 0.17.0. Your are currently running "+scipy_version)
         self.period = 1.0/frequency # period in seconds between each two data points
         # queue is updated every time update func is called.
         self.time_range = time_range # time range captured (size of window for fitting the curve)
@@ -45,7 +49,7 @@ class Wave_position():
         # xdata & ydata are updated in time_range periods
         self.xdata = np.array([])
         self.ydata = np.array([])
-        self.popt = np.array([])
+        self.popt = np.array([0, 0, 0])
         self.initializing = True
         self.last_refresh = 0 # time when last refresh occured
 
@@ -61,22 +65,30 @@ class Wave_position():
             self.queue.popleft()
             now = time.time()
             if ((now - self.last_refresh) >= self.refresh_time):
-                self.last_refresh = now
-                # Copy current queue to self.ydata.
-                self.process_queue()
-                # Fit model_func to the data.
-                self.train()
+                try:
+                    # Copy current queue to self.ydata.
+                    self.process_queue()
+                    # Fit model_func to the data.
+                    self.train()
+                    self.last_refresh = now
+                except RuntimeError as e:
+                    print(e) 
 
-
-    def model_func(self, x, a, b, c, d):
-        return a * (np.cos(b * x + c)) + d
+    def model_func(self, x, a, b, c):
+        return a * (np.cos(b * x + c)) + np.mean(self.ydata)
 
     def train(self):
         """
         Fits model_func to self.xdata & self.ydata and saves fit parameters
         to self.popt.
         """
-        self.popt, pcov = curve_fit(self.model_func, self.xdata, self.ydata)
+        guess_freq = 0.5
+        guess_amplitude = 3*np.std(self.ydata)/(2**0.5)
+        guess_phase = 0
+        p0=[guess_amplitude, guess_freq, guess_phase]
+
+        popt, pcov = curve_fit(f=self.model_func, xdata=self.xdata, ydata=self.ydata, p0=p0, bounds=((0, 0, 0), (100., 2., np.pi)), maxfev=2000)
+        self.popt = popt
 
     def process_queue(self):
         """
@@ -98,12 +110,21 @@ class Wave_position():
         (It is relative distance from the last crest.)
         """
         if (not self.initializing):
-            a, b, c, d = self.popt
             pi = np.pi
+            amplitude, frequency, phase = self.popt
+            last_refresh = self.last_refresh
             now = time.time()
-            diff = float(now - self.refresh_time)
-            cos_inner = float(b * diff + c)
+            diff = float(now - last_refresh)
+            cos_inner = float(frequency * diff + phase)
             rel_distance = cos_inner/pi - int(cos_inner/pi)
+
+            # print("frequency: {}".format(frequency))
+            # print("diff: {}".format(diff))
+            # print("phase: {}".format(phase))
+            # print("cos_inner: {}".format(cos_inner))
+            # print("rel_distance: {}".format(rel_distance))
+            # print("\n")
+
             return rel_distance
         else:
             return "initializing"
@@ -119,17 +140,26 @@ class Wave_position():
     #     np.random.seed(1729)
     #     y_noise = 0.2 * np.random.normal(size=self.xdata.size)
     #     self.ydata = y + y_noise
-    #
-    # def plot(self):
+    
+    # def plot_all(self):
     #     import matplotlib.pyplot as plt
-    #     plt.plot(self.xdata, self.ydata, 'b*', label='data')
-    #     plt.plot(self.xdata, self.model_func(self.xdata, *self.popt), 'r+')
+    #     plt.plot(self.xdata, self.ydata, 'b*', label='training data')
+    #     plt.plot(self.xdata, self.model_func(self.xdata, *self.popt), 'r+', label='predicted')
+    #     plt.legend(loc=0)
     #     plt.show()
-    #
+
+    # def plot_training_data(self):
+    #     import matplotlib.pyplot as plt
+    #     plt.plot(self.xdata, self.ydata, 'b*')
+    #     plt.show()
+    
     # def print_vars(self):
     #     print("period: {}\n".format(self.period))
     #     print("time_range: {}\n".format(self.time_range))
     #     print("refresh_time: {}\n".format(self.refresh_time))
+    #     print("queue size: {}\n".format(len(self.queue)))
+    #     print("xdata size: {}\n".format(len(self.xdata)))
+    #     print("ydata size: {}\n".format(len(self.ydata)))
     #     print("queue: {}\n".format(self.queue))
     #     print("xdata: {}\n".format(self.xdata))
     #     print("ydata: {}\n".format(self.ydata))
