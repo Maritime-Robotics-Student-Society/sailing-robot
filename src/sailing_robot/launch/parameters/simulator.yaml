@@ -4,7 +4,7 @@
 simulation/wind/speed: 5
 
 # wind direction relative to north
-simulation/wind/direction: 180
+simulation/wind/direction: 317
 
 # A gaussian noise is generated on both wind speed and wind direction, use a value of 0 to remove the noise generation.
 # These parameters are the 'width' of the gaussian distribution
