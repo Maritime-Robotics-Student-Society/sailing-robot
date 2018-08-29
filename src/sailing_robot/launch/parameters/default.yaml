@@ -42,7 +42,7 @@ config/battery_rate: 0.05
 # Angle area from going directly upwind to the end of the deadzone (the total
 # angular area of the dead zone is therefore 2*beating_angle).
 # in [degrees]
-navigation/beating_angle: 50
+navigation/beating_angle: 45
 # Zone number of the UTM system to use. Southampton is in zone 30,
 # Oslo in zone 32. http://www.dmap.co.uk/utmworld.htm
 # Distance calculations will be less accurate the further from the specified
@@ -53,7 +53,7 @@ navigation/utm_zone: 30
 # Helming Procedure
 #
 # True to turn by jibing preferably instead of tacking:
-procedure/jibe_to_turn: false
+procedure/jibe_to_turn: true
 
 # Timeout after wich a procedure is considered as failed
 procedure/timeout: 15 #in second
@@ -62,7 +62,7 @@ procedure/timeout: 15 #in second
 # If the coefficient is 0: the fastest procedure that works will always be chosen
 # If the coefficient is 1: all the procedures will be tried randomly at first
 # If the coefficient is 0.3: 30% of the time an untested procedure will be tried
-procedure/exploration_coefficient: 0.3 #number between 0 and 1
+procedure/exploration_coefficient: 0.1 #number between 0 and 1
 
 
 

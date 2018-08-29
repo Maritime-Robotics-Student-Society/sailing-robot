@@ -13,9 +13,9 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/calshot_waypoints_area_scanning.yaml" command="load"/> 
+    <rosparam file="$(find sailing_robot)/launch/parameters/calshot_waypoints_area_scanning_2.yaml" command="load"/> 
 
-    <arg name="log_name" value="calshot_area_scanning" />  
+    <arg name="log_name" value="calshot_area_scanning_attempt2" />  
     <param name="log_name" value="$(arg log_name)" />
 
     <!--
