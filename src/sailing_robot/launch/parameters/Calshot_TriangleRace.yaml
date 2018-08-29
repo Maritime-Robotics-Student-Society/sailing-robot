@@ -1,0 +1,19 @@
+# CAUTION:
+# Some of these waypoints may not be suitable in all tide conditions!!
+# for simplified entry of path, simply add list of waypoint names
+# starts with list entry 0, continues until end is reached
+
+wp/list: ["3", "1", "2","3"]
+
+
+# distance within waypoint is accepted, in [m]
+wp/acceptRadius: 3.5
+wp/tackVotingRadius: 20
+
+
+# Dictionary for looking up waypoints, using [lat, lon] format of NavSatFix
+#
+wp/table: { "1" : [50.822000,-1.31188333],
+            "2" : [50.821183,-1.3117666],
+            "3" : [50.821116,-1.310633]
+}

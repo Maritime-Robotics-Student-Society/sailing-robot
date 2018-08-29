@@ -6,6 +6,7 @@ import collections
 import numpy as np
 import random
 from std_msgs.msg import Float64, Float32, Int16, String
+from std_msgs.msg import Bool
 
 from sailing_robot.sail_table import SailTable, SailData
 
