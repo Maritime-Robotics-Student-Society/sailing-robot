@@ -71,11 +71,11 @@ vCA = vCA/CA
 wp_list = [wpC_utm + vCD/2 + vCA/2]
 top_cell = 35
 
-top_wp = (wpC_utm + vCD*(0.5)*cellsize + vCA*(0.5)*cellsize)
+top_wp = (wpC_utm + vCD*(0.5)*cellsize + vCA*(2.5)*cellsize)
 wp_list.append(top_wp)
 dir = +1
-for j in range(subY):
-    wp_list.append(wp_list[-1] + vCA*cellsize)
+for j in range(subY/2):
+    wp_list.append(wp_list[-1] + vCA*cellsize*2)
     for i in range(int(subX/3)-1):
         wp_list.append(wp_list[-1] + dir*vCD*cellsize*3)
     dir = -dir

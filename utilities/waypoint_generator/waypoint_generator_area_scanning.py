@@ -69,46 +69,18 @@ vCA = vCA/CA
 
 
 wp_list = [wpC_utm + vCD/2 + vCA/2]
+top_cell = 58
 
-top_wp = (wpC_utm + vCD*(subX-0.5)*cellsize + vCA*(45-0.5)*cellsize)
+top_wp = (wpC_utm + vCD*(subX-0.5)*cellsize + vCA*(top_cell-0.5)*cellsize)
 wp_list.append(top_wp)
 dir = -1
-for j in range(45):
+for j in range(top_cell):
     wp_list.append(wp_list[-1] - vCA*cellsize)
-    for i in range(int(subX/3)):
+    for i in range(int(subX/3)-1):
         wp_list.append(wp_list[-1] + dir*vCD*cellsize*3)
     dir = -dir
         
 wp_list.pop(0) # to remove the first wp (only there because it was easier to loop like that...)
-
-# wp_list_top = [wpA_utm - vAB/2 + vAB_orth/2]
-# dir = 1
-# for wp_idx_vert in range(4):
-#     wp_list_top.append(wp_list_top[-1] + vAB)
-#     for wp_idx_hor in range(7):
-#         wp_list_top.append(wp_list_top[-1] + dir*vAB_orth)
-#     dir = -dir
-# wp_list_top.pop(0) # to remove the first wp (only there because it was easier to loop like that...)
-
-
-#### BOTTOM 4x4 part
-# wp_list_bot = [wpA_utm + vAB*3.5 + vAB_orth*4.5]
-# dir = 1
-# for wp_idx_vert in range(4):
-#     wp_list_bot.append(wp_list_bot[-1] + vAB)
-#     for wp_idx_hor in range(3):
-#         wp_list_bot.append(wp_list_bot[-1] + dir*vAB_orth)
-#     dir = -dir
-# wp_list_bot.pop(0) # to remove the first wp (only there because it was easier to loop like that...)
-
-
-#### Finish line
-# wp_finish = [wpA_utm + vAB*5 + vAB_orth/2, wpA_utm + vAB*5 - vAB_orth/2]
-# wp_finish = [wpD_utm - vAB + vAB_orth/2, wpD_utm - vAB - vAB_orth/2] # uncomment if wpD is correctly set
-# wp_finish = [wpC_utm + vAB + vAB_orth/2, wpC_utm + vAB - vAB_orth/2] # uncomment if wpC is correctly set
-
-
-# wp_list = wp_start + wp_list_top + wp_list_bot + wp_finish 
 
 wp_latlon_list = [ utm_to_latlon(wp[0], wp[1]) for wp in wp_list ]
 
