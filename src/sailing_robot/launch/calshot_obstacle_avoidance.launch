@@ -10,7 +10,7 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
 
     <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
-    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython_rigA.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
     <rosparam file="$(find sailing_robot)/launch/parameters/calshot_obstacle_avodiance.yaml" command="load"/>   <!-- **Add waypoints file(can be found in the parameters directory, sailingClub_waypoints.yaml) -->
