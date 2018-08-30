@@ -124,14 +124,14 @@ camera_detection/average_time: 1  # [s]
 
 # Two colors are needed because red is in the upper and lower end of the HSV colour space
 # Lower color:
-camera_detection/Lower_color_hsv1: [0, 32, 95] # /!\ HSV colorspace
+camera_detection/Lower_color_hsv1: [0, 173, 143] # /!\ HSV colorspace
 # Upper color:
-camera_detection/Upper_color_hsv1: [10,255,255] # /!\ HSV colorspace
+camera_detection/Upper_color_hsv1: [12,255,255] # /!\ HSV colorspace
 
 # Lower color:
-camera_detection/Lower_color_hsv2: [170, 32, 90] # /!\ HSV colorspace
+camera_detection/Lower_color_hsv2: [0, 0, 0] # /!\ HSV colorspace
 # Upper color:
-camera_detection/Upper_color_hsv2: [185,255,255] # /!\ HSV colorspace
+camera_detection/Upper_color_hsv2: [0,0,0] # /!\ HSV colorspace
 
 
 # Power-On Self Test. If run, the rudder will wiggle and the sheet move
