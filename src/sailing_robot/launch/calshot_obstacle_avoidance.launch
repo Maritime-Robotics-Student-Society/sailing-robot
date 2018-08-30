@@ -13,9 +13,9 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython_rigA.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/calshot_obstacle_avodiance.yaml" command="load"/>   <!-- **Add waypoints file(can be found in the parameters directory, sailingClub_waypoints.yaml) -->
+    <rosparam file="$(find sailing_robot)/launch/parameters/calshot_obstacle_avodiance_1.yaml" command="load"/>  
 
-    <arg name="log_name" value="calshot_station_keeping" />         <!-- **Add log name(sailingclub_tests, eastleigh_tests) -->
+    <arg name="log_name" value="calshot_obstacle_avoidance" /> 
     <param name="log_name" value="$(arg log_name)" />
 
     <!--
