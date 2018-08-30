@@ -1,0 +1,31 @@
+# distance within waypoint is accepted, in [m]
+wp/acceptRadius: 5
+wp/tackVotingRadius: 20
+
+wp/table:
+  A: [50.8208148975909, -1.3137864720799257]
+  B: [50.821110724829616, -1.3136170482685259]
+  B1: [50.8209880710378, -1.313083318737597]
+  C: [50.82132202982804, -1.3134960299252896]
+  C1: [50.8211993754666, -1.3129622983283866]
+  D: [50.821533334683, -1.3133750104694286]
+  D1: [50.82141067975195, -1.31284127680658]
+  E: [50.821744639394545, -1.313253989900943]
+  E1: [50.82162198389388, -1.312720254172092]
+  F: [50.821955943962635, -1.3131329682198327]
+  F1: [50.82183328789233, -1.3125992304249792]
+  G: [50.822251770117006, -1.3129635359969711]
+wp/tasks:
+- {kind: to_waypoint, waypoint: A}
+- {kind: to_waypoint, waypoint: B}
+- {kind: obstacle_waypoints, normal: C, obstacle: B1}
+- {kind: obstacle_waypoints, normal: D, obstacle: C1}
+- {kind: obstacle_waypoints, normal: E, obstacle: D1}
+- {kind: obstacle_waypoints, normal: F, obstacle: E1}
+- {kind: to_waypoint, waypoint: G}
+- {kind: to_waypoint, waypoint: F}
+- {kind: obstacle_waypoints, normal: E, obstacle: F1}
+- {kind: obstacle_waypoints, normal: D, obstacle: E1}
+- {kind: obstacle_waypoints, normal: C, obstacle: D1}
+- {kind: obstacle_waypoints, normal: B, obstacle: C1}
+- {kind: to_waypoint, waypoint: A}
