@@ -18,22 +18,30 @@ import numpy as np
 from sailing_robot.navigation import Navigation
 
 # See http://www.dmap.co.uk/utmworld.htm to find the right zone
-UTM_ZONE = 32
+UTM_ZONE = 30
 
 # Load yaml file given in argument
 input_file = sys.argv[1]
-with open(input_file, 'r') as f:
-    yaml_data = yaml.safe_load(f)
+#with open(input_file, 'r') as f:
+#    yaml_data = yaml.safe_load(f)
 
 output_file = input_file[:-5] + "_gen_obstacle.yaml"
 
 margin = 10 # [m]
 
-wp1 = yaml_data['wp/table']['wp1']
-wp2 = yaml_data['wp/table']['wp2']
+#wp1 = yaml_data['wp/table']['wp1']
+#wp2 = yaml_data['wp/table']['wp2']
 #wp3 = yaml_data['wp/table']['wp3']
-wp4 = yaml_data['wp/table']['wp4']
+#wp4 = yaml_data['wp/table']['wp4']
+# course 1
+wp1 = (50.82082570829222,-1.311508136900023)
+wp2 = (50.820720237801176,-1.31363073133094)
+wp4 = (50.820646434491884,-1.3114859407167054)
 
+# course 2
+wp1 = (50.82086875660889,-1.3136046333659215)
+wp2 = (50.822136584453986,-1.3128785101937752)
+wp4 = (50.820930082615554,-1.313871497810471)
 
 nav = Navigation(utm_zone=UTM_ZONE)
 wp1_utm = nav.latlon_to_utm(wp1[0], wp1[1])
@@ -77,7 +85,8 @@ def to_wp(wp):
 
 # Convert new waypoints to lat/long pairs
 latlon_wp = {k: to_wp(v) for (k,v) in utm_wp.items()}
-yaml_data['wp/table'].update(latlon_wp)
+yaml_data = {}
+yaml_data['wp/table'] = latlon_wp
 
 # Task order
 yaml_data['wp/tasks'] = [{'kind': 'to_waypoint', 'waypoint': 'A'},
