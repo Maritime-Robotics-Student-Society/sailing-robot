@@ -11,7 +11,7 @@ from std_msgs.msg import String, Float32, Float64
 from sensor_msgs.msg import NavSatFix
 import numpy as np
 
-import smopy
+#import smopy
 
 # color palette definition (V2 from  https://matplotlib.org/users/dflt_style_changes.html#colors-color-cycles-and-color-maps)
 C = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
