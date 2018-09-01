@@ -2,4 +2,4 @@
 set -e
 
 echo "SSH-ing to the pi at ${SAIL_PI_IP:=192.168.12.1}..."
-ssh pi@$SAIL_PI_IP
+ssh -X pi@$SAIL_PI_IP
