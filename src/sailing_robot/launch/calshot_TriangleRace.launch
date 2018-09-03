@@ -1,6 +1,6 @@
 <launch>
     <!--
-    **Test description and date
+    27.08.2018 Triangle Race at Calshot WRSC 2018
     -->
 
     <!--
@@ -10,12 +10,12 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
 
     <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
-    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython_rigA.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/waypoints file" command="load"/>   <!-- **Add waypoints file(can be found in the parameters directory, sailingClub_waypoints.yaml) -->
+    <rosparam file="$(find sailing_robot)/launch/parameters/Calshot_TriangleRace.yaml" command="load"/>   <!-- **Add waypoints file(can be found in the parameters directory, sailingClub_waypoints.yaml) -->
     
-    <arg name="log_name" value="location_tests" />         <!-- **Add log name(sailingclub_tests, eastleigh_tests) -->
+    <arg name="log_name" value="calshot_triangle_race" />         <!-- **Add log name(sailingclub_tests, eastleigh_tests) -->
     <param name="log_name" value="$(arg log_name)" />
 
     <!--

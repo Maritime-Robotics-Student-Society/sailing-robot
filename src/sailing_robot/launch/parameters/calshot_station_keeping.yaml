@@ -1,0 +1,15 @@
+
+wp/tasks: [
+  {"kind": "to_waypoint", "waypoint": "mark"},
+  {"kind": "keep_station", "waypoint": "mark", "linger": 30000, "wind_angle": 45, "radius": 1.5},
+]
+
+# distance within waypoint is accepted, in [m]
+wp/acceptRadius: 2
+wp/tackVotingRadius: 20
+
+
+# Dictionary for looking up waypoints, using [lat, lon] format of NavSatFix
+#
+wp/table: {"mark" : [50.82046666,  	-1.328633333],   
+}

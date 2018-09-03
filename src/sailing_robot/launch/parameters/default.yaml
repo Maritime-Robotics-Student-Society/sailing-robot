@@ -56,7 +56,7 @@ navigation/utm_zone: 30
 procedure/jibe_to_turn: false
 
 # Timeout after wich a procedure is considered as failed
-procedure/timeout: 30 #in second
+procedure/timeout: 15 #in second
 
 # Exploration coefficient: it is the percentage of exploration in the search for the best procedure
 # If the coefficient is 0: the fastest procedure that works will always be chosen

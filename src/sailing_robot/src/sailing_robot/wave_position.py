@@ -40,6 +40,7 @@ class Wave_position():
 
         if ((int(scipy_version.split('.')[0]) == 0) and (int(scipy_version.split('.')[1]) < 17)):
             raise Exception("Your scipy is outdated. Minimal required version is 0.17.0. Your are currently running "+scipy_version)
+
         self.period = 1.0/frequency # period in seconds between each two data points
         # queue is updated every time update func is called.
         self.time_range = time_range # time range captured (size of window for fitting the curve)

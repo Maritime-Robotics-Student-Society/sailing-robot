@@ -1,0 +1,28 @@
+<launch>
+    <!--
+    test GPS
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailingClub_waypoints.yaml" command="load"/>
+    
+    <param name="log_name" value="sailingclub_tests" />
+
+    <!--
+    Nodes
+    -->
+    <node name = "sensor_driver_gps" pkg='sailing_robot' type="sensor_driver_gps" respawn="true"/>
+    <node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log" respawn="true"/>
+
+    <!-- Serve an HTML dashboard so we can see what's going on -->
+    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
+ </launch>

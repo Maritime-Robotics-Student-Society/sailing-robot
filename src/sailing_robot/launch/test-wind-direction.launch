@@ -1,0 +1,30 @@
+<launch>
+    <!--
+    Script for testing the wind sensor and compass calibration without running the whole boat
+    At the start, the rudder and sail will move to test if they are wired correctly
+    -->
+
+    <!--
+    Parameters
+    -->
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
+    <!--rosparam file="$(find sailing_robot)/launch/parameters/calibration_111.yaml" ns="/calibration" command="load"/-->
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailsettings_blackpython_rigA.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/servos_blackpython.yaml" command="load"/>
+    <param name="do_post" value="true" />
+
+
+    <!--
+    Nodes
+    -->
+    <node name = "sensor_service_imu" pkg="sailing_robot" type="sensor_service_imu" respawn="true"/>
+    <!--node name = "sensor_driver_imu" pkg="sailing_robot" type="sensor_driver_imu"  respawn="true"/-->
+    <node name = "sensor_driver_wind_direction" pkg="sailing_robot" type="sensor_driver_wind_direction"  respawn="true"/>
+    
+    <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
+
+
+ </launch>
