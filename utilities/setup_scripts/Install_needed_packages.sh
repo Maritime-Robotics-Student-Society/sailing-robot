@@ -18,5 +18,5 @@ sudo apt-get --assume-yes install libgeos-dev python-scipy python-pip vim bc pyt
 # tornado (web server for HTML dashboard)
 echo "Installing Python packages..."
 yes | sudo pip install --upgrade pip
-yes | sudo pip install Latlon shapely pyproj pynmea2 spidev tornado 
+yes | sudo pip install Latlon shapely pyproj==1.9.6 pynmea2 spidev tornado 
 
