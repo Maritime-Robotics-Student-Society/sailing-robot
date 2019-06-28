@@ -34,4 +34,14 @@
                                           Thank you for your support!
 ```
 
+Please consider cite the following [paper](https://arxiv.org/abs/1903.06677) if you use our code in your research.
+
+```
+@article{lemaireadaptive,
+  title={Adaptive Probabilistic Tack Manoeuvre Decision for Sailing Vessels},
+  author={Lemaire, S{\'e}bastien and Cao, Yu and Kluyver, Thomas and Hausner, Daniel and Vasilovici, Camil and Lee, Zhong-yuen and Varbaro, Umberto Jos{\'e} and Schillai, Sophia M}
+}
+```
+
+
 Click Wiki page for more information. We also have a [website](http://sotonsailrobot.org/) and a [blog](https://blog.sotonsailrobot.org/). 
