@@ -1,1 +1,2 @@
-export SAIL_PI_IP=192.168.12.1
+export SAIL_PI_IP=10.42.0.1
+
