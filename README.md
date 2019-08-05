@@ -37,10 +37,19 @@
 Please consider cite the following [paper](https://arxiv.org/abs/1903.06677) if you use our code in your research.
 
 ```
-@article{lemaireadaptive,
-  title={Adaptive Probabilistic Tack Manoeuvre Decision for Sailing Vessels},
-  author={Lemaire, S{\'e}bastien and Cao, Yu and Kluyver, Thomas and Hausner, Daniel and Vasilovici, Camil and Lee, Zhong-yuen and Varbaro, Umberto Jos{\'e} and Schillai, Sophia M}
+@inproceedings{Lemaire:IRSC2018,
+  author       = {Sébastien Lemaire and Yu Cao and Thomas Kluyver and Daniel Hausner and Camil Vasilovici and Zhong-Yuen Lee and Umberto José Varbaro and Sophia M. Schillai},
+  title        = {{Adaptive Probabilistic Tack Manoeuvre Decision for Sailing Vessels}},
+  year         = {2018},
+  editor       = {Sophia M. Schillai and Nicholas Townsend},
+  booktitle    = {Robotic Sailing 2018},
+  booksubtitle = {Proceedings of the 11th International Robotic Sailing Conference},
+  eventdate    = {2018-08-31/2018-09-01},
+  location     = {Southampton, UK},
+  pages        = {95--103},
+  url          = {http://ceur-ws.org/Vol-2331/#paper10}
 }
+
 ```
 
 
