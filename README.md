@@ -53,4 +53,4 @@ Please consider cite the following [paper](https://arxiv.org/abs/1903.06677) if 
 ```
 
 
-Click Wiki page for more information. We also have a [website](http://sotonsailrobot.org/) and a [blog](https://blog.sotonsailrobot.org/). 
+Click Wiki page for more information. We also have a [website](http://sotonsailrobot.org/) and a [blog](https://blog.sotonsailrobot.org/). Finally, all of our recorded data logs are available freely on [Zenodo](https://zenodo.org/record/3597449).
