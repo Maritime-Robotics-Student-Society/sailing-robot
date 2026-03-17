@@ -27,7 +27,7 @@ class DebuggingGpsLog(Node):
         self.csvw = csv.writer(self.csv_file)
 
         self.create_subscription(gpswtime, 'gps_fix', self.write_record, 10)
-        self.get_logger().info('GPS logging to %s' % filename)
+        self.get_logger().info(f'GPS logging to {filename}')
 
     def write_record(self, msg):
         ts = '%02d%02d%02d%02d' % (msg.time_h, msg.time_m, msg.time_s, self.day_of_month)

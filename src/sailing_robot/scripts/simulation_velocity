@@ -19,7 +19,7 @@ class VelocitySimu(Node):
         self.declare_parameter('simulation.velocity.tacking_punishment_coefficient', 0.2)
         self.declare_parameter('simulation.velocity.coefficient', 0.4)
         self.declare_parameter('simulation.velocity.minimum', 0.5)
-        self.declare_parameter('simulation.vecolity.coef_sailsheet_error', 1.0)
+        self.declare_parameter('simulation.velocity.coef_sailsheet_error', 1.0)
         self.declare_parameter('config.rate', 10)
         self.declare_parameter('sailsettings.table', '{}')
 
@@ -28,7 +28,7 @@ class VelocitySimu(Node):
         self.tacking_punishment_coef = self.get_parameter('simulation.velocity.tacking_punishment_coefficient').value
         self.velocity_coefficient = self.get_parameter('simulation.velocity.coefficient').value
         self.velocity_minimum = self.get_parameter('simulation.velocity.minimum').value
-        self.coef_sailsheet_error = self.get_parameter('simulation.vecolity.coef_sailsheet_error').value
+        self.coef_sailsheet_error = self.get_parameter('simulation.velocity.coef_sailsheet_error').value
         self.freq = self.get_parameter('config.rate').value
 
         sail_table_val = self.get_parameter('sailsettings.table').value
