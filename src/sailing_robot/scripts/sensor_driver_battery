@@ -1,49 +1,59 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
-
+import rclpy
+from rclpy.node import Node
 from sailing_robot.msg import BatteryState
-from ina219 import INA219
-import rospy
+
+try:
+    from ina219 import INA219
+    INA_AVAILABLE = True
+except ImportError:
+    INA_AVAILABLE = False
 
 
-
-
-class Battery():
-    """
-        Node that publishes current and voltage from the ina219 module
-    """
+class Battery(Node):
     def __init__(self):
-        # initialize the library
-        SHUNT_OHMS = 0.1
-        MAX_EXPECTED_AMPS = 1
-        self.ina = INA219(SHUNT_OHMS, MAX_EXPECTED_AMPS)
-        self.ina.configure(self.ina.RANGE_16V, self.ina.GAIN_AUTO)
-        self.ina.sleep()
+        super().__init__('battery')
 
+        self.declare_parameter('config.battery_rate', 1.0)
+        rate_hz = self.get_parameter('config.battery_rate').value
 
-        self.battery_pub = rospy.Publisher('battery', BatteryState, queue_size=10)
-        rospy.init_node("battery", anonymous=True)
+        self.battery_pub = self.create_publisher(BatteryState, 'battery', 10)
 
-        self.rate = rospy.Rate(rospy.get_param("config/battery_rate"))
-        self.battery_publisher()
+        if INA_AVAILABLE:
+            shunt_ohms = 0.1
+            max_expected_amps = 1
+            self.ina = INA219(shunt_ohms, max_expected_amps)
+            self.ina.configure(self.ina.RANGE_16V, self.ina.GAIN_AUTO)
+            self.ina.sleep()
+        else:
+            self.ina = None
+            self.get_logger().warn('ina219 not available - running in simulation mode')
 
+        self.timer = self.create_timer(1.0 / rate_hz, self.publish_battery)
 
-    def battery_publisher(self):
-
-        while not rospy.is_shutdown():
-            msg = BatteryState()
+    def publish_battery(self):
+        msg = BatteryState()
+        if self.ina:
             self.ina.wake()
-            msg.voltage =  self.ina.voltage()
+            msg.voltage = self.ina.voltage()
             msg.current = -self.ina.current()
             msg.power = -msg.voltage * msg.current
             self.ina.sleep()
-            self.battery_pub.publish(msg)
-            self.rate.sleep()
+        self.battery_pub.publish(msg)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = Battery()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        Battery()
-    except rospy.ROSInterruptException:
-        pass
-
+    main()

@@ -1,84 +1,96 @@
-#!/usr/bin/python
-#
-#
-
-#This Python 2 program reads the data from an LSM303D and an L3GD20H which are both attached to the I2C bus of a Raspberry Pi.
-#Both can be purchased as a unit from Pololu as their MinIMU-9 v3 Gyro, Accelerometer, and Compass  product.
-#
-#First follow the procedure to enable I2C on R-Pi.
-#1. Add the lines "ic2-bcm2708" and "i2c-dev" to the file /etc/modules
-#2. Comment out the line "blacklist ic2-bcm2708" (with a #) in the file /etc/modprobe.d/raspi-blacklist.conf
-#3. Install I2C utility (including smbus) with the command "apt-get install python-smbus i2c-tools"
-#4. Connect the I2C device to the SDA and SCL pins of the Raspberry Pi and detect it using the command "i2cdetect -y 1".  It should show up as 1D (typically) or 1E (if the jumper is set).
+#!/usr/bin/env python3
+"""Read IMU data without calibration."""
 
 from __future__ import division
-
-import rospy
-import tf
-from std_msgs.msg import Float32
-from geometry_msgs.msg import Vector3, Quaternion
-from sensor_msgs.msg import Imu, MagneticField
 import math
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Float32
+from geometry_msgs.msg import Vector3
+from sensor_msgs.msg import Imu, MagneticField
 
-from sailing_robot.imu_utils import ImuReader
+try:
+    from sailing_robot.imu_utils import ImuReader
+    IMU_AVAILABLE = True
+except ImportError:
+    IMU_AVAILABLE = False
 
 IMU_BUS = 1
-LGD = 0x6b #Device I2C slave address
-LSM = 0x1d #Device I2C slave address
+LGD = 0x6b
+LSM = 0x1d
 
 
+class SensorDriverImuWithoutCali(Node):
+    def __init__(self):
+        super().__init__('sensor_driver_imu_without_cali')
 
-def heading_publisher():
+        self.heading_pub = self.create_publisher(Float32, 'heading', 10)
+        self.imu_pub = self.create_publisher(Imu, 'imu/data', 10)
+        self.mag_pub = self.create_publisher(MagneticField, 'imu/mag', 10)
 
-    rate = rospy.Rate(20)
+        if IMU_AVAILABLE:
+            self.imu = ImuReader(IMU_BUS, LSM, LGD)
+            self.imu.check_status()
+            self.imu.configure_for_reading()
+        else:
+            self.imu = None
+            self.get_logger().warn('IMU hardware not available - running in simulation mode')
 
-    imu = ImuReader(IMU_BUS, LSM, LGD)
-    imu.check_status()
-    imu.configure_for_reading()
+        self.timer = self.create_timer(1.0 / 20.0, self.publish_heading)
 
-    while not rospy.is_shutdown():
-        #Read data from the chips ----------------------
-        rate.sleep()
-        magx, magy, magz = imu.read_mag_field()
-        # * 16 to nanoTesla, /1e9 to Tesla
+    def publish_heading(self):
+        if self.imu is None:
+            return
+
+        magx, magy, magz = self.imu.read_mag_field()
         MagX = magx * 16 / 1e9
         MagY = magy * 16 / 1e9
         MagZ = magz * 16 / 1e9
 
-
-        accx, accy, accz = imu.read_acceleration()
-        # * 0.061 to mg, /1000 to g * 9.8 to m/s^2
+        accx, accy, accz = self.imu.read_acceleration()
         AccX = accx * 0.061 * 9.8 / 1000
         AccY = accy * 0.061 * 9.8 / 1000
         AccZ = accz * 0.061 * 9.8 / 1000
 
+        gyrox, gyroy, gyroz = self.imu.read_gyro()
+        GyroX = gyrox * 8.75 / 1000 * math.pi / 180
+        GyroY = gyroy * 8.75 / 1000 * math.pi / 180
+        GyroZ = gyroz * 8.75 / 1000 * math.pi / 180
 
-        gyrox, gyroy, gyroz = imu.read_gyro()
+        heading_rad = math.atan2(-MagY, MagX)
+        heading_deg = math.degrees(heading_rad) % 360
 
-        # * 8.75 to mdeg/s, /1000 to deg/s, then convert to radians/s
-        GyroX = gyrox * 8.75/1000 * math.pi /180
-        GyroY = gyroy * 8.75/1000 * math.pi /180
-        GyroZ = gyroz * 8.75/1000 * math.pi /180
+        h_msg = Float32()
+        h_msg.data = float(heading_deg)
+        self.heading_pub.publish(h_msg)
+
+        imudata = Imu()
+        imudata.linear_acceleration.x = float(AccX)
+        imudata.linear_acceleration.y = float(AccY)
+        imudata.linear_acceleration.z = float(AccZ)
+        imudata.angular_velocity.x = float(GyroX)
+        imudata.angular_velocity.y = float(GyroY)
+        imudata.angular_velocity.z = float(GyroZ)
+        self.imu_pub.publish(imudata)
+
+        mag_msg = MagneticField()
+        mag_msg.magnetic_field.x = float(MagX)
+        mag_msg.magnetic_field.y = float(MagY)
+        mag_msg.magnetic_field.z = float(MagZ)
+        self.mag_pub.publish(mag_msg)
 
 
-        imu_raw_msg = Imu()
-        imu_raw_msg.header.stamp = rospy.Time.now()
-        imu_raw_msg.header.frame_id = "imu_link_ned"
-        imu_raw_msg.orientation = Quaternion(0, 0, 0, 0)
-        imu_raw_msg.angular_velocity = Vector3(GyroX, GyroY, GyroZ)
-        imu_raw_msg.linear_acceleration = Vector3(AccX, AccY, AccZ)
-        imu_raw_pub.publish(imu_raw_msg)
+def main(args=None):
+    rclpy.init(args=args)
+    node = SensorDriverImuWithoutCali()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
-        imu_mag_raw = MagneticField()
-        imu_mag_raw.header.stamp = rospy.Time.now()
-        imu_mag_raw.magnetic_field = Vector3(MagX, MagY, MagZ)
-        mag_raw_pub.publish(imu_mag_raw)
 
 if __name__ == '__main__':
-    try:
-        mag_raw_pub = rospy.Publisher('imu/mag', MagneticField, queue_size=10)
-        imu_raw_pub = rospy.Publisher('imu/data_raw', Imu, queue_size=10)
-        rospy.init_node("publish_heading_data", anonymous=True)
-        heading_publisher()
-    except rospy.ROSInterruptException:
-        pass
+    main()

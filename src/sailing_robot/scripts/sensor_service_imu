@@ -1,54 +1,88 @@
-#!/usr/bin/env python
-#
-# Sensor service IMU is a node to
-#  * convert quaternion orientation into heading angle with our convention
-#  * transform NED (North East Down) reference IMU data into ENU (East North Up)
-#
+#!/usr/bin/env python3
+# Sensor service IMU: convert quaternion orientation to heading angle
 # Subscribe to: imu/data (Imu)
-# Published topic: heading (Float32)
+# Publish: heading (Float32), pitch (Float32), roll (Float32)
 
-
-from __future__ import division
-
-import rospy
-import tf
 import math
-
+import rclpy
+from rclpy.node import Node
 from std_msgs.msg import Float32
 from sensor_msgs.msg import Imu
 
-class heading_processing(object):
+try:
+    from tf_transformations import euler_from_quaternion
+except ImportError:
+    # Fallback using scipy if tf_transformations not available
+    try:
+        from scipy.spatial.transform import Rotation
+        def euler_from_quaternion(q):
+            r = Rotation.from_quat([q[0], q[1], q[2], q[3]])
+            return r.as_euler('xyz')
+    except ImportError:
+        def euler_from_quaternion(q):
+            # Simple fallback
+            x, y, z, w = q
+            t0 = +2.0 * (w * x + y * z)
+            t1 = +1.0 - 2.0 * (x * x + y * y)
+            roll = math.atan2(t0, t1)
+            t2 = +2.0 * (w * y - z * x)
+            t2 = +1.0 if t2 > +1.0 else t2
+            t2 = -1.0 if t2 < -1.0 else t2
+            pitch = math.asin(t2)
+            t3 = +2.0 * (w * z + x * y)
+            t4 = +1.0 - 2.0 * (y * y + z * z)
+            yaw = math.atan2(t3, t4)
+            return roll, pitch, yaw
+
+
+class HeadingProcessing(Node):
     def __init__(self):
-        rospy.init_node('Heading_service')
-        self.heading = 0
-        self.heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
-        self.pitch_pub = rospy.Publisher('pitch', Float32, queue_size=10)
-        self.roll_pub = rospy.Publisher('roll', Float32, queue_size=10)
-        rospy.Subscriber('imu/data', Imu, self.heading_publisher)
+        super().__init__('Heading_service')
 
-    def heading_publisher(self, msg):
+        self.heading = 0.0
+        self.pitch = 0.0
+        self.roll = 0.0
+
+        self.heading_pub = self.create_publisher(Float32, 'heading', 10)
+        self.pitch_pub = self.create_publisher(Float32, 'pitch', 10)
+        self.roll_pub = self.create_publisher(Float32, 'roll', 10)
+
+        self.create_subscription(Imu, 'imu/data', self.process_imu, 10)
+
+        self.timer = self.create_timer(1.0 / 20.0, self.publish_heading)
+
+    def process_imu(self, msg):
         imu = msg.orientation
-        self.heading = (math.degrees(
-                        tf.transformations.euler_from_quaternion(
-                        (imu.x, imu.y,imu.z, imu.w))[2]) - 90) % 360
-        self.pitch = math.degrees(
-                        tf.transformations.euler_from_quaternion(
-                        (imu.x, imu.y,imu.z, imu.w))[1])
-        self.roll = math.degrees(
-                        tf.transformations.euler_from_quaternion(
-                        (imu.x, imu.y,imu.z, imu.w))[0])
+        roll, pitch, yaw = euler_from_quaternion([imu.x, imu.y, imu.z, imu.w])
+        self.heading = (math.degrees(yaw) - 90) % 360
+        self.pitch = math.degrees(pitch)
+        self.roll = math.degrees(roll)
+
+    def publish_heading(self):
+        h_msg = Float32()
+        h_msg.data = float(self.heading)
+        self.heading_pub.publish(h_msg)
+
+        p_msg = Float32()
+        p_msg.data = float(self.pitch)
+        self.pitch_pub.publish(p_msg)
+
+        r_msg = Float32()
+        r_msg.data = float(self.roll)
+        self.roll_pub.publish(r_msg)
 
 
+def main(args=None):
+    rclpy.init(args=args)
+    node = HeadingProcessing()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
-    def run(self):
-        r = rospy.Rate(20)
-        while not rospy.is_shutdown():
-            self.heading_pub.publish(self.heading)
-            r.sleep()
 
 if __name__ == '__main__':
-    process = heading_processing()
-    try:
-        process.run()
-    except rospy.ROSInterruptException:
-        pass
+    main()

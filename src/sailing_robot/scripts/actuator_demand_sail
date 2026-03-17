@@ -1,31 +1,56 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import rospy
+import rclpy
+from rclpy.node import Node
 from std_msgs.msg import Float64, Float32, String
 
 from sailing_robot.sail_table import SailTable, SailData
 import sailing_robot.pid_control as _PID
 
-sail_table_dict = rospy.get_param('sailsettings/table')
-sheet_out_to_jibe = rospy.get_param('sailsettings/sheet_out_to_jibe', False)
-sail_table = SailTable(sail_table_dict)
-sail_data = SailData(sail_table)
 
-def node_publisher():
-    pub = rospy.Publisher('sailsheet_normalized', Float32, queue_size=10)
-    rospy.init_node('actuator_demand_sail', anonymous=True)
+class ActuatorDemandSail(Node):
+    def __init__(self):
+        super().__init__('actuator_demand_sail')
 
-    rate = rospy.Rate(10)
-    while not rospy.is_shutdown():
-        sheet_normalized = sail_data.calculate_sheet_setting()
-        pub.publish(sheet_normalized)
-        rate.sleep()
+        self.declare_parameter('sailsettings.table', '{}')
+        self.declare_parameter('sailsettings.sheet_out_to_jibe', False)
+        self.declare_parameter('config.rate', 10)
+
+        sail_table_dict = self.get_parameter('sailsettings.table').value
+        sheet_out_to_jibe = self.get_parameter('sailsettings.sheet_out_to_jibe').value
+        rate_hz = self.get_parameter('config.rate').value
+
+        if isinstance(sail_table_dict, str):
+            import yaml
+            sail_table_dict = yaml.safe_load(sail_table_dict) or {}
+
+        sail_table = SailTable(sail_table_dict)
+        self.sail_data = SailData(sail_table)
+
+        self.pub = self.create_publisher(Float32, 'sailsheet_normalized', 10)
+        self.create_subscription(Float64, 'wind_direction_apparent', self.sail_data.update_wind, 10)
+        self.create_subscription(String, 'sailing_state', self.sail_data.update_sailing_state, 10)
+
+        self.timer = self.create_timer(1.0 / rate_hz, self.publish_sail)
+
+    def publish_sail(self):
+        sheet_normalized = self.sail_data.calculate_sheet_setting()
+        msg = Float32()
+        msg.data = float(sheet_normalized)
+        self.pub.publish(msg)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = ActuatorDemandSail()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        rospy.Subscriber('wind_direction_apparent', Float64, sail_data.update_wind)
-        rospy.Subscriber('sailing_state', String, sail_data.update_sailing_state)
-        node_publisher()
-    except rospy.ROSInterruptException:
-        pass
+    main()

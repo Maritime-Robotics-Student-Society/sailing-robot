@@ -1,26 +1,45 @@
-#!/usr/bin/env python
-#
+#!/usr/bin/env python3
 # Node receives sailing_state from heading_control
 # Outputs tack_sail and tack_rudder to override normal direction control
 
-import rospy
-from std_msgs.msg import Float32
-from std_msgs.msg import String
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Float32, String
 
 from sailing_robot.tack_control import Tacking
 
-if __name__ == '__main__':
-    try:
-        sail_pub = rospy.Publisher('tack_sail', Float32, queue_size=10)
-        rudder_pub = rospy.Publisher('tack_rudder', Float32, queue_size=10)
-        tacking = Tacking()
-        def recv(msg):
-            sail, rudder = tacking.calculate_sail_and_rudder(msg.data)
-            sail_pub.publish(sail)
-            rudder_pub.publish(rudder)
 
-        rospy.init_node("publish_tack_data", anonymous=True)
-        rospy.Subscriber('sailing_state', String, recv)
-        rospy.spin()  # Wait for shutdown
-    except rospy.ROSInterruptException:
+class TackNode(Node):
+    def __init__(self):
+        super().__init__('publish_tack_data')
+
+        self.sail_pub = self.create_publisher(Float32, 'tack_sail', 10)
+        self.rudder_pub = self.create_publisher(Float32, 'tack_rudder', 10)
+        self.tacking = Tacking()
+
+        self.create_subscription(String, 'sailing_state', self.recv, 10)
+
+    def recv(self, msg):
+        sail, rudder = self.tacking.calculate_sail_and_rudder(msg.data)
+        sail_msg = Float32()
+        sail_msg.data = float(sail)
+        rudder_msg = Float32()
+        rudder_msg.data = float(rudder)
+        self.sail_pub.publish(sail_msg)
+        self.rudder_pub.publish(rudder_msg)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = TackNode()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
         pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()

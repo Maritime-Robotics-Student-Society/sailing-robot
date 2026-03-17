@@ -1,45 +1,55 @@
-#!/usr/bin/python
-#
-# Node publishes apparent wind direction
-# DUMMY NODE: keeps publishing a constant wind direction as specified in the
-# parameters file. See 'gps' for our real gps node.
+#!/usr/bin/env python3
 
 from datetime import datetime
-import rospy
-
+import rclpy
+from rclpy.node import Node
 from sensor_msgs.msg import NavSatFix
 from sailing_robot.msg import gpswtime
 
-currentLatitude = rospy.get_param("dummy/latitude")
-currentLongitude = rospy.get_param("dummy/longitude")
 
-position = NavSatFix()
+class DummyPosition(Node):
+    def __init__(self):
+        super().__init__('publish_dummy_position_data')
 
-def position_publisher():
-    rate = rospy.Rate(rospy.get_param("config/rate"))
+        self.declare_parameter('dummy.latitude', 50.8)
+        self.declare_parameter('dummy.longitude', 1.0)
+        self.declare_parameter('config.rate', 10)
 
-    position.latitude = currentLatitude
-    position.longitude = currentLongitude
+        self.latitude = self.get_parameter('dummy.latitude').value
+        self.longitude = self.get_parameter('dummy.longitude').value
+        rate_hz = self.get_parameter('config.rate').value
 
-    while not rospy.is_shutdown():
-        position_pub.publish(position)
-        
+        self.position_pub = self.create_publisher(NavSatFix, 'position', 10)
+        self.gps_pub = self.create_publisher(gpswtime, 'gps_fix', 10)
+
+        self.timer = self.create_timer(1.0 / rate_hz, self.publish_position)
+
+    def publish_position(self):
+        position = NavSatFix()
+        position.latitude = float(self.latitude)
+        position.longitude = float(self.longitude)
+        self.position_pub.publish(position)
+
         now = datetime.utcnow()
         wtime = gpswtime()
         wtime.fix = position
         wtime.time_h = now.hour
         wtime.time_m = now.minute
         wtime.time_s = now.second
-        gps_pub.publish(wtime)
-        rate.sleep()
+        self.gps_pub.publish(wtime)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = DummyPosition()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        position_pub = rospy.Publisher('position', NavSatFix, queue_size=10)
-        gps_pub = rospy.Publisher('gps_fix', gpswtime, queue_size=10)
-        rospy.init_node("publish_dummy_position_data", anonymous=True)
-
-        position_publisher()
-    except rospy.ROSInterruptException:
-        pass
+    main()

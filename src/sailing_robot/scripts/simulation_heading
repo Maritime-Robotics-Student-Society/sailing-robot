@@ -1,79 +1,77 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # Simulator for the heading
 
-
-import rospy
+import math
+import rclpy
+from rclpy.node import Node
 from std_msgs.msg import Float32, Int16
 from sailing_robot.msg import Velocity
-import time, math
 
 
-class Heading_simu():
+class HeadingSimu(Node):
     def __init__(self):
-        """
-            Compute the heading thanks to the rudder angle and the boat velocity
-            The boat moves on a circle defined by the keel and the rudder
-        """
+        super().__init__('simulation_heading')
 
-        self.heading_pub = rospy.Publisher('heading', Float32, queue_size=10)
+        self.declare_parameter('simulation.heading_init', 270.0)
+        self.declare_parameter('simulation.heading.coefficient', 1.0)
+        self.declare_parameter('config.rate', 10)
 
-        rospy.init_node("simulation_heading", anonymous=True)
+        self.heading = self.get_parameter('simulation.heading_init').value
+        self.diff_heading_coefficient = self.get_parameter('simulation.heading.coefficient').value
+        self.freq = self.get_parameter('config.rate').value
 
-        rospy.Subscriber('rudder_control', Int16, self.update_rudder)
-        self.rudder = 0
-        rospy.Subscriber('gps_velocity', Velocity, self.update_velocity)
-        self.speed = 0
+        self.rudder = 0.0
+        self.speed = 0.0
 
-        self.heading = rospy.get_param("simulation/heading_init")
+        self.heading_pub = self.create_publisher(Float32, 'heading', 10)
+        self.create_subscription(Int16, 'rudder_control', self.update_rudder, 10)
+        self.create_subscription(Velocity, 'gps_velocity', self.update_velocity, 10)
 
-        self.diff_heading_coefficient = rospy.get_param("simulation/heading/coefficient")
-        self.freq = rospy.get_param("config/rate")
-        self.rate = rospy.Rate(self.freq)
-
-
-        rospy.loginfo("Heading simulated")
-        self.heading_publisher()
-
+        self.timer = self.create_timer(1.0 / self.freq, self.publish_heading)
+        self.get_logger().info('Heading simulated')
 
     def update_rudder(self, msg):
-        self.rudder = msg.data
+        self.rudder = float(msg.data)
 
     def update_velocity(self, msg):
         self.speed = msg.speed
 
     def diff_heading(self):
         if self.rudder == 0:
-            return 0
-
-
-        Ay = -0.25    # -1/4 of the size of the boat [m]
-        r = 0.05      # radius of the rudder [m]
-        By = Ay*2
-        Cx = - r*math.sin(math.radians(self.rudder))
-        Cy = By - r*math.cos(math.radians(self.rudder))
-
-        d = self.speed/self.freq
-
+            return 0.0
+        Ay = -0.25
+        r = 0.05
+        By = Ay * 2
+        Cx = -r * math.sin(math.radians(self.rudder))
+        Cy = By - r * math.cos(math.radians(self.rudder))
+        d = self.speed / self.freq
+        discriminant = (Cx**4 + Cy**4 - 2*Ay*Cy**3 + Ay**2*Cy**2 +
+                        2*Cx**2*Cy**2 - 4*Cx**2*d**2 - 2*Ay*Cx**2*Cy +
+                        4*Ay*Cx**2*d)
+        if discriminant < 0:
+            return 0.0
+        x = (-(-Cx**2 - Cy**2 + Ay*Cy + math.sqrt(discriminant)) / (2*Cx))
         y = d
-        x = (-(-Cx**2-Cy**2+Ay*Cy+math.sqrt(Cx**4+Cy**4-2*Ay*Cy**3+Ay**2*Cy**2+2*Cx**2*Cy**2-4*Cx**2*d**2-2*Ay*Cx**2*Cy+4*Ay*Cx**2*d))/(2*Cx))
-        #x=(-(-Cx**2-Cy**2+Ay*Cy-(math.sqrt(Cx**4+Cy**4-2*Ay*Cy**3+Ay**2*Cy**2+2*Cx**2*Cy**2-4*Cx**2*d**2-2*Ay*Cx**2*Cy+4*Ay*Cx**2*d)))/(2*Cx))
+        return -math.degrees(math.atan2(y, x)) + 90
 
-        return -math.degrees(math.atan2(y,x)) + 90
+    def publish_heading(self):
+        self.heading = (self.diff_heading_coefficient * self.diff_heading() + self.heading) % 360
+        msg = Float32()
+        msg.data = float(self.heading)
+        self.heading_pub.publish(msg)
 
 
-    def heading_publisher(self):
-
-        while not rospy.is_shutdown():
-           
-            self.heading = (self.diff_heading_coefficient * self.diff_heading() + self.heading) % 360
-
-            self.heading_pub.publish(self.heading)
-            self.rate.sleep()
+def main(args=None):
+    rclpy.init(args=args)
+    node = HeadingSimu()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        Heading_simu()
-    except rospy.ROSInterruptException:
-        pass
-
+    main()

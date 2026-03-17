@@ -1,51 +1,76 @@
-#!/usr/bin/env python
-"""
-Node looks up correct sail setting from table
-Subscribes: wind direction apparent
-Sets sail actuator to correct PWM value
+#!/usr/bin/env python3
+"""Control the sail servo
+
+Subscribes: sailsheet_normalized (Float32)
 """
 import time
-import rospy
-from std_msgs.msg import Float64, Float32, String
-import pigpio
-from sailing_robot.sail_table import SailTable
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Float32
 
-SAILGPIO = rospy.get_param('sail/pin')
+try:
+    import pigpio
+    PIGPIO_AVAILABLE = True
+except ImportError:
+    PIGPIO_AVAILABLE = False
 
-# get dictionary for the boat specific sail PWM settings
-minPWM = rospy.get_param('sail/servolowerlimits')
-maxPWM = rospy.get_param('sail/servohigherlimits')
 
-def sail_servo_update(msg):
-    sheet_normalized = msg.data
+class ActuatorDriverSail(Node):
+    def __init__(self):
+        super().__init__('actuator_driver_sail')
 
-    # calculate actual PWM value from limits
-    sheetPWM = (sheet_normalized * (maxPWM-minPWM)) + minPWM
-    debug_pub_pwm.publish(sheetPWM)
-    piPWM.set_servo_pulsewidth(SAILGPIO, sheetPWM)
+        self.declare_parameter('sail.pin', 24)
+        self.declare_parameter('sail.servolowerlimits', 1000.0)
+        self.declare_parameter('sail.servohigherlimits', 2000.0)
+        self.declare_parameter('do_post', False)
 
-def post():
-    '''Power-On Self Test'''
-    if not rospy.get_param('do_post', False):
+        self.sail_gpio = self.get_parameter('sail.pin').value
+        self.min_pwm = self.get_parameter('sail.servolowerlimits').value
+        self.max_pwm = self.get_parameter('sail.servohigherlimits').value
+        do_post = self.get_parameter('do_post').value
+
+        self.debug_pub = self.create_publisher(Float32, 'debug_sailsheet_pwm', 10)
+
+        if PIGPIO_AVAILABLE:
+            self.pi_pwm = pigpio.pi()
+            self.pi_pwm.set_mode(self.sail_gpio, pigpio.OUTPUT)
+            if do_post:
+                self.post()
+        else:
+            self.pi_pwm = None
+            self.get_logger().warn('pigpio not available - running in simulation mode')
+
+        self.create_subscription(Float32, 'sailsheet_normalized', self.sail_servo_update, 10)
+
+    def sail_servo_update(self, msg):
+        sheet_normalized = msg.data
+        sheet_pwm = (sheet_normalized * (self.max_pwm - self.min_pwm)) + self.min_pwm
+        pwm_msg = Float32()
+        pwm_msg.data = float(sheet_pwm)
+        self.debug_pub.publish(pwm_msg)
+        if self.pi_pwm:
+            self.pi_pwm.set_servo_pulsewidth(self.sail_gpio, sheet_pwm)
+
+    def post(self):
+        self.get_logger().warn('sail test: sheet in')
+        self.pi_pwm.set_servo_pulsewidth(self.sail_gpio, self.min_pwm)
+        time.sleep(3)
+        self.get_logger().warn('sail test: sheet out')
+        self.pi_pwm.set_servo_pulsewidth(self.sail_gpio, self.max_pwm)
+        time.sleep(3)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = ActuatorDriverSail()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
         pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
-    rospy.logwarn('sail test: sheet in')
-    piPWM.set_servo_pulsewidth(SAILGPIO, minPWM)
-    time.sleep(3)
-    rospy.logwarn('sail test: sheet out')
-    piPWM.set_servo_pulsewidth(SAILGPIO, maxPWM)
-    time.sleep(3)
 
 if __name__ == '__main__':
-    piPWM = pigpio.pi();
-    piPWM.set_mode(SAILGPIO, pigpio.OUTPUT) # GPIO 24/RPi PIN 18 as sail servo pin
-    post()
-    try:
-        debug_pub_pwm = rospy.Publisher('debug_sailsheet_pwm', Float32, queue_size=10)
-        rospy.init_node('actuator_driver_sail', anonymous=True)
-        rospy.Subscriber('sailsheet_normalized', Float32, sail_servo_update)
-
-        rospy.spin()
-
-    except rospy.ROSInterruptException:
-        pass
+    main()

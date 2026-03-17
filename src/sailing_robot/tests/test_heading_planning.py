@@ -1,7 +1,6 @@
 import unittest
-from nose.tools import assert_equal
 
-from LatLon import LatLon
+from LatLon23 import LatLon
 from sailing_robot.heading_planning import HeadingPlan, TackVoting
 from sailing_robot.navigation import Navigation, angleAbsDistance
 

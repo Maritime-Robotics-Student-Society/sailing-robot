@@ -76,3 +76,8 @@ CATKIN_IGNORE
 
 # ignore mac DS files
 *.DS_Store
+
+# pytest cache
+.pytest_cache/
+__pycache__/
+*.pyc

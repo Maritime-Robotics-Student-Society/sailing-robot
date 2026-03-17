@@ -1,5 +1,5 @@
 """Code for staying inside a target region"""
-import LatLon as ll
+import LatLon23 as ll
 from shapely.geometry import Polygon
 
 from .taskbase import TaskBase
