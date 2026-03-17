@@ -1,183 +1,97 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8)
 project(sailing_robot)
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  rospy
-  std_msgs
-  sensor_msgs
-  message_generation
-  dynamic_reconfigure
-)
-
-## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
-
-
-## Uncomment this if the package has a setup.py. This macro ensures
-## modules and global scripts declared therein get installed
-## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-catkin_python_setup()
-
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-## To declare and build messages, services or actions from within this
-## package, follow these steps:
-## * Let MSG_DEP_SET be the set of packages whose message types you use in
-##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).
-## * In the file package.xml:
-##   * add a build_depend tag for "message_generation"
-##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET
-##   * If MSG_DEP_SET isn't empty the following dependency has been pulled in
-##     but can be declared for certainty nonetheless:
-##     * add a run_depend tag for "message_runtime"
-## * In this file (CMakeLists.txt):
-##   * add "message_generation" and every package in MSG_DEP_SET to
-##     find_package(catkin REQUIRED COMPONENTS ...)
-##   * add "message_runtime" and every package in MSG_DEP_SET to
-##     catkin_package(CATKIN_DEPENDS ...)
-##   * uncomment the add_*_files sections below as needed
-##     and list every .msg/.srv/.action file to be processed
-##   * uncomment the generate_messages entry below
-##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
-
-# Generate messages in the 'msg' folder
-add_message_files(
-    FILES
-    Velocity.msg
-    gpswtime.msg
-    BatteryState.msg
-)
-
-## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
-
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
-
-## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   std_msgs
-   sensor_msgs
- )
-
- generate_dynamic_reconfigure_options(  
-   cfg/TackVoting.cfg  
-   #...
-   )
-
-###################################
-## catkin specific configuration ##
-###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if you package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES sailing_robot
-  CATKIN_DEPENDS rospy std_msgs sensor_msgs message_runtime
-#  DEPENDS system_lib
-)
-
-###########
-## Build ##
-###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-# include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
-
-## Declare a C++ library
-# add_library(sailing_robot
-#   src/${PROJECT_NAME}/sailing_robot.cpp
-# )
-
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(sailing_robot ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Declare a C++ executable
-# add_executable(sailing_robot_node src/sailing_robot_node.cpp)
-
-## Add cmake target dependencies of the executable
-## same as for the library above
-# add_dependencies(sailing_robot_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Specify libraries to link a library or executable target against
-# target_link_libraries(sailing_robot_node
-#   ${catkin_LIBRARIES}
-# )
-
-#############
-## Install ##
-#############
-
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark executables and/or libraries for installation
-# install(TARGETS sailing_robot sailing_robot_node
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
-#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#   FILES_MATCHING PATTERN "*.h"
-#   PATTERN ".svn" EXCLUDE
-# )
-
-## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
-
-#############
-## Testing ##
-#############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_sailing_robot.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-if (CATKIN_ENABLE_TESTING)
-  # rostests
-  find_package(rostest REQUIRED)
-  add_rostest(rostests/test-1.test)
-
-  # Python nosetests
-  catkin_add_nosetests(tests)
+# Default to C99
+if(NOT CMAKE_C_STANDARD)
+  set(CMAKE_C_STANDARD 99)
 endif()
+
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(rclpy REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
+# Generate ROS messages
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/Velocity.msg"
+  "msg/gpswtime.msg"
+  "msg/BatteryState.msg"
+  DEPENDENCIES std_msgs sensor_msgs
+)
+
+# Install the Python package (sailing_robot library)
+ament_python_install_package(${PROJECT_NAME}
+  PACKAGE_DIR src/sailing_robot
+)
+
+# Install node scripts
+install(PROGRAMS
+  scripts/actuator_demand_rudder
+  scripts/actuator_demand_sail
+  scripts/actuator_driver_rudder
+  scripts/actuator_driver_sail
+  scripts/debugging_2D_plot
+  scripts/debugging_2D_plot_matplot
+  scripts/debugging_blink_on_sailing_state
+  scripts/debugging_dashboard
+  scripts/debugging_dump_params
+  scripts/debugging_gps_log
+  scripts/dummy_apparent_wind_direction
+  scripts/dummy_heading
+  scripts/dummy_position
+  scripts/force_jibe_tack
+  scripts/helming
+  scripts/sensor_camera_detect
+  scripts/sensor_driver_battery
+  scripts/sensor_driver_gps
+  scripts/sensor_driver_imu
+  scripts/sensor_driver_imu_fusion
+  scripts/sensor_driver_imu_without_cali
+  scripts/sensor_driver_multiplexer
+  scripts/sensor_driver_wind_direction
+  scripts/sensor_processed_wind_direction
+  scripts/sensor_service_imu
+  scripts/simulation_gps_fix
+  scripts/simulation_heading
+  scripts/simulation_position
+  scripts/simulation_velocity
+  scripts/simulation_wind_apparent
+  scripts/tack
+  scripts/tasks
+  scripts/wave_period
+  scripts/wave_position
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# Install launch files
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
+
+# Install parameter files
+install(DIRECTORY
+  launch/parameters
+  DESTINATION share/${PROJECT_NAME}/launch
+)
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+
+  find_package(ament_cmake_pytest REQUIRED)
+  ament_add_pytest_test(sailing_robot_tests tests)
+endif()
+
+ament_package()
