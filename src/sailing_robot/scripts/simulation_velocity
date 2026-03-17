@@ -1,65 +1,60 @@
-#!/usr/bin/python
-# READY FOR MIT
+#!/usr/bin/env python3
 # Simulator for the boat velocity
 
-
-
-import rospy
+import math
+import rclpy
+from rclpy.node import Node
 from std_msgs.msg import Float64, Float32, String
 from sailing_robot.msg import Velocity
 from sailing_robot.sail_table import SailTable
 import scipy.interpolate
-import time, math
 
 
-
-
-
-
-class Velocity_simu():
-    """ Node to simulate boat velocity based on polar and the wind direction and speed
-        A minimum velocity is set in the parameter file to be able to tack correctly
-    """
+class VelocitySimu(Node):
     def __init__(self):
-        self.velocity_pub = rospy.Publisher('gps_velocity', Velocity, queue_size=10)
+        super().__init__('simulation_velocity')
 
-        rospy.init_node("simulation_velocity", anonymous=True)
+        self.declare_parameter('simulation.heading_init', 270.0)
+        self.declare_parameter('simulation.velocity.tacking_punishment_time', 3.0)
+        self.declare_parameter('simulation.velocity.tacking_punishment_coefficient', 0.2)
+        self.declare_parameter('simulation.velocity.coefficient', 0.4)
+        self.declare_parameter('simulation.velocity.minimum', 0.5)
+        self.declare_parameter('simulation.vecolity.coef_sailsheet_error', 1.0)
+        self.declare_parameter('config.rate', 10)
+        self.declare_parameter('sailsettings.table', '{}')
 
-        rospy.Subscriber('heading', Float32, self.update_heading)
-        self.heading = rospy.get_param("simulation/heading_init")
+        self.heading = self.get_parameter('simulation.heading_init').value
+        self.tacking_punishment_time = self.get_parameter('simulation.velocity.tacking_punishment_time').value
+        self.tacking_punishment_coef = self.get_parameter('simulation.velocity.tacking_punishment_coefficient').value
+        self.velocity_coefficient = self.get_parameter('simulation.velocity.coefficient').value
+        self.velocity_minimum = self.get_parameter('simulation.velocity.minimum').value
+        self.coef_sailsheet_error = self.get_parameter('simulation.vecolity.coef_sailsheet_error').value
+        self.freq = self.get_parameter('config.rate').value
 
-        rospy.Subscriber('wind_direction_apparent', Float64, self.update_wind_direction)
-        self.wind_direction = 0
+        sail_table_val = self.get_parameter('sailsettings.table').value
+        if isinstance(sail_table_val, str):
+            import yaml
+            sail_table_dict = yaml.safe_load(sail_table_val) or {}
+        else:
+            sail_table_dict = sail_table_val or {}
 
-        rospy.Subscriber('wind_speed_apparent', Float64, self.update_wind_speed)
-        self.wind_speed = 0
-
-        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
+        self.sail_table = SailTable(sail_table_dict)
+        self.punishment = 1.0
+        self.wind_direction = 0.0
+        self.wind_speed = 0.0
         self.sailing_state = 'normal'
+        self.sailsheet_normalized = 0.0
 
-        rospy.Subscriber('sailsheet_normalized', Float32, self.update_sailsheet_normalized)
-        self.sailsheet_normalized = 0 # actual normalized setting of the sheet
+        self.velocity_pub = self.create_publisher(Velocity, 'gps_velocity', 10)
+        self.create_subscription(Float32, 'heading', self.update_heading, 10)
+        self.create_subscription(Float64, 'wind_direction_apparent', self.update_wind_direction, 10)
+        self.create_subscription(Float64, 'wind_speed_apparent', self.update_wind_speed, 10)
+        self.create_subscription(String, 'sailing_state', self.update_sailing_state, 10)
+        self.create_subscription(Float32, 'sailsheet_normalized', self.update_sailsheet_normalized, 10)
 
-        self.sail_table_dict = rospy.get_param('sailsettings/table')
-        self.sail_table = SailTable(self.sail_table_dict)
-
-        self.punishment = 1
-        self.tacking_punishment_time = rospy.get_param("simulation/velocity/tacking_punishment_time")
-        self.tacking_punishment_coef = rospy.get_param("simulation/velocity/tacking_punishment_coefficient")
-
-        self.velocity_coefficient = rospy.get_param("simulation/velocity/coefficient")
-        self.velocity_minimum = rospy.get_param("simulation/velocity/minimum")
-
-        self.coef_sailsheet_error = rospy.get_param("simulation/vecolity/coef_sailsheet_error")
-
-        self.freq = rospy.get_param("config/rate")
-        self.rate = rospy.Rate(self.freq)
-
-        self.velocity = Velocity()
-
-        rospy.loginfo("Velocity simulated")
         self.polardef()
-        self.velocity_publisher()
+        self.timer = self.create_timer(1.0 / self.freq, self.publish_velocity)
+        self.get_logger().info('Velocity simulated')
 
     def update_heading(self, msg):
         self.heading = msg.data
@@ -71,102 +66,56 @@ class Velocity_simu():
         self.wind_speed = msg.data
 
     def update_sailing_state(self, msg):
-        prev_sailing_state = self.sailing_state
+        prev = self.sailing_state
         self.sailing_state = msg.data
         if self.sailing_state == 'normal':
-            if prev_sailing_state != self.sailing_state:
-                self.start_punishment()
-            else:
-                self.decr_punishment()
+            if prev != self.sailing_state:
+                self.punishment = self.tacking_punishment_coef
+        else:
+            if self.punishment < 1:
+                self.punishment += (1 - self.tacking_punishment_coef) / (
+                    self.tacking_punishment_time * self.freq)
 
     def update_sailsheet_normalized(self, msg):
         self.sailsheet_normalized = msg.data
-        
-    def start_punishment(self):
-        self.punishment = self.tacking_punishment_coef
-
-    def decr_punishment(self):
-        if self.punishment < 1:
-            self.punishment = self.punishment + (1-self.tacking_punishment_coef)/(self.tacking_punishment_time * self.freq)
-
 
     def polardef(self):
-        """ Polar data from: https://1.bp.blogspot.com/-i_cyGtVorDs/T8rCqga1ZkI/AAAAAAAAARo/Lrmy5AooMbw/s1600/Laser+Polars.JPG
-        """
-
-        ang_pol = [ 0,
-                   13.3727803547,
-                   25.9524035025,
-                   27.0751750586,
-                   30.4378864816,
-                   35.6660200539,
-                   42.0349112634,
-                   49.7665534516,
-                   58.2972310405,
-                   64.8124671853,
-                   71.964538913,
-                   79.8079847501,
-                   89.7055041223,
-                   98.2026979197,
-                   112.8408218317,
-                   122.0785817886,
-                   131.0447776393,
-                   139.5439071043,
-                   151.1246799202,
-                   162.550911114,
-                   175.4021514163,
-                   180,]
-
-        speed_pol = [0.0620155039,
-                     0.0769833174,
-                     0.1566796511,
-                     0.2423907054,
-                     0.3651209659,
-                     0.4761790727,
-                     0.5978118655,
-                     0.7203837181,
-                     0.8119202931,
-                     0.8693697206,
-                     0.9346114548,
-                     0.9762073829,
-                     1.0001019704,
-                     0.9925925807,
-                     0.9593461558,
-                     0.9271178874,
-                     0.8870117091,
-                     0.8327395402,
-                     0.7718802369,
-                     0.733971012,
-                     0.6907957239,
-                     0.688696381,]
-        
+        ang_pol = [0, 13.37, 25.95, 27.08, 30.44, 35.67, 42.03, 49.77,
+                   58.30, 64.81, 71.96, 79.81, 89.71, 98.20, 112.84,
+                   122.08, 131.04, 139.54, 151.12, 162.55, 175.40, 180]
+        speed_pol = [0.062, 0.077, 0.157, 0.242, 0.365, 0.476, 0.598,
+                     0.720, 0.812, 0.869, 0.935, 0.976, 1.000, 0.993,
+                     0.959, 0.927, 0.887, 0.833, 0.772, 0.734, 0.691, 0.689]
         self.polar = scipy.interpolate.interp1d(ang_pol, speed_pol)
 
-    def velocity_publisher(self):
+    def publish_velocity(self):
+        wind_direction_180 = 180 - abs(self.wind_direction - 180)
+        sheet_normalized_ideal = self.sail_table.interpolate_sail_setting(wind_direction_180)
+        sailsheet_error_norm = abs(self.sailsheet_normalized - sheet_normalized_ideal)
 
-        while not rospy.is_shutdown():
-            # wind direction between 0 and 180 degree
-            wind_direction_180 =  180 - abs(self.wind_direction - 180)
+        velx = (self.polar(wind_direction_180) * self.wind_speed *
+                self.velocity_coefficient *
+                (1 - sailsheet_error_norm * self.coef_sailsheet_error))
+        if velx < self.velocity_minimum:
+            velx = self.velocity_minimum
 
-            sheet_normalized_ideal = self.sail_table.interpolate_sail_setting(wind_direction_180) # ideal setting
-            sailsheet_error_norm = abs(self.sailsheet_normalized - sheet_normalized_ideal) # calculate error between actual and ideal
-            # rospy.logwarn(sailsheet_error_norm)
+        velocity = Velocity()
+        velocity.speed = float(velx * self.punishment)
+        velocity.heading = float(self.heading)
+        self.velocity_pub.publish(velocity)
 
-            velx = self.polar( wind_direction_180 )*self.wind_speed*self.velocity_coefficient*(1-sailsheet_error_norm*self.coef_sailsheet_error)
-            if velx < self.velocity_minimum:
-                velx = self.velocity_minimum
-            
 
-            self.velocity.speed = velx * self.punishment
-            self.velocity.heading = self.heading
-            self.velocity_pub.publish(self.velocity)
-
-            self.rate.sleep()
+def main(args=None):
+    rclpy.init(args=args)
+    node = VelocitySimu()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        Velocity_simu()
-    except rospy.ROSInterruptException:
-        pass
-
+    main()

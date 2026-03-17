@@ -1,58 +1,52 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
-import rospy
+import rclpy
+from rclpy.node import Node
 from std_msgs.msg import Float32
 from sensor_msgs.msg import Imu
 from sailing_robot.wave_position import Wave_position
 
-############################################################################
-##								Setting 		   						  ##
-############################################################################
 
-time_range = rospy.get_param('wave_position/time_range') # time window captured by the wave_position algorithm
-refresh_time = rospy.get_param('wave_position/refresh_time') # how often the model is re-trained
+class WavePositionNode(Node):
+    def __init__(self):
+        super().__init__('wave_position')
 
-"""
-The higher the time_range, the less the algorithm is sensitive to noise.
-Also, the higher the time_range, the worse the algorithm reacts to change
-to wave period. (time_range should be small for irregular waves)
-After resfrest_time seconds pass, the algorithm takes last time_range
-seconds of the acceleration reading and uses that for prediction. This
-repeats every refresh_time seconds.
-"""
+        self.declare_parameter('wave_position.time_range', 10.0)
+        self.declare_parameter('wave_position.refresh_time', 5.0)
+        self.declare_parameter('config.rate', 10)
 
-############################################################################
+        time_range = self.get_parameter('wave_position.time_range').value
+        refresh_time = self.get_parameter('wave_position.refresh_time').value
+        frequency = self.get_parameter('config.rate').value
+
+        self.wp = Wave_position(frequency, time_range, refresh_time)
+        self.pub = self.create_publisher(Float32, 'wave_position', 10)
+
+        self.create_subscription(Imu, '/imu/data', self.update_wp_queue, 10)
+        self.timer = self.create_timer(1.0 / frequency, self.talker)
+
+    def update_wp_queue(self, msg):
+        self.wp.update(msg.linear_acceleration.z)
+
+    def talker(self):
+        result = self.wp.get_wave_position()
+        if result is not None:
+            msg = Float32()
+            msg.data = float(result)
+            self.pub.publish(msg)
 
 
-rospy.init_node('wave_position', anonymous=True)
-initializing = True
-frequency = rospy.get_param("config/rate")
+def main(args=None):
+    rclpy.init(args=args)
+    node = WavePositionNode()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
-wp = Wave_position(frequency, time_range, refresh_time)
-
-def update_wp_queue(msg):
-	wp.update(msg.linear_acceleration.z)
-
-rospy.Subscriber('/imu/data', Imu, update_wp_queue)
-
-def talker():
-	global initializing
-	pub = rospy.Publisher('wave_position', Float32, queue_size=10)
-	rate = rospy.Rate(frequency)
-	while not rospy.is_shutdown():
-		wave_position = wp.get_position()
-		# Start publishing only after initialization ends.
-		if(initializing):
-			if (wave_position != 'initializing'):
-				initializing = False
-				rospy.loginfo("Initialization of wave_position completed.")
-				rospy.loginfo("Sart publishing wave_position prediction.")
-		else:
-			pub.publish(wave_position)
-		rate.sleep()
 
 if __name__ == '__main__':
-    try:
-        talker()
-    except rospy.ROSInterruptException:
-        pass
+    main()

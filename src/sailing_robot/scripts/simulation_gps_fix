@@ -1,59 +1,49 @@
-#!/usr/bin/python
-# READY FOR MIT
+#!/usr/bin/env python3
 # Simulator for gps_fix
 
-
-import rospy
+from datetime import datetime
+import rclpy
+from rclpy.node import Node
 from sensor_msgs.msg import NavSatFix
 from sailing_robot.msg import gpswtime
-import time, math
-from datetime import datetime
 
 
-
-class Gps_fix_simu():
+class GpsFixSimu(Node):
     def __init__(self):
-        """
-            Publish gps_fix topic for the logger
-        """
+        super().__init__('simulation_gps_fix')
 
-        self.gps_fix_pub = rospy.Publisher('gps_fix', gpswtime, queue_size=10)
+        self.position = None
+        self.gps_fix_pub = self.create_publisher(gpswtime, 'gps_fix', 10)
+        self.create_subscription(NavSatFix, 'position', self.update_position, 10)
 
-        rospy.init_node("simulation_gps_fix", anonymous=True)
-
-        self.rate = rospy.Rate(1)
-
-        rospy.Subscriber('position', NavSatFix, self.update_position)
-        self.gps_fix_lock = True
-
-        while self.gps_fix_lock and not rospy.is_shutdown():
-            self.rate.sleep()
-
-        rospy.loginfo("gps fix simulated")
-        self.gps_fix_publisher()
-
+        self.timer = self.create_timer(1.0, self.publish_gps_fix)
+        self.get_logger().info('gps fix simulated')
 
     def update_position(self, msg):
         self.position = msg
-        self.gps_fix_lock = False
 
-    def gps_fix_publisher(self):
+    def publish_gps_fix(self):
+        if self.position is None:
+            return
+        msg = gpswtime()
+        msg.fix = self.position
+        msg.time_h = datetime.now().hour
+        msg.time_m = datetime.now().minute
+        msg.time_s = datetime.now().second
+        self.gps_fix_pub.publish(msg)
 
-        while not rospy.is_shutdown():
-           
-            msg = gpswtime()
-            msg.fix = self.position
-            msg.time_h = datetime.now().hour
-            msg.time_m = datetime.now().minute
-            msg.time_s = datetime.now().second
 
-            self.gps_fix_pub.publish(msg)
-            self.rate.sleep()
+def main(args=None):
+    rclpy.init(args=args)
+    node = GpsFixSimu()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        Gps_fix_simu()
-    except rospy.ROSInterruptException:
-        pass
-
+    main()
