@@ -1,124 +1,101 @@
-#!/usr/bin/env python
-"""
-Supply browser view of ros topics in local network
-"""
-
-import rospy
-from std_msgs.msg import Float32, Float64, Int16, String, Bool
-from sensor_msgs.msg import NavSatFix
-from rosgraph_msgs.msg import Log
+#!/usr/bin/env python3
+"""Supply browser view of ros topics in local network."""
 
 import json
 import os
-import tornado.ioloop
-import tornado.log
-import tornado.web
-import tornado.websocket
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Float32, Float64, Int16, String, Bool
+from sensor_msgs.msg import NavSatFix
+
+try:
+    import tornado.ioloop
+    import tornado.web
+    import tornado.websocket
+    TORNADO_AVAILABLE = True
+except ImportError:
+    TORNADO_AVAILABLE = False
 
 PORT = 8448
 STATIC_PATH = os.path.expanduser('~/sailing-robot/dashboard/src')
 
-simple_topics = [
-    ('/heading', Float32),
-    ('/heading_comp', Float32),
-    # ('/pitch', Float32),
-    # ('/roll', Float32),
-    ('/goal_heading', Float32),
-    ('/dbg_goal_wind_angle', Float32),
-    ('/rudder_control', Int16),
-    ('/sailing_state', String),
-    ('/dbg_helming_procedure', String),
-    ('/wind_direction_apparent', Float64),
-    ('/dbg_distance_to_waypoint', Float32),
-    ('/dbg_heading_to_waypoint', Float32),
-    ('/gps_satellites', Int16),
-    # ('/tack_rudder', Float32),
-    ('/task_ix', Int16),
-    ('/active_task_kind', String),
-    ('/dbg_latest_waypoint_id', String),
-    ('/wind_direction_average', Float32),
-    ('/camera_detection', String),
-    ('/remote_control', Bool),
+SIMPLE_TOPICS = [
+    ('heading', Float32),
+    ('goal_heading', Float32),
+    ('rudder_control', Int16),
+    ('sailing_state', String),
+    ('dbg_helming_procedure', String),
+    ('wind_direction_apparent', Float64),
+    ('dbg_distance_to_waypoint', Float32),
+    ('dbg_heading_to_waypoint', Float32),
+    ('gps_satellites', Int16),
+    ('task_ix', Int16),
+    ('active_task_kind', String),
+    ('wind_direction_average', Float32),
+    ('camera_detection', String),
 ]
 
-geo_topics = [
-    # '/position',
-]
 
-class MessageForwarder(object):
-    """Forward ROS messages to a websocket"""
+class DebuggingDashboard(Node):
     def __init__(self):
-        self.sockets = []
-        self.loop = tornado.ioloop.IOLoop.current()
-        for topic, rostype in simple_topics:
-            self.simple_forwarding(topic, rostype)
-        for topic in geo_topics:
-            self.geo_forwarding(topic)
-        self.rosout_forwarding()
-    
-    def broadcast(self, content):
-        for s in self.sockets:
-            s.send_json_message(content)
-    
-    # The callbacks we give to ROS are called on separate threads, so we use
-    # loop.add_callback to ensure we actually send the data from the main thread.
-    def simple_forwarding(self, topic_name, rostype):
-        def forward(msg):
-            self.broadcast({'topic': topic_name, 'value': msg.data})
-        return rospy.Subscriber(topic_name, rostype,
-                            lambda m: self.loop.add_callback(forward, m))
+        super().__init__('debugging_dashboard')
 
-    def geo_forwarding(self, topic_name):
-        def forward(msg):
-            self.broadcast({'topic': topic_name, 'latitude': msg.latitude,
-                            'longitude': msg.longitude})
-        return rospy.Subscriber(topic_name, NavSatFix,
-                            lambda m: self.loop.add_callback(forward, m))
+        self.data = {}
+        for topic, msg_type in SIMPLE_TOPICS:
+            self.data[topic] = None
+            self.create_subscription(
+                msg_type, topic,
+                lambda msg, t=topic: self._update(t, msg),
+                10
+            )
 
-    def rosout_forwarding(self):
-        def forward(msg):
-            d = {'topic': '/rosout', 'level': msg.level, 'name': msg.name,
-              'msg': msg.msg, 'file': msg.file, 'line': msg.line,
-              'function': msg.function, 'topics': msg.topics}
-            self.broadcast(d)
-        return rospy.Subscriber('rosout_agg', Log,
-                                lambda m: self.loop.add_callback(forward, m))
+        self.create_subscription(NavSatFix, 'position', self._update_position, 10)
 
-class UpdateHandler(tornado.websocket.WebSocketHandler):
-    def initialize(self, forwarder):
-        self.forwarder = forwarder
-    
-    def open(self):
-        self.forwarder.sockets.append(self)
-    
-    def on_close(self):
-        self.forwarder.sockets.remove(self)
-    
-    def send_json_message(self, content):
-        json_msg = json.dumps(content)
-        self.write_message(json_msg)
+        if TORNADO_AVAILABLE:
+            self.get_logger().info('Dashboard available at http://localhost:%d' % PORT)
+            self._start_server()
+        else:
+            self.get_logger().warn('tornado not available - dashboard disabled')
 
-def dashboard_server():
-    tornado.log.enable_pretty_logging()
-    forwarder = MessageForwarder()
-    app = tornado.web.Application([
-        (r"/updates", UpdateHandler,
-            {"forwarder": forwarder}),
-        (r"/(.*)", tornado.web.StaticFileHandler,
-            {"path": STATIC_PATH, "default_filename": "index.html"}),
-        
-    ],
-    compiled_template_cache=False,
-    )
-    app.listen(PORT, address='0.0.0.0')
-    loop = tornado.ioloop.IOLoop.current()
-    rospy.client.on_shutdown(loop.stop)
-    loop.start()
+    def _update(self, topic, msg):
+        self.data[topic] = msg.data
+
+    def _update_position(self, msg):
+        self.data['position'] = {'lat': msg.latitude, 'lon': msg.longitude}
+
+    def _start_server(self):
+        dashboard_data = self.data
+
+        class DataHandler(tornado.websocket.WebSocketHandler):
+            def open(self):
+                self.write_message(json.dumps(dashboard_data, default=str))
+
+            def on_message(self, message):
+                pass
+
+        class IndexHandler(tornado.web.RequestHandler):
+            def get(self):
+                self.write('Sailing Robot Dashboard')
+
+        app = tornado.web.Application([
+            (r'/', IndexHandler),
+            (r'/ws', DataHandler),
+            (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': STATIC_PATH}),
+        ])
+        app.listen(PORT)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = DebuggingDashboard()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        rospy.init_node("debugging_dashboard", anonymous=True)
-        dashboard_server()
-    except rospy.ROSInterruptException:
-        pass
+    main()

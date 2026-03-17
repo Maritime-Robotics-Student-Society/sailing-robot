@@ -1,77 +1,107 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Node steps through a series of tasks to perform.
 
 Tasks (or waypoints) are loaded from parameters, and then each one is used to
 calculate sailing_state and goal_heading until its check_end_condition()
 returns True.
 """
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Float32, Float64, String
+from sensor_msgs.msg import NavSatFix
 
-import rospy
-from std_msgs.msg import Float32
-from std_msgs.msg import Float64
-from std_msgs.msg import String
-from dynamic_reconfigure.server import Server
-import sailing_robot
 from sailing_robot.tasks import tasks_from_wps
 from sailing_robot.tasks_ros import RosTasksRunner
 from sailing_robot.navigation import Navigation
-from sailing_robot.cfg import TackVotingConfig
-from sensor_msgs.msg import NavSatFix
 
 
-def goal_heading_publisher(tasks_runner):
-    pub = rospy.Publisher("goal_heading", Float32, queue_size=10)
-    pub_state = rospy.Publisher("sailing_state", String, queue_size=10)
-    rate = rospy.Rate(rospy.get_param("config/rate"))
+class TasksNode(Node):
+    def __init__(self):
+        super().__init__('publish_goal_heading')
 
-    tasks_runner.start_next_task()
-    while not rospy.is_shutdown():
-        state, goal_heading = tasks_runner.calculate_state_and_goal()
-        pub.publish(goal_heading)
-        pub_state.publish(state)
-        rate.sleep()
+        self.declare_parameter('tack_voting.radius', 2.0)
+        self.declare_parameter('tack_voting.samples', 50.0)
+        self.declare_parameter('tack_voting.threshold', 0.8)
+        self.declare_parameter('config.rate', 10)
+        self.declare_parameter('navigation.beating_angle', 45)
+        self.declare_parameter('navigation.utm_zone', 30)
+        self.declare_parameter('wp.acceptRadius', 2.5)
+        self.declare_parameter('wp.tackVotingRadius', 1.0)
+        self.declare_parameter('wp.list', ['wp0'])
+        self.declare_parameter('wp.table', '{}')
 
-def jibe_tack_now(msg):
-    tasks_runner.insert_task({
-        'kind': 'jibe_tack_now',
-        'action': msg.data,
-    })
+        rate_hz = self.get_parameter('config.rate').value
+        beating_angle = self.get_parameter('navigation.beating_angle').value
+        utm_zone = self.get_parameter('navigation.utm_zone').value
+        accept_radius = self.get_parameter('wp.acceptRadius').value
+        tack_voting_radius = self.get_parameter('wp.tackVotingRadius').value
+
+        wp_table_val = self.get_parameter('wp.table').value
+        if isinstance(wp_table_val, str):
+            import yaml
+            wp_table = yaml.safe_load(wp_table_val) or {}
+        else:
+            wp_table = wp_table_val or {}
+
+        wp_list_val = self.get_parameter('wp.list').value
+        if not isinstance(wp_list_val, list):
+            wp_list_val = [wp_list_val]
+
+        wp_params = {
+            'acceptRadius': accept_radius,
+            'tackVotingRadius': tack_voting_radius,
+            'table': wp_table,
+            'list': wp_list_val,
+        }
+
+        tasks = tasks_from_wps(wp_params)
+        nav = Navigation(beating_angle=beating_angle, utm_zone=utm_zone)
+        self.tasks_runner = RosTasksRunner(tasks, nav, node=self)
+
+        self.goal_heading_pub = self.create_publisher(Float32, 'goal_heading', 10)
+        self.sailing_state_pub = self.create_publisher(String, 'sailing_state', 10)
+
+        self.create_subscription(Float32, 'heading', nav.update_heading, 10)
+        self.create_subscription(Float64, 'wind_direction_apparent', nav.update_wind_direction, 10)
+        self.create_subscription(NavSatFix, 'position', nav.update_position, 10)
+        self.create_subscription(NavSatFix, 'temporary_wp', self.insert_waypoint, 10)
+        self.create_subscription(String, 'jibe_tack_now', self.jibe_tack_now, 10)
+
+        self.tasks_runner.start_next_task()
+        self.timer = self.create_timer(1.0 / rate_hz, self.publish_goal_heading)
+
+    def jibe_tack_now(self, msg):
+        self.tasks_runner.insert_task({'kind': 'jibe_tack_now', 'action': msg.data})
+
+    def insert_waypoint(self, msg):
+        self.tasks_runner.insert_task({
+            'kind': 'to_waypoint',
+            'waypoint_ll': (msg.latitude, msg.longitude),
+            'target_radius': 2.5,
+            'tack_voting_radius': 1,
+        })
+
+    def publish_goal_heading(self):
+        state, goal_heading = self.tasks_runner.calculate_state_and_goal()
+        heading_msg = Float32()
+        heading_msg.data = float(goal_heading)
+        self.goal_heading_pub.publish(heading_msg)
+        state_msg = String()
+        state_msg.data = str(state)
+        self.sailing_state_pub.publish(state_msg)
 
 
-def insert_waypoint(msg):
-    tasks_runner.insert_task({
-        'kind': 'to_waypoint',
-        'waypoint_ll': (msg.latitude, msg.longitude),
-        'target_radius': 2.5,     # set default value, hot fix for the force jibing node
-        'tack_voting_radius': 1 # set default value, hot fix for the force jibing node
-    })
-
-def tack_voting_callback(config, level):
-    """
-    get updates for the dynamic parameters
-    """
-    radius = config.radius
-    samples = config.samples
-    threshold = config.threshold
-    return config
+def main(args=None):
+    rclpy.init(args=args)
+    node = TasksNode()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        rospy.init_node("publish_goal_heading", anonymous=True)
-        #tasks = rospy.get_param("tasks")
-        tasks = tasks_from_wps(rospy.get_param("wp"))
-        nav_options = rospy.get_param("navigation")
-        nav = Navigation(**nav_options)
-        tasks_runner = RosTasksRunner(tasks, nav)
-
-        rospy.Subscriber('heading', Float32, nav.update_heading)
-        rospy.Subscriber('wind_direction_apparent', Float64, nav.update_wind_direction)
-        rospy.Subscriber('position', NavSatFix, nav.update_position)
-        rospy.Subscriber('temporary_wp', NavSatFix, insert_waypoint)
-        rospy.Subscriber('jibe_tack_now', String, jibe_tack_now)
-        srv = Server(TackVotingConfig, tack_voting_callback)
-
-        goal_heading_publisher(tasks_runner)
-    except rospy.ROSInterruptException:
-        pass
+    main()

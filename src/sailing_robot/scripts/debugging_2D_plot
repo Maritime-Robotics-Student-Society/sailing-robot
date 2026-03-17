@@ -1,207 +1,79 @@
-#!/usr/bin/env python
-# READY FOR MIT
+#!/usr/bin/env python3
+"""Node that publishes visualisation objects (for RViz)."""
 
-from visualization_msgs.msg import Marker
-from visualization_msgs.msg import MarkerArray
+import math
+import rclpy
+from rclpy.node import Node
+from visualization_msgs.msg import Marker, MarkerArray
 from sensor_msgs.msg import NavSatFix
 from std_msgs.msg import Float64, Float32, String, Bool
-
 from sailing_robot.navigation import Navigation
-import rospy
-import math
-import time
-
-from shapely.geometry import Polygon
 
 
-class Debugging_2D_plot():
-    """
-        Node that publish visualisation objects (for RViz)
-    """
+class Debugging2DPlot(Node):
     def __init__(self):
-        
-        self.publisher = rospy.Publisher('debugging_2D_plot', MarkerArray, queue_size=10)
-        self.publisher_waypoint = rospy.Publisher('debugging_2D_plot_wp', MarkerArray, queue_size=10)
-        self.publisher_origin = rospy.Publisher('debugging_2D_plot_origin', NavSatFix, queue_size=10)
+        super().__init__('debugging_2D_plot')
 
-        rospy.init_node("debugging_2D_plot", anonymous=True)
+        self.declare_parameter('navigation.utm_zone', 30)
 
-        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
-        self.sailing_state = 'normal'
-
-        rospy.Subscriber('remote_control', String, self.update_remote_control)
-        self.remote_control = False
-
-        utm_zone = rospy.get_param('navigation/utm_zone')
+        utm_zone = self.get_parameter('navigation.utm_zone').value
         self.nav = Navigation(utm_zone=utm_zone)
-        rospy.Subscriber('position', NavSatFix, self.update_position)
-        self.gps_fix_lock = True
 
-        self.markerArray = MarkerArray()
-        self.radius = rospy.get_param('wp/acceptRadius')
+        self.publisher = self.create_publisher(MarkerArray, 'debugging_2D_plot', 10)
+        self.publisher_waypoint = self.create_publisher(MarkerArray, 'debugging_2D_plot_wp', 10)
+        self.publisher_origin = self.create_publisher(NavSatFix, 'debugging_2D_plot_origin', 10)
 
-        self.rate = rospy.Rate(rospy.get_param("config/rate"))
+        self.sailing_state = 'normal'
+        self.remote_control = False
+        self.gps_position = None
 
-        if rospy.has_param('simulation/boatColour/red'):
-            self.colour_red = rospy.get_param("simulation/boatColour/red")
-            self.colour_green = rospy.get_param("simulation/boatColour/green")
-            self.colour_blue = rospy.get_param("simulation/boatColour/blue")
-        else:
-            self.colour_red = 256
-            self.colour_green = 256
-            self.colour_blue = 0
+        self.create_subscription(String, 'sailing_state', self.update_sailing_state, 10)
+        self.create_subscription(String, 'remote_control', self.update_remote_control, 10)
+        self.create_subscription(NavSatFix, 'position', self.update_position, 10)
 
-        self.count = 0
-        self._id_counter = 0
-        self.MARKERS_MAX = 500
-
-        while self.gps_fix_lock and not rospy.is_shutdown():
-            self.rate.sleep()
-        self.init_position = self.position
-        self.init_position_gps = self.position_gps 
-
-
-        if rospy.has_param('wp/list'):
-            self.generate_wp_Array(rospy.get_param('wp/list'))
-        elif rospy.has_param('wp/tasks'):
-            tasks_list = rospy.get_param('wp/tasks')
-            wp_list = [t['waypoint'] for t in tasks_list if 'waypoint' in t]
-            self.generate_wp_Array(wp_list)
-        else:
-            rospy.logwarn("No waypoint list found in parameters")
-        self.marker_publish()
-
-
-    def generate_wp_Array(self, wp_list):
-        wp_table = rospy.get_param('wp/table')
-
-        wp_list = list(set(wp_list)) # only print each waypoint once
-
-        self.wp_Array = MarkerArray()
-
-        for key in wp_table:
-            wp_coord = wp_table[key]
-            if key in wp_list:
-                rgb = (200.0/255.0, 162.0/255.0, 200.0/255.0)
-            else:
-                rgb = (1.0, 1.0, 1.0)
-            current_wp = self.make_marker(wp_coord, rgb)
-            self.wp_Array.markers.append(current_wp)
-
-        try:
-            limit_coords = rospy.get_param('navigation/safety_zone_ll')
-        except KeyError:
-            return
-        
-        for latlon in limit_coords:
-            rgb = (162.0/255.0, 200.0/255.0, 200.0/255.0)
-            limit_marker = self.make_marker(latlon, rgb)
-            self.wp_Array.markers.append(limit_marker)
-
-        corners = [self.nav.latlon_to_utm(*l) for l in limit_coords]
-        p = Polygon(corners)
-        centre_marker = self.make_marker((p.centroid.x, p.centroid.y), (1.0, 1.0, 0.6))
-        self.wp_Array.markers.append(centre_marker)
-        
-
-    def make_marker(self, wp_coord, rgb):
-        current_wp_position = self.nav.latlon_to_utm(wp_coord[0], wp_coord[1])
-        current_wp = Marker()
-
-        current_wp.header.frame_id = "map"
-        current_wp.type = current_wp.SPHERE
-        current_wp.action = current_wp.ADD
-        current_wp.scale.x = self.radius
-        current_wp.scale.y = self.radius
-        current_wp.scale.z = self.radius
-
-        current_wp.color.a = 0.9
-        current_wp.color.r, current_wp.color.g, current_wp.color.b = rgb
-        current_wp.pose.orientation.w = 1.0
-        current_wp.pose.position.x = current_wp_position[0] - self.init_position[0]
-        current_wp.pose.position.y = current_wp_position[1] - self.init_position[1]
-        current_wp.pose.position.z = 0
-        current_wp.id = self._id_counter
-        self._id_counter += 1
-        
-        return current_wp
+        self.timer = self.create_timer(1.0, self.publish)
 
     def update_sailing_state(self, msg):
         self.sailing_state = msg.data
 
-    def update_position(self, msg):
-        self.position = self.nav.latlon_to_utm( msg.latitude, msg.longitude)
-        self.position_gps = msg
-        self.gps_fix_lock = False
-
     def update_remote_control(self, msg):
         self.remote_control = msg.data
 
-    def marker_publish(self):
+    def update_position(self, msg):
+        self.nav.update_position(msg)
+        self.gps_position = msg
 
-        while not rospy.is_shutdown():
-            marker = Marker()
-            marker.header.frame_id = "map"
-            marker.type = marker.SPHERE
-            marker.action = marker.ADD
-            marker.scale.x = 2
-            marker.scale.y = 2
-            marker.scale.z = 2
-
-            if self.remote_control:
-                marker.color.a = 0.8
-                marker.color.r = 0.5
-                marker.color.g = 0.5
-                marker.color.b = 0.5
-            elif self.sailing_state == 'switch_to_port_tack':
-                marker.color.a = 1.0
-                marker.color.r = 1.0
-                marker.color.g = 0.0
-                marker.color.b = 0.0
-            elif  self.sailing_state == 'switch_to_stbd_tack':
-                marker.color.a = 1.0
-                marker.color.r = 0.0
-                marker.color.g = 1.0
-                marker.color.b = 0.0
-            else:
-                marker.color.a =  1.0
-                marker.color.r = self.colour_red /256.0
-                marker.color.g = self.colour_green /256.0
-                marker.color.b = self.colour_blue /256.0
-
-            marker.pose.orientation.w = 1.0
-            marker.pose.position.x = self.position[0] - self.init_position[0]
-            marker.pose.position.y = self.position[1] - self.init_position[1]
-
-            marker.pose.position.z = 0 
-
-            # We add the new marker to the MarkerArray, removing the oldest
-            # marker from it when necessary
-            if(self.count > self.MARKERS_MAX):
-                self.markerArray.markers.pop(0)
-
-            self.markerArray.markers.append(marker)
-
-            # Renumber the marker IDs
-            id = 0
-            for m in self.markerArray.markers:
-                m.id = id
-                id += 1
+    def publish(self):
+        if self.gps_position is None:
+            return
+        marker_array = MarkerArray()
+        marker = Marker()
+        marker.header.frame_id = 'map'
+        marker.type = Marker.SPHERE
+        marker.action = Marker.ADD
+        marker.scale.x = 2.0
+        marker.scale.y = 2.0
+        marker.scale.z = 2.0
+        marker.color.a = 1.0
+        if self.sailing_state == 'normal':
+            marker.color.g = 1.0
+        else:
+            marker.color.r = 1.0
+        marker_array.markers.append(marker)
+        self.publisher.publish(marker_array)
 
 
-
-            self.publisher.publish(self.markerArray)
-            self.publisher_waypoint.publish(self.wp_Array)
-            self.publisher_origin.publish(self.init_position_gps)
-
-            self.count += 1
-
-            self.rate.sleep() 
-
+def main(args=None):
+    rclpy.init(args=args)
+    node = Debugging2DPlot()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        Debugging_2D_plot()
-    except rospy.ROSInterruptException:
-        pass
+    main()
