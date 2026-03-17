@@ -1,70 +1,73 @@
-#!/usr/bin/env python
-#
-# based on:http://docs.ros.org/diamondback/api/rospy_tutorials/html/test__on__shutdown_8py_source.html 
-#
-# Software License Agreement (BSD License)
-#
-# Copyright (c) 2008, Willow Garage, Inc.
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above
-#    copyright notice, this list of conditions and the following
-#    disclaimer in the documentation and/or other materials provided
-#    with the distribution.
-#  * Neither the name of Willow Garage, Inc. nor the names of its
-#    contributors may be used to endorse or promote products derived
-#    from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
-#
-# Revision $Id: test_peer_subscribe_notify.py 3803 2009-02-11 02:04:39Z rob_wheeler $
+#!/usr/bin/env python3
+"""
+Integration test for the tack node (ROS 2 version).
 
-## Integration test for peer_subscribe_notify
+This test publishes a sailing_state message and checks that tack_rudder is
+published in response.  It uses rclpy directly (no rostest/roslaunch needed)
+and is run by pytest.
 
-PKG = 'rospy_tutorials'
-NAME = 'peer_subscribe_notify_test'
+NOTE: This test requires a running ROS 2 daemon and the ``tack`` executable
+to be available on PATH (i.e. the package must be installed/sourced first).
+If rclpy is not available the test is skipped so that the plain unit-test
+suite still passes in environments without ROS 2 installed.
+"""
 
+import subprocess
 import sys
 import time
 import unittest
-from Queue import Queue
 
-import rospy
-import rostest
-import roslib.scriptutil as scriptutil
-from std_msgs.msg import String, Float32
+try:
+    import rclpy
+    from rclpy.node import Node
+    from std_msgs.msg import String, Float32
+    ROS2_AVAILABLE = True
+except ImportError:
+    ROS2_AVAILABLE = False
 
-def subscribe_queue(topic, msg_type):
-    q = Queue()
-    rospy.Subscriber(topic, msg_type, q.put)
-    return q
 
-class TestOnShutdown(unittest.TestCase):
-    def test_notify(self):
-        q = subscribe_queue("/tack_rudder", Float32)
-        rospy.init_node(NAME, anonymous=True)
-        p = rospy.Publisher("/sailing_state", String, queue_size=10)
-        time.sleep(0.2) # Icky fudge factor to give the tack node time to be ready
-        p.publish('switch_to_stbd_tack')
-        msg = q.get(timeout=2)
-        self.assertEqual(msg.data, 90)
+@unittest.skipUnless(ROS2_AVAILABLE, 'rclpy not available')
+class TestTackNode(unittest.TestCase):
+    """Test that the tack node responds to sailing_state messages."""
+
+    @classmethod
+    def setUpClass(cls):
+        rclpy.init()
+        cls.node = Node('test_tack_node')
+        cls.received = []
+
+        cls.sub = cls.node.create_subscription(
+            Float32, '/tack_rudder',
+            lambda msg: cls.received.append(msg.data),
+            10)
+
+        cls.pub = cls.node.create_publisher(String, '/sailing_state', 10)
+
+        # Give the tack node (started externally) time to come up
+        time.sleep(0.2)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.node.destroy_node()
+        rclpy.shutdown()
+
+    def test_tack_rudder_published(self):
+        """Publishing switch_to_stbd_tack should produce a tack_rudder value."""
+        msg = String()
+        msg.data = 'switch_to_stbd_tack'
+        deadline = time.time() + 2.0
+        while time.time() < deadline:
+            self.pub.publish(msg)
+            rclpy.spin_once(self.node, timeout_sec=0.1)
+            if self.received:
+                break
+
+        self.assertTrue(
+            len(self.received) > 0,
+            'No tack_rudder message received within 2 seconds')
+        self.assertEqual(self.received[0], 90.0)
+
 
 if __name__ == '__main__':
-    rostest.rosrun(PKG, NAME, TestOnShutdown, sys.argv)
+    unittest.main()
+

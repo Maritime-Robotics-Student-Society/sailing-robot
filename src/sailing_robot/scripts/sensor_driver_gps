@@ -33,7 +33,7 @@ except ImportError:
 
 BAUD_RATE = 9600
 READ_TIMEOUT = 0.5
-FILENAME_BASE = '~/sailing-robot/gps-raw-nmea_{}_{}\'
+FILENAME_BASE = '~/sailing-robot/gps-raw-nmea_{}_{}'
 I2C_ADDRESS = 0x42
 
 
@@ -101,7 +101,7 @@ class SensorDriverGps(Node):
                 data = b''
                 for _ in range(64):
                     char = chr(self.i2c_bus.read_byte(I2C_ADDRESS))
-                    if char != '\xff':
+                    if char != chr(0xff):
                         data += char.encode()
             elif hasattr(self, 'serial_port') and self.serial_port:
                 data = self.serial_port.read(64)

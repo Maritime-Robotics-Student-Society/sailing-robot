@@ -1,7 +1,7 @@
 """Common navigation machinery used by different modules"""
 
 import math
-from LatLon import LatLon
+from LatLon23 import LatLon
 from pyproj import Proj
 from shapely.geometry import Point, Polygon
 

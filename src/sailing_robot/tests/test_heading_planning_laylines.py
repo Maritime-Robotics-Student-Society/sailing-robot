@@ -1,5 +1,4 @@
 import unittest
-from nose.tools import assert_equal
 
 from shapely.geometry import Point
 from sailing_robot.heading_planning_laylines import HeadingPlan, LAYLINE_EXTENT

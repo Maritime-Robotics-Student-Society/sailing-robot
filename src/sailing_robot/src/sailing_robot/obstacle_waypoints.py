@@ -1,5 +1,5 @@
 """Code for staying near a target point (2016 station keeping challenge)"""
-from LatLon import LatLon
+from LatLon23 import LatLon
 from shapely.geometry import Point
 import time
 

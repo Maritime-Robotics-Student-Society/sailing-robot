@@ -6,7 +6,7 @@ integrates with ROS to publish logging and debugging topics.
 
 from __future__ import print_function
 
-from LatLon import LatLon
+from LatLon23 import LatLon
 import time
 import types
 
