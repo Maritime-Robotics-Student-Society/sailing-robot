@@ -1,54 +1,62 @@
-#!/usr/bin/python
-# READY FOR MIT
+#!/usr/bin/env python3
 
 import collections
-import rospy
+import rclpy
+from rclpy.node import Node
 from std_msgs.msg import Float32, Float64
+
 from sailing_robot.navigation import angle_average
 
 
-
-class Wind_direction_average():
+class WindDirectionAverage(Node):
     def __init__(self):
-        self.wind_direction_average_pub = rospy.Publisher('wind_direction_average', Float32, queue_size=10)
+        super().__init__('sensor_processed_wind_direction')
 
-        rospy.init_node("sensor_processed_wind_direction", anonymous=True)
-        rospy.Subscriber('heading', Float32, self.update_heading)
-        self.heading = 0
-        rospy.Subscriber('wind_direction_apparent', Float64, self.update_wind_direction_apparent)
-        self.wind_direction_apparent = 0
+        self.declare_parameter('config.rate', 10)
+        self.declare_parameter('wind.trend_average_time', 5.0)
 
-        sensor_rate = rospy.get_param("config/rate")
-        self.rate = rospy.Rate(sensor_rate)
-        AVE_TIME = rospy.get_param("wind/trend_average_time")   # lengh of the averaging in seconds
-        AVE_SIZE = int(AVE_TIME * sensor_rate)                        # size of the averaging sample
-        self.average_list = collections.deque(maxlen = AVE_SIZE)
-        self.wind_direction_average_publisher()
+        sensor_rate = self.get_parameter('config.rate').value
+        ave_time = self.get_parameter('wind.trend_average_time').value
+        ave_size = int(ave_time * sensor_rate)
 
+        self.heading = 0.0
+        self.wind_direction_apparent = 0.0
+        self.average_list = collections.deque(maxlen=ave_size)
+
+        self.wind_direction_average_pub = self.create_publisher(
+            Float32, 'wind_direction_average', 10)
+        self.create_subscription(Float32, 'heading', self.update_heading, 10)
+        self.create_subscription(Float64, 'wind_direction_apparent',
+                                 self.update_wind_direction_apparent, 10)
+
+        self.timer = self.create_timer(1.0 / sensor_rate, self.publish_wind_direction_average)
 
     def update_heading(self, msg):
         self.heading = msg.data
 
-
     def update_wind_direction_apparent(self, msg):
         self.wind_direction_apparent = msg.data
 
+    def publish_wind_direction_average(self):
+        wind_direction = (self.wind_direction_apparent + self.heading) % 360
+        self.average_list.append(wind_direction)
+        wind_direction_average = angle_average(list(self.average_list))
+        msg = Float32()
+        msg.data = float(wind_direction_average)
+        self.wind_direction_average_pub.publish(msg)
 
-    def wind_direction_average_publisher(self):
 
-        while not rospy.is_shutdown():
-            wind_direction = (self.wind_direction_apparent + self.heading) % 360
-
-            self.average_list.append(wind_direction)
-
-            wind_direction_average = angle_average(list(self.average_list))
-            self.wind_direction_average_pub.publish(wind_direction_average)
-
-            self.rate.sleep()
+def main(args=None):
+    rclpy.init(args=args)
+    node = WindDirectionAverage()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        Wind_direction_average()
-    except rospy.ROSInterruptException:
-        pass
+    main()

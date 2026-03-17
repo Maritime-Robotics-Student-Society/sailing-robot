@@ -1,60 +1,83 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Control the rudder servo
 
 Subscribes: rudder_control (Int16)
 """
 import time
-import pigpio
-import rospy
-from std_msgs.msg import UInt16, Int16
-import numpy as np
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Int16
 
-rudderdata = rospy.get_param('rudder')
-rudderservo_PWM_offset = rudderdata['PWMoffset']
-rudderservo_lower_limits = rudderdata['servolowerlimits']
-rudderservo_higher_limits = rudderdata['servohigherlimits']
-rudderservo_netural_point = (rudderservo_lower_limits +
-                             rudderservo_higher_limits) / 2
-rudderservo_range = (rudderservo_higher_limits - rudderservo_lower_limits)
+try:
+    import pigpio
+    PIGPIO_AVAILABLE = True
+except ImportError:
+    PIGPIO_AVAILABLE = False
 
-PIN = rospy.get_param('rudder/pin')
 
-def setup():
-    pi = pigpio.pi()
-    pi.set_mode(13, pigpio.OUTPUT) # GPIO 13/RPi PIN 33 as rudder servo pin
+class ActuatorDriverRudder(Node):
+    def __init__(self):
+        super().__init__('actuator_driver_rudder')
 
-def rudderservoPWMcontrol(data):
-    """This function takes in the /rudder_control (90 to -90) value and directly write PWM signal to the rudder servo. Netural point was determined by the start and end points. rudderservoPWMoffset is used for software level trim. """
-    degrees = data.data
-    pwm = rudderservo_range*(-1.0*degrees)/90 + rudderservo_netural_point +\
-         rudderservo_PWM_offset
-    pi.set_servo_pulsewidth(PIN, pwm)
+        self.declare_parameter('rudder.PWMoffset', 0.0)
+        self.declare_parameter('rudder.servolowerlimits', 1000.0)
+        self.declare_parameter('rudder.servohigherlimits', 2000.0)
+        self.declare_parameter('rudder.maxAngle', 40.0)
+        self.declare_parameter('rudder.pin', 13)
+        self.declare_parameter('do_post', False)
 
-def post():
-    '''Power-On Self Test'''
-    if not rospy.get_param('do_post', False):
-        return
+        self.pwm_offset = self.get_parameter('rudder.PWMoffset').value
+        self.lower_limits = self.get_parameter('rudder.servolowerlimits').value
+        self.higher_limits = self.get_parameter('rudder.servohigherlimits').value
+        self.neutral = (self.lower_limits + self.higher_limits) / 2
+        self.range = self.higher_limits - self.lower_limits
+        self.pin = self.get_parameter('rudder.pin').value
+        do_post = self.get_parameter('do_post').value
 
-    rospy.logwarn('rudder test: lower limit')
-    for _ in range(4):
-        pi.set_servo_pulsewidth(PIN, rudderservo_netural_point)
-        time.sleep(0.25)
-        pi.set_servo_pulsewidth(PIN, rudderservo_lower_limits)
-        time.sleep(0.25)
+        if PIGPIO_AVAILABLE:
+            self.pi = pigpio.pi()
+            self.pi.set_mode(self.pin, pigpio.OUTPUT)
+            if do_post:
+                self.post()
+        else:
+            self.pi = None
+            self.get_logger().warn('pigpio not available - running in simulation mode')
 
-    rospy.logwarn('rudder test: higher limit')
-    for _ in range(4):
-        pi.set_servo_pulsewidth(PIN, rudderservo_netural_point)
-        time.sleep(0.25)
-        pi.set_servo_pulsewidth(PIN, rudderservo_higher_limits)
-        time.sleep(0.25)
+        self.create_subscription(Int16, 'rudder_control', self.rudder_servo_pwm_control, 10)
+
+    def rudder_servo_pwm_control(self, data):
+        degrees = data.data
+        pwm = self.range * (-1.0 * degrees) / 90 + self.neutral + self.pwm_offset
+        if self.pi:
+            self.pi.set_servo_pulsewidth(self.pin, pwm)
+
+    def post(self):
+        self.get_logger().warn('rudder test: lower limit')
+        for _ in range(4):
+            self.pi.set_servo_pulsewidth(self.pin, self.neutral)
+            time.sleep(0.25)
+            self.pi.set_servo_pulsewidth(self.pin, self.lower_limits)
+            time.sleep(0.25)
+
+        self.get_logger().warn('rudder test: higher limit')
+        for _ in range(4):
+            self.pi.set_servo_pulsewidth(self.pin, self.neutral)
+            time.sleep(0.25)
+            self.pi.set_servo_pulsewidth(self.pin, self.higher_limits)
+            time.sleep(0.25)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = ActuatorDriverRudder()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
 
 if __name__ == '__main__':
-    pi = pigpio.pi()
-    post()
-    try:
-        rospy.init_node('actuator_driver_servos', anonymous=True)
-        rospy.Subscriber('rudder_control', Int16, rudderservoPWMcontrol)
-        rospy.spin()
-    except rospy.ROSInterruptException:
-        pass
+    main()

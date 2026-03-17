@@ -1,51 +1,74 @@
-#!/usr/bin/env python
-"""Read whether the servos are being remotely control.
+#!/usr/bin/env python3
+"""Read whether the servos are being remotely controlled.
 
 Publishes: remote_control (Bool)
 """
-import rospy
-from std_msgs.msg import Bool
-import pigpio
 import time
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Bool
 
-# GPIO 22/RPi PIN 15 as multiplexer connection
-GPIO = rospy.get_param('multiplexer/gpio', default=22)
+try:
+    import pigpio
+    PIGPIO_AVAILABLE = True
+except ImportError:
+    PIGPIO_AVAILABLE = False
 
-# Reading PWMs: we set up callbacks for the edges of the pulse (tick and tock).
-# The time between when they are called, in microseconds, is the pulse width.
 
-last_tick = 0
-last_interval = 0
-last_pulse_time = 0
+class SensorDriverMultiplexer(Node):
+    def __init__(self):
+        super().__init__('sensor_driver_multiplexer')
 
-def tick(gpio, level, tick):
-    global last_tick
-    last_tick = tick
+        self.declare_parameter('multiplexer.gpio', 22)
+        self.declare_parameter('config.rate', 10)
 
-def tock(gpio, level, tick):
-    global last_interval, last_pulse_time
-    last_interval = tick - last_tick
-    last_pulse_time = time.time()
+        self.gpio = self.get_parameter('multiplexer.gpio').value
+        rate_hz = self.get_parameter('config.rate').value
+
+        self.last_tick = 0
+        self.last_interval = 0
+        self.last_pulse_time = 0.0
+
+        self.pub = self.create_publisher(Bool, 'remote_control', 10)
+
+        if PIGPIO_AVAILABLE:
+            self.pi = pigpio.pi()
+            self.pi.set_mode(self.gpio, pigpio.INPUT)
+            self.pi.callback(self.gpio, pigpio.RISING_EDGE, self.tick)
+            self.pi.callback(self.gpio, pigpio.FALLING_EDGE, self.tock)
+        else:
+            self.pi = None
+            self.get_logger().warn('pigpio not available - running in simulation mode')
+
+        self.timer = self.create_timer(1.0 / rate_hz, self.publish_remote_control)
+
+    def tick(self, gpio, level, tick):
+        self.last_tick = tick
+
+    def tock(self, gpio, level, tick):
+        self.last_interval = tick - self.last_tick
+        self.last_pulse_time = time.time()
+
+    def publish_remote_control(self):
+        msg = Bool()
+        if time.time() - self.last_pulse_time > 0.1:
+            msg.data = False
+        else:
+            msg.data = self.last_interval > 1500
+        self.pub.publish(msg)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = SensorDriverMultiplexer()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
 
 if __name__ == '__main__':
-    pi = pigpio.pi();
-    pi.set_mode(GPIO, pigpio.INPUT)
-    try:
-        rospy.init_node("sensor_driver_multiplexer", anonymous=True)
-        pub = rospy.Publisher('remote_control', Bool, queue_size=10)
-        rate = rospy.Rate(rospy.get_param("config/rate"))
-
-        pi.callback(GPIO, pigpio.RISING_EDGE, tick)
-        pi.callback(GPIO, pigpio.FALLING_EDGE, tock)
-
-        while not rospy.is_shutdown():
-            if time.time() - last_pulse_time > 0.1:
-                # No recent pulse: RC off or connection lost
-                pub.publish(False)
-            else:
-                # Long pulse means RC overrides raspberry pi. 1500 us cutoff
-                pub.publish(last_interval > 1500)
-            rate.sleep()
-
-    except rospy.ROSInterruptException:
-        pass
+    main()

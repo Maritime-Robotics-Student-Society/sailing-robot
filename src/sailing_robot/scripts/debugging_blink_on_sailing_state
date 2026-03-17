@@ -1,49 +1,47 @@
-#!/usr/bin/python
-# READY FOR MIT
-"""
-Blink LEDs to indicate sailing state
-\n
-Publishes: messages that encode a colour in an Int32
-\n
-Subscribes: sailing state
-"""
+#!/usr/bin/env python3
 
-import rospy
+import rclpy
+from rclpy.node import Node
 from std_msgs.msg import Int32, String
 
 
-class Blink_on_sailing_state():
+class BlinkOnSailingState(Node):
     def __init__(self):
-        self.led_blink = rospy.Publisher('led_blink', Int32, queue_size=10)
+        super().__init__('debugging_blink_on_sailing_state')
 
-        rospy.init_node("debugging_blink_on_sailing_state", anonymous=True)
-        rospy.Subscriber('sailing_state', String, self.update_sailing_state)
-        self.sailing_state = "normal"
-        self.rate = rospy.Rate(rospy.get_param("config/rate"))
-        self.blink_publisher()
+        self.declare_parameter('config.rate', 10)
+        rate_hz = self.get_parameter('config.rate').value
 
+        self.sailing_state = 'normal'
+        self.led_blink = self.create_publisher(Int32, 'led_blink', 10)
+        self.create_subscription(String, 'sailing_state', self.update_sailing_state, 10)
+
+        self.timer = self.create_timer(1.0 / rate_hz, self.blink_publisher)
 
     def update_sailing_state(self, msg):
         self.sailing_state = msg.data
 
-
     def blink_publisher(self):
+        msg = Int32()
+        if self.sailing_state == 'switch_to_port_tack':
+            msg.data = 255 * 300 * 300  # red
+            self.led_blink.publish(msg)
+        elif self.sailing_state == 'switch_to_stbd_tack':
+            msg.data = 255 * 300  # green
+            self.led_blink.publish(msg)
 
-        while not rospy.is_shutdown():
 
-            if self.sailing_state == "switch_to_port_tack":
-                color = 255*300*300 # red
-                self.led_blink.publish(color)
-
-            elif self.sailing_state == "switch_to_stbd_tack":
-                color = 255*300 # green
-                self.led_blink.publish(color)
-
-            self.rate.sleep()
+def main(args=None):
+    rclpy.init(args=args)
+    node = BlinkOnSailingState()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':
-    try:
-        Blink_on_sailing_state()
-    except rospy.ROSInterruptException:
-        pass
+    main()
